@@ -1,276 +1,275 @@
-import { Pressable, StyleSheet, Text, TextInput, View,ScrollView, ImageBackground } from "react-native";
-import React, { use, useState } from "react";
-import { Ionicons } from '@expo/vector-icons'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import Danger from '../Modules/danger'
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Danger from "../Modules/danger";
 
-const adddata = () => {
+const AddData = () => {
+  const [showPicker, setShowPicker] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
 
-  const [close,setclosde]=useState(0)
-  const [other,setother]=useState(0)
-  const [item,setitem]=useState('')
-  const [income,setincome]=useState('income')
-    const [date, setDate] = useState(new Date())
-  const [show, setShow] = useState(false)
-  const [amm,setamm]=useState('')
-  const [desc,setdesc]=useState('')
-const [expenss,setexpenss]=useState('expenss')
-const [error,seterror]=useState('')
-const [due,setdue]=useState('due data')
-  const onChange = (event, selectedDate) => {
-    setShow(false)
-    if (selectedDate) {
-      setDate(selectedDate)
-    }
-  }
-  
+  const [date, setDate] = useState(new Date());
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const [desc, setDesc] = useState("");
+  const [error, setError] = useState("");
 
-  const food='food 🍴'
-  const shopping='salary 💸'
-  const traveling='traveling 🧳'
-  const household='household 🏠'
-  const spoort='sports 🥎'
-  const other2='other '
+  const categories = [
+    "Food 🍔",
+    "Salary 💰",
+    "Travel ✈️",
+    "House 🏠",
+    "Sports 🏀",
+    "Other 📦",
+  ];
 
-
-
-  const main=()=>{
-    setclosde(0)
-    setitem(food)
-  }
-
-  const datefatch=(yes)=>{
-    if(date=="" || amm==""||item==""||desc=="")
-    {
-      
-         alert('Enter A valid Data ❌')
-       
-    }
-    else{
-    console.log(date)
-    console.log(amm)
-    console.log(item)
-    console.log(desc)
-    console.log(yes)
-
-    seterror('data enterd succesfully')
-       setTimeout(() => {
-        seterror('')
-    }, 2000);
+  const submit = (type) => {
+    if (!amount || !category || !desc) {
+      setError("Please fill all fields ❌");
+      setTimeout(() => setError(""), 2000);
+      return;
     }
 
-    setDate(new Date())
-    setamm('')
-    setdesc('')
-    setitem('')
+    console.log({
+      type,
+      date,
+      amount,
+      category,
+      desc,
+    });
 
- 
-  }
+    setError("Data saved successfully ✅");
+    setTimeout(() => setError(""), 2000);
 
+    setAmount("");
+    setCategory("");
+    setDesc("");
+  };
 
- 
-   
   return (
-      
-    <ImageBackground source={require('../../assets/ChatGPT Image Jan 21, 2026, 07_34_58 PM.png')} style={{flex:1}}>
-        {error?<Danger errror={error}/>:''}
-      <View style={[styles.addincomeexpensse,close===2 && {opacity:0.5}]} >
-        <View style={styles.text1}>
-          <Text style={styles.innertext}>income & expenss</Text>
-        </View>
-        <View style={styles.inputs}>
-          <Pressable onPress={() => setShow(true)} style={[styles.inp,{display:'flex',flexDirection:"row"}]}>
-  <Text style={{paddingTop:25}}>{date.toLocaleDateString()}</Text>
-    <Ionicons name="calendar" style={{position:'relative',left:220,top:26}} size={18}></Ionicons>
-</Pressable>
+    <ImageBackground
+      // source={require("../../assets/ChatGPT Image Jan 21, 2026, 07_34_58 PM.png")}
+      style={styles.bg}
+    >
 
-          
-      {show && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          onChange={onChange}
-        />
-      )}
-          <TextInput style={styles.inp} placeholder="2000" keyboardType="numeric" value={amm} onChangeText={setamm}></TextInput>
+      {/* HEADER */}
+      <Text style={styles.title}>Add Income / Expense</Text>
+
+      {/* CARD */}
+      <View style={styles.card}>
+        {/* DATE */}
+        <Pressable style={styles.inputRow} onPress={() => setShowPicker(true)}>
+          <Ionicons name="calendar-outline" size={20} color="#0a63bc" />
+          <Text style={styles.inputText}>{date.toDateString()}</Text>
+        </Pressable>
+
+        {showPicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            onChange={(e, d) => {
+              setShowPicker(false);
+              d && setDate(d);
+            }}
+          />
+        )}
+
+        {/* AMOUNT */}
+        <View style={styles.inputRow}>
+          <Ionicons name="cash-outline" size={20} color="#0a63bc" />
           <TextInput
-            style={styles.inp}
-            placeholder="Food,Traveling,shopping"
-            onPress={()=>setclosde(2)}
-          >
-            <Text>{item}</Text>
-          </TextInput>
+            placeholder="Amount"
+            keyboardType="numeric"
+            style={styles.input}
+            value={amount}
+            onChangeText={setAmount}
+          />
+        </View>
+
+        {/* CATEGORY */}
+        <Pressable
+          style={styles.inputRow}
+          onPress={() => setShowCategory(true)}
+        >
+          <Ionicons name="apps-outline" size={20} color="#0a63bc" />
+          <Text style={styles.inputText}>
+            {category || "Select Category"}
+          </Text>
+        </Pressable>
+        
+
+        {/* DESCRIPTION */}
+        <View style={styles.inputRow}>
+          <Ionicons name="document-text-outline" size={20} color="#0a63bc" />
           <TextInput
-            style={styles.inp}
-            placeholder="Description For Income Or Expenss"
+            placeholder="Description"
+            style={styles.input}
             value={desc}
-            onChangeText={setdesc}
-          ></TextInput>
-          <View style={styles.mainbtn}>
-            <Pressable style={[styles.btn, { backgroundColor: "#0a63bc" },close==10 && {backgroundColor:'#0b42b9'}]} onPress={()=>datefatch(income)}
-             onPressIn={()=>setclosde(10)} onPressOut={()=>setclosde(0)} >
-              <Text
-                style={{
-                  color: "white",
-                  textTransform: "capitalize",
-                  fontFamily: "serif",
-                  fontSize: 16,
-                }}
-              >
-                {income}
-              </Text>
-            </Pressable>
-            <Pressable style={[styles.btn, { backgroundColor: "#ff0303c2" },close==11 && {backgroundColor:'#ff0000'}]} onPress={()=>datefatch(expenss)}  onPressIn={()=>setclosde(11)} onPressOut={()=>setclosde(0)}  >
-              <Text
-                style={{
-                  color: "white",
-                  textTransform: "capitalize",
-                  fontFamily: "serif",
-                  fontSize: 16,
-                }}
-              >
-                Expenss
-              </Text>
-            </Pressable>
-          </View>
-           <Pressable style={[styles.btn, { backgroundColor: "#1343ace3",width:250,position:'relative',left:35,top:20 },close==12 && {backgroundColor:'#1343acc0'}]} onPress={()=>datefatch(due)} onPressIn={()=>setclosde(12)} onPressOut={()=>setclosde(0)}  >
-              <Text
-                style={{
-                  color: "white",
-                  textTransform: "capitalize",
-                  fontFamily: "serif",
-                  fontSize: 16,
-                  width:200,
-                }}
-              >
-                Add data for due pyment
-              </Text>
-            </Pressable>
+            onChangeText={setDesc}
+          />
         </View>
+
+        {/* BUTTONS */}
+        <View style={styles.row}>
+          <Pressable
+            style={[styles.btn, styles.income]}
+            onPress={() => submit("income")}
+          >
+            <Text style={styles.btnText}>Income</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.btn, styles.expense]}
+            onPress={() => submit("expense")}
+          >
+            <Text style={styles.btnText}>Expense</Text>
+          </Pressable>
+        </View>
+
+        <Pressable
+          style={[styles.btn, styles.due]}
+          onPress={() => submit("due")}
+        >
+          <Text style={styles.btnText}>Add Due Payment</Text>
+        </Pressable>
       </View>
-        <View style={[{position:'absolute'}]}>
-      {/* <Category cat={cat(yes)}/> */}
-         <View style={[styles.main,close==2 && {display:'block'}]} >
-            <View style={styles.text}>
-          <Text style={{color:'black',fontSize:18,textTransform:'capitalize',textAlign:'center'}}>select category</Text>
-          <Ionicons name='close' size={20} style={{position:'relative',left:40}} onPress={()=>setclosde(0)} ></Ionicons>
-          </View>
-           <ScrollView style={{display:'flex',flexDirection:'column',height:150}}>
-          <Pressable style={[]} onPressIn={()=>setother(3)} onPressOut={()=>setother(0)} onPress={()=>main()}>
-            <Text style={[styles.cat,other===3 && {backgroundColor:'#3e62ffda'}]}>{food}</Text></Pressable>  
-                      <Pressable style={[]} onPressIn={()=>setother(4)} onPressOut={()=>setother(0)} onPress={()=>{[setclosde(0), setitem(shopping)]}}>
 
-            <Text style={[[styles.cat,other===4 && {backgroundColor:'#3e62ffda'}]]}>{shopping}</Text></Pressable>
-                      <Pressable style={[]} onPressIn={()=>setother(5)} onPressOut={()=>setother(0)} onPress={()=>{[setclosde(0),setitem(traveling)]}}>
-
-            <Text style={[styles.cat,other===5 && {backgroundColor:'#3e62ffda'}]}>{traveling}</Text></Pressable>
-                      <Pressable style={[]} onPressIn={()=>setother(6)} onPressOut={()=>setother(0)} onPress={()=>{[setclosde(0),setitem(household)]}}>
-
-            <Text style={[styles.cat,other===6 && {backgroundColor:'#3e62ffda'}]}>{household}</Text></Pressable>
-                      <Pressable style={[]} onPressIn={()=>setother(7)} onPressOut={()=>setother(0)} onPress={()=>{[setclosde(0),setitem(spoort)]}}>
-
-            <Text style={[styles.cat,other===7 && {backgroundColor:'#3e62ffda'}]}>{spoort}</Text></Pressable>
-                      <Pressable style={[]} onPressIn={()=>setother(8)} onPressOut={()=>setother(0)} onPress={()=>{[setclosde(0),setitem(other2)]}}>
-
-            <Text style={[styles.cat,{marginBottom:2},other===8 && {backgroundColor:'#3e62ffda'}]}>{other2}</Text></Pressable>
-           </ScrollView>
+      {/* CATEGORY MODAL */}
+      {showCategory && (
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>Select Category</Text>
+          <ScrollView>
+            {categories.map((item, i) => (
+              <Pressable
+                key={i}
+                style={styles.cat}
+                onPress={() => {
+                  setCategory(item);
+                  setShowCategory(false);
+                }}
+              >
+                <Text style={styles.catText}>{item}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
       
-          </View>
-      </View> 
     </ImageBackground>
   );
 };
 
-export default adddata;
+export default AddData;
 
 const styles = StyleSheet.create({
-  addincomeexpensse: {
-    // backgroundColor:'red',
-    height: 760,
-    width: 370,
-    marginLeft: 0,
-    
+  bg: {
+    flex: 1,
+    padding: 20,
   },
-  text1: {
-    height: 40,
-    marginTop:40,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  innertext: {
-    fontSize: 20,
-    fontFamily: "serif",
-    textTransform: "capitalize",
-    // backgroundColor:'yellow',
-    width:200,
+
+  title: {
+    fontSize: 22,
+    fontWeight: "600",
     textAlign: "center",
+    marginVertical: 20,
   },
-  inputs: {
-    // backgroundColor:'green',
-    height: 335,
-    width: 330,
-    marginLeft:15
+
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 20,
+    elevation: 6,
+    height: "57%",
   },
-  inp: {
-    borderBottomWidth: 1,
-    fontSize: 15,
-    borderColor: "#2a74e2ff",
-    fontFamily: "Gill Sans",
-    height: 65,
-    textTransform: "capitalize",
-  },
-  mainbtn: {
-    display: "flex",
+
+  inputRow: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    gap: 30,
-    paddingTop: 30,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderColor: "#e0e0e0",
+    paddingVertical: 14,
   },
+
+  input: {
+    flex: 1,
+    fontSize: 15,
+  },
+
+  inputText: {
+    fontSize: 15,
+    color: "#555",
+  },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 25,
+  },
+
   btn: {
-    height: 40,
-    width: 150,
-    display: "flex",
+    height: 45,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
-    elevation:5,
-    shadowColor:'red'
+    flex: 1,
+    marginHorizontal: 5,
   },
-      main:{
-        backgroundColor:'white',
-        position:'absolute',
-        height:300,
-        width:250,
-        margin:50,
-        marginTop:200,
-        borderRadius:20,
-        display:'none'
-        },
-        text:{
-     
-          height:45,
-          display:'flex',
-          justifyContent:'center',
-          flexDirection:'row',
-          alignItems:'center',
-          width:250,
-          paddingTop:0,
-          backgroundColor:'#2c59d68a',
-          borderTopLeftRadius:20,
-          borderTopRightRadius:20,
-          
 
-        },
-        cat:{
-         paddingTop:10,
-          marginTop:40,
-          height:40,textAlign:'center',
-          fontFamily:'serif',
-          textTransform:'uppercase',
+  income: {
+    backgroundColor: "#0a63bc",
+  },
 
-          
-        }
+  expense: {
+    backgroundColor: "#ff3b3b",
+  },
+
+  due: {
+    backgroundColor: "#1343ac",
+    marginTop: 15,
+    height:0
+  },
+
+  btnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+
+  modal: {
+    position:'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius:20,
+    padding: 20,
+    elevation: 10,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+    textAlign: "center",
+  
+  },
+
+  cat: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
+
+  catText: {
+    fontSize: 16,
+  },
 });

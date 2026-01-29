@@ -71,25 +71,26 @@ const headr = () => {
       ];
       
   return (
-    <ImageBackground source={require('../../assets/ChatGPT Image Jan 21, 2026, 07_34_58 PM.png')} resizeMode='cover' style={{flex:1,alignItems:'center'}}>
+    <View style={{alignItems:'center',backgroundColor:''}}>
       
         <View style={styles.chartsText}>
             <Text style={{fontSize:20,fontFamily:'sens-serif',color:'white',textShadowColor:'grey',textShadowRadius:20}}>Transction charts</Text>
             </View>
             <View style={styles.PieChart}>
-              <PieChart cover={0.45} widthAndHeight={widthAndHeight } series={series} style={{marginTop:-30,marginLeft:20}}></PieChart>
+              <PieChart cover={0.45} widthAndHeight={widthAndHeight } series={series} style={{marginTop:-30,marginLeft:20,
+                backgroundColor:'white',elevation:15,borderRadius:100}}></PieChart>
                 <View style={{display:'flex',flexDirection:'column',margin:5,height:80}}>
               {series.map((i,key)=>(
                     <View style={{display:'flex',flexDirection:'row'}}>
                     <View style={{height:8,width:10,backgroundColor:`${i.color}`}}>
                       </View>
-                           <Text style={{fontSize:14,color:'white',marginTop:-3,height:30,fontFamily:'serif',textTransform:'capitalize',width:80}}>   {i.label}</Text>
+                           <Text style={{fontSize:14,color:'',marginTop:-3,height:30,fontFamily:'serif',textTransform:'capitalize',width:80}}>  {i.label}</Text>
                         </View>
                     
               ))}
             </View>
             </View> 
-              <Text style={{position:'relative',top:-60,textTransform:'capitalize',width:345,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
+              <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:345,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
                 textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,}}>
                 pai chrats of category</Text>
             <View>
@@ -102,10 +103,10 @@ const headr = () => {
     />
             </View>
               <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:345,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
-                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,left:2}}>
+                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,left:2.5}}>
                 pai chrats of category</Text>
 </View>
-    </ImageBackground>
+    </View>
     
   )
 }

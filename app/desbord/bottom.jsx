@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons,MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 
@@ -8,75 +8,30 @@ const bottom = () => {
   return (
     <View>
          <View style={styles.footer}>
-          <View style={styles.innerfooter}>
-        <Ionicons
-          name="home"
-          size={26}
-          color={"white"}
-          marginTop={-30}
-        >
-          <Text>{'\n'}</Text>
-          <Text style={styles.fonts}>Home</Text>
+          <Pressable style={styles.foot} onPress={()=>router.push('../desbord')} >
+            <MaterialIcons name="home-filled" size={26} color="white" />
+            <Text style={styles.fonts}>Home</Text>
+          </Pressable>
           
-        
-        </Ionicons>
-        </View>                 
-         <View style={styles.innerfooter}>
-        <Ionicons
-        onPress={()=>router.push("../charts/headr")}
-          name="stats-chart"
-          size={26}
-          color={"white"}
-          marginTop={-30}
-          
-        >
-          <Text>{'\n'}</Text>
-          <Text style={styles.fonts}>Stats</Text>
-        </Ionicons>
-        </View>
-        <Ionicons
-          onPress={() => router.push("./adddata")}
-          name="add"
-          size={46}
-          style={{
-            position: "relative",
-            top: -40,
-            backgroundColor: "#0a63bcd5",
-            color: "white",
-            borderRadius: 50,
-            borderColor: "white",
-            borderWidth: 2,
-          }}
-        >
-          
-        </Ionicons>
-        </View>
-          <View style={styles.innerfooter}>
-        <Ionicons
-          name="wallet"
-          size={26}
-          color={"white"}
-          marginTop={-30}
-        >
-          <Text>{'\n'}</Text>
-          <Text style={styles.fonts}>due Entry</Text>
-        </Ionicons>
-        </View>
-          <View style={styles.innerfooter}>
-        <Ionicons
-          name="settings"
-          size={26}
-          color={"white"}
-          marginTop={-30}
-        >
-          <Text>{'\n'}</Text>
-          <Text style={styles.fonts}>Setting</Text>
-        </Ionicons>
-      </View>
-      <View>
-        </View>
-      </View>
- 
+            <Pressable style={styles.foot} onPress={()=>router.push('../charts/headr')}>
+              <Ionicons name="stats-chart" size={26} color="white" />
+              <Text style={styles.fonts}>Stats</Text>
+            </Pressable>
+              <Pressable style={styles.addbtn} onPress={()=>router.push('../desbord/adddata')}>
+              <Ionicons name="add" size={60} color="white" style={styles.addbtns} />  
+
+            </Pressable>
+            <View style={styles.foot}>
+              <Ionicons name="time" size={26} color="white" />
+              <Text style={styles.fonts}>Due</Text>
+            </View>
+             <View style={styles.foot}>
+              <Ionicons name="settings-sharp" size={26} color="white" />
+              <Text style={styles.fonts}>Setting</Text>
+            </View>
+                        </View>
+
+ </View>
   )
 }
 
@@ -90,13 +45,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+
   },
   fonts:{
-    fontSize:15,
+    fontSize:12,
+    textTransform:'capitalize',
+    color:'white',fontFamily:'serif'
   },
-  innerfooter:{
-    backgroundColor:'yellow',
-    
+  foot:{
+    justifyContent:'center',alignItems:'center',marginTop:-30
+  },
+  addbtn:{
+        marginTop:-90,
+    borderColor:'white',
+    borderWidth:7,
+    borderRadius:50,
+    backgroundColor:'#0a63bc',
+    elevation:10
+  },
+  addbtns:{
+
   }
 
 })
