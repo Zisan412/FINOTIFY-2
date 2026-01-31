@@ -21,14 +21,14 @@ const bottom = () => {
               <Ionicons name="add" size={60} color="white" style={styles.addbtns} />  
 
             </Pressable>
-            <View style={styles.foot}>
+            <Pressable style={styles.foot} onPress={()=>router.push('../DuePyment/due')}>
               <Ionicons name="time" size={26} color="white" />
               <Text style={styles.fonts}>Due</Text>
-            </View>
-             <View style={styles.foot}>
+            </Pressable>
+             <Pressable style={styles.foot} onPress={()=>router.push('../Usersetting/setting')}>
               <Ionicons name="settings-sharp" size={26} color="white" />
               <Text style={styles.fonts}>Setting</Text>
-            </View>
+            </Pressable>
                         </View>
 
  </View>

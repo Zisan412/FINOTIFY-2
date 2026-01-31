@@ -63,7 +63,7 @@ const Items = ({ datas }) => {
 };
 
 export default Items;
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     paddingBottom: 20,
     height:450

@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Danger from "../Modules/danger";
+import { router } from "expo-router";
 
 const AddData = () => {
   const [showPicker, setShowPicker] = useState(false);
@@ -114,6 +115,7 @@ const AddData = () => {
             style={styles.input}
             value={desc}
             onChangeText={setDesc}
+            multiline
           />
         </View>
 
@@ -134,18 +136,20 @@ const AddData = () => {
           </Pressable>
         </View>
 
-        <Pressable
-          style={[styles.btn, styles.due]}
-          onPress={() => submit("due")}
+      
+      </View>
+          <Pressable
+          style={[ styles.due]}
+          onPress={() => {submit("due") ,router.push('../DuePyment/addduepy')}}
         >
           <Text style={styles.btnText}>Add Due Payment</Text>
+          <Ionicons name="add-outline" size={18} color="#fff" />
         </Pressable>
-      </View>
-
       {/* CATEGORY MODAL */}
       {showCategory && (
         <View style={styles.modal}>
           <Text style={styles.modalTitle}>Select Category</Text>
+          <Ionicons name="close-circle-outline" size={24} color="#555" style={{position:'absolute',right:20,top:20}} onPress={()=>setShowCategory(false)}/>
           <ScrollView>
             {categories.map((item, i) => (
               <Pressable
@@ -187,7 +191,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 20,
     elevation: 6,
-    height: "57%",
+    height: "55%",
   },
 
   inputRow: {
@@ -235,7 +239,12 @@ const styles = StyleSheet.create({
   due: {
     backgroundColor: "#1343ac",
     marginTop: 15,
-    height:0
+    height:45,
+    borderRadius:12,
+    justifyContent:'center',
+    alignItems:'center',
+    flexDirection:'row',
+    gap:6,
   },
 
   btnText: {

@@ -1,79 +1,69 @@
-import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
-import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, View,Pressable } from "react-native";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-const income = ({go}) => {
-  const [data, setdata] = React.useState(new Date());
+import { styles } from "./all";
 
-
+const Income = ({ go }) => {
+  const date = new Date();
+  console.log(go)
 
   return (
-    <>
-    <ScrollView style={{ height: 450 }}>
-      {go.map((i, key) => ( 
-        <View>
-          {i.it=='income'?
-          <View style={styles.list}>
-              <View style={styles.innerfirst}>
-                  <Text style={styles.cat}>{i.cat}</Text>
-                  <Text style={styles.amm}><Ionicons name='arrow-up-circle' style={styles.icn} color={'#69df72'} size={20}></Ionicons> ₹{i.amm}</Text>
-                  <Pressable style={styles.delete}>
-                    <Ionicons name='trash-outline' color={'red'} size={20}></Ionicons>
-                  </Pressable>
-                </View>
-                <View style={styles.des}>
-                  <Text style={styles.des}>{i.des}</Text>
-                  </View>
-            </View>
-:<Text></Text>}
-        </View>
+<ScrollView style={styles.container}>
+      {go.map((i, index) => {
+        const isIncome = i.it === "income";
 
-))}
+        return (
+          isIncome  && 
+          <View
+            key={index}
+            style={[
+              styles.card,
+              { borderLeftColor: isIncome && "#2ecc71"  },
+            ]}
+          >
+            {/* Top Row */}
+            <View style={styles.row}>
+              <Text style={styles.category}>{i.cat}</Text>
+
+              <View style={styles.amountBox}>
+                <Ionicons
+                  name={isIncome ? "arrow-up-circle" : "arrow-down-circle"}
+                  size={18}
+                  color={isIncome ? "#2ecc71" : "#e74c3c"}
+                />
+                <Text
+                  style={[
+                    styles.amount,
+                    { color: isIncome ? "#2ecc71" : "#e74c3c" },
+                  ]}
+                >
+                  ₹ {i.amm}
+                </Text>
+                    <Pressable style={{marginLeft:10}}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={20}
+                    color="#ff3232af"
+                  />
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Description */}
+            <Text style={styles.desc}>{i.des}</Text>
+
+            {/* Date */}
+            <Text style={styles.date}>
+              {date.getDate()}{" "}
+              {date.toLocaleString("default", { month: "short" })},{" "}
+              {date.getFullYear()}
+            </Text>
+          </View>
+        );
+      })}
     </ScrollView>
-    </>
   );
-  
 };
 
-export default income;
-
-const styles = StyleSheet.create({
-  list: {
-    elevation:4,
-    borderRadius:20,
-    height: 100,
-    backgroundColor: "white",
-    margin: 10,
-    borderLeftColor:'#69df72',
-    borderLeftWidth:5
-  },
-  innerfirst:{
-    // backgroundColor:'red',
-    height:50,display:'flex',flexDirection:'row',justifyContent:'space-between'
-  },
-  cat:{
-    // backgroundColor:'green',
-    width:'49%',
-    margin:12,
-    fontSize:18,
-    textTransform:'capitalize'
-  },
-  amm:{
-    marginTop:13,
-    color:'#69df72',
-    fontSize:18,
-    fontWeight:800
-  },
-  icn:{
-    
-  },
-  delete:{
-    margin:15
-  },
-  des:{
-    marginLeft:6,
-    fontWeight:100 
-  
-  }
-  
-});
+export default Income;
