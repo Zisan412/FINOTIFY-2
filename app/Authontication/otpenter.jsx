@@ -6,11 +6,13 @@ import Upper from "../Modules/Upper";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/danger";
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 const Otpenter = () => {
-    const [otp,setotp]=useState()
+    const [otp,setotp]=useState('')
   const [press, setpress] = useState(0);
     const [yes,setyes]=useState('')
     const [error,seterror]=useState('')
+  let [timer,settimer]=useState(false)
 
   const sub=()=>{
     if(otp=="")
@@ -20,7 +22,7 @@ const Otpenter = () => {
         seterror('')
       }, 2000)
     }
-    else if(otp!=12345)
+    else if(otp!='12345')
       {
           alert('no match otp')  
     
@@ -31,17 +33,30 @@ const Otpenter = () => {
     
     else{
       router.push('./newpass')
+      settimer(true)
     }
   }
+
+  const timerfun=()=>{
+      if(timer)
+      { 
+        setyes('otp resend successfully')
+        settimer(false)
+      }
+      else{
+          alert('please wait for timer to end')
+      }
+    }
+
+ 
   return (
     <View style={{backgroundColor: "#ffffff", height:'100%' }}>
           {/* TOP IMAGE */}
-          <Image
+          {/* <Image
             source={require("../../assets/Forgget.png")}
             style={styles.container2}
-          />  
-       <Text>{yes}</Text>
-           <View style={{paddingTop:0}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
+          />   */}
+           <View style={{paddingTop:0,marginTop:100}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
                enter code sent on email {'\n'} musabmomin234@gmail.com</Text></View>
       <View style={styles.input}>
                  <View style={{display:'flex',flexDirection:'row',width:'80%',justifyContent:'center',alignItems:'center',borderRadius:14,marginTop:0,elevation:3,backgroundColor:'white'}}>
@@ -55,6 +70,8 @@ const Otpenter = () => {
           placeholder="Enter a otp"
             value={otp}
             onChangeText={setotp}
+            MaxLength={5}
+            autoFocus={true}
             
         ></TextInput>
         </View>
@@ -79,9 +96,36 @@ const Otpenter = () => {
             Submit
           </Text>
         </Pressable>
-       
+       <View style={styles.otpresend}  >
+          {timer==true?
+          <Pressable onPress={()=>timerfun()}>
+          <Text style={{color:'#0a63bcff',fontSize:16,textTransform:'capitalize',width:100}}>resend otp</Text>
+                   </Pressable>
+
+          :
+          
+          <CountdownCircleTimer
+    isPlaying
+
+    duration={15}
+    remainingTime={10}
+    
+    size={50}
+    strokeWidth={6}
+    colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+    colorsTime={[7, 5, 2, 0]}
+    onComplete={() => settimer(true)}
+
+            
+    
+
+  >
+    {({ remainingTime }) => <Text>{remainingTime} :s</Text>
+}
+</CountdownCircleTimer>}
       </View>
 
+    </View>
     </View>
   );
 };
@@ -139,5 +183,14 @@ const styles = StyleSheet.create({
     color: "white",
     textTransform: "capitalize",
     width: 190,
+  },
+  otpresend:{
+    paddingTop:0,
+    height:70,
+    alignItems:'center',
+    justifyContent:'center',
+    width:'50%',  
+      flexDirection:'row',
+  
   },
 });

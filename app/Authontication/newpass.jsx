@@ -64,11 +64,11 @@ const Newpass = () => {
   return (
     <View style={{ backgroundColor: "#ffffff", height: "100%" }}>
       {/* TOP IMAGE */}
-      <Image
+      {/* <Image
         source={require("../../assets/Forgget.png")}
         style={styles.container2}
-      />
-      <View style={{ paddingTop: 0 }}>
+      /> */}
+      <View style={{ paddingTop: 0,marginTop: 100 }}>
         <Text
           style={{
             textAlign: "center",

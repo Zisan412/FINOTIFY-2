@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Pressable } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -13,65 +13,18 @@ const income = ({go}) => {
       {go.map((i, key) => ( 
         <View>
           {i.it=='income'?
-          <View style={[styles.list,i.it=='income' && {borderLeftColor:'green',borderLeftWidth:5},i.it=='expenss' && {borderLeftColor:'red',borderLeftWidth:5}]}>
-          <View style={styles.first}>
-            <View style={styles.date}>
-              <Text style={{ color: "white" }}>{data.getDate()}-</Text>
-              <Text
-                style={{
-                  backgroundColor: "black",
-                  width: 32,
-                  color: "white",
-                  height: 20,
-                  textAlign: "center",
-                }}
-              >
-                {data.toLocaleString("default", { month: "short" })}
-              </Text>
-              <Text>-</Text>
-              <Text style={{ color: "white" }}>{data.getFullYear()}</Text>
+          <View style={styles.list}>
+              <View style={styles.innerfirst}>
+                  <Text style={styles.cat}>{i.cat}</Text>
+                  <Text style={styles.amm}><Ionicons name='arrow-up-circle' style={styles.icn} color={'#69df72'} size={20}></Ionicons> ₹{i.amm}</Text>
+                  <Pressable style={styles.delete}>
+                    <Ionicons name='trash-outline' color={'red'} size={20}></Ionicons>
+                  </Pressable>
+                </View>
+                <View style={styles.des}>
+                  <Text style={styles.des}>{i.des}</Text>
+                  </View>
             </View>
-          </View>
-          <View style={styles.second}>
-            <View style={styles.cat}>
-              <Text
-                style={{
-                  textTransform: "capitalize",
-                  paddingTop: 5,
-                  fontFamily: "serif",
-                  fontStyle: "italic",
-                  fontSize: 18,
-                }}
-              >
-                {i.cat}
-              </Text>
-            </View>
-     
-              <View style={styles.income}>
-                <Text style={{ color: "green", fontSize: 18 }}>{i.amm}</Text>
-              </View>
-              <View style={styles.income}>
-                <Text>-</Text>
-              </View>
-           
-
-            <View
-              style={{
-                height: 30,
-                width: 30,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Ionicons name="trash-sharp" size={22} color={"red"}></Ionicons>
-            </View>
-          </View>
-          <View style={styles.last}>
-            <View style={styles.des}>
-              <Text style={{ textTransform: "capitalize" }}>{i.des}</Text>
-            </View>
-          </View>
-        </View>
 :<Text></Text>}
         </View>
 
@@ -86,63 +39,41 @@ export default income;
 
 const styles = StyleSheet.create({
   list: {
-    elevation: 3,
-    borderRadius: 5,
-    height: 130,
+    elevation:4,
+    borderRadius:20,
+    height: 100,
     backgroundColor: "white",
     margin: 10,
+    borderLeftColor:'#69df72',
+    borderLeftWidth:5
   },
-  first: {
-    height: 32,
-    width: "100%",
-    paddingLeft: 5,
-    paddingBottom: 5,
-    alignItems: "center",
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+  innerfirst:{
+    // backgroundColor:'red',
+    height:50,display:'flex',flexDirection:'row',justifyContent:'space-between'
+  },
+  cat:{
+    // backgroundColor:'green',
+    width:'49%',
+    margin:12,
+    fontSize:18,
+    textTransform:'capitalize'
+  },
+  amm:{
+    marginTop:13,
+    color:'#69df72',
+    fontSize:18,
+    fontWeight:800
+  },
+  icn:{
     
   },
-  date: {
-    paddingTop: 5,
-    paddingLeft: 5,
-    // backgroundColor:'yellow',
-    marginBottom: 20,
-    height: 30,
-    width: 100,
-    textTransform: "capitalize",
-    display: "flex",
-    flexDirection: "row",
-    gap: 4,
+  delete:{
+    margin:15
   },
-  cat: {
-    paddingLeft: 5,
-    fontFamily: "serif",
-  },
-  des: {
-    width: 300,
-    fontFamily: "sens-serif",
-    fontSize: 20,
-    paddingLeft: 5,
-    paddingTop: 5,
-  },
-  second: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    // paddingTop:2,backgroundColor:'yellow',
-    height: 35,
-    padding: 3,
-  },
-  last: {
-    display: "flex",
-    flexDirection: "row",
-    gap: 10,
-    paddingTop: 10,
-    paddingLeft: 10,
-    paddingBottom: 10,
-    // backgroundColor:'red'
-  },
-  income: {
-    paddingTop: 5,
-  },
+  des:{
+    marginLeft:6,
+    fontWeight:100 
+  
+  }
+  
 });

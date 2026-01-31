@@ -129,6 +129,8 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     marginTop: 50,
     resizeMode: "cover",
+  Radius:20,
+   
   },
 
   heading: {

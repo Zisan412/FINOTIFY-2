@@ -90,7 +90,7 @@ const headr = () => {
               ))}
             </View>
             </View> 
-              <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:345,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
+              <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:348,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
                 textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,}}>
                 pai chrats of category</Text>
             <View>
@@ -98,12 +98,12 @@ const headr = () => {
             <BarChart
             isAnimated
             data={barData}
-            width={290}
+            width={290} 
             height={200}    
     />
             </View>
-              <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:345,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
-                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,left:2.5}}>
+              <Text style={{position:'relative',top:-39,textTransform:'capitalize',width:348,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
+                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,left:1.8}}>
                 pai chrats of category</Text>
 </View>
     </View>

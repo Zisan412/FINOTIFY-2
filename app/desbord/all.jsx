@@ -1,107 +1,116 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, View,Pressable } from "react-native";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-const items = ({ datas }) => {
-  const [data, setdata] = React.useState(new Date());
-  console.log(data);
+const Items = ({ datas }) => {
+  const date = new Date();
 
   return (
-    <>
-      <ScrollView style={{ height: 450 }}>
-        
-        {datas.map((i, key) => (
+    <ScrollView style={styles.container}>
+      {datas.map((i, index) => {
+        const isIncome = i.it === "income";
+
+        return (
           <View
+            key={index}
             style={[
-              styles.list,
-              i.it == "income" && {
-                borderLeftColor: "green",
-                borderLeftWidth: 10,
-              },
-              i.it == "expenss" && {
-                borderLeftColor: "red",
-                borderLeftWidth: 10,
-              },
+              styles.card,
+              { borderLeftColor: isIncome ? "#2ecc71" : "#e74c3c" },
             ]}
           >
-            <View style={styles.first}>
-              <Text style={styles.cat}>{i.cat}</Text>
+            {/* Top Row */}
+            <View style={styles.row}>
+              <Text style={styles.category}>{i.cat}</Text>
+
+              <View style={styles.amountBox}>
+                <Ionicons
+                  name={isIncome ? "arrow-up-circle" : "arrow-down-circle"}
+                  size={18}
+                  color={isIncome ? "#2ecc71" : "#e74c3c"}
+                />
+                <Text
+                  style={[
+                    styles.amount,
+                    { color: isIncome ? "#2ecc71" : "#e74c3c" },
+                  ]}
+                >
+                  ₹ {i.amm}
+                </Text>
+                    <Pressable style={{marginLeft:10}}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={20}
+                    color="#ff3232af"
+                  />
+                </Pressable>
+              </View>
             </View>
-            <View style={styles.second}>
-              <Text style={styles.amm}>{i.amm}</Text>
-            </View>
-            <View style={styles.third}>
-              <Text>
-                {data.getDate()}-
-                {data.toLocaleString("default", { month: "short" })}-
-                {data.getFullYear()}
-              </Text>
-            </View>
-            <View style={styles.last}>
-              <Text>{i.des}</Text>
-            </View>
-            
+
+            {/* Description */}
+            <Text style={styles.desc}>{i.des}</Text>
+
+            {/* Date */}
+            <Text style={styles.date}>
+              {date.getDate()}{" "}
+              {date.toLocaleString("default", { month: "short" })},{" "}
+              {date.getFullYear()}
+            </Text>
           </View>
-        ))}
-      </ScrollView>
-    </>
+        );
+      })}
+    </ScrollView>
   );
 };
 
-export default items;
-
+export default Items;
 const styles = StyleSheet.create({
-  list: {
-    elevation: 3,
-    borderRadius: 5,
-    height: 130,
-    backgroundColor: "white",
-    margin: 10,
-  },
-  first: {
-    height: 35,
-    width: "100%",
-    paddingLeft: 5,
-    paddingBottom: 5,
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-  },
-  cat: {
-    textTransform: "capitalize",
-    fontSize: 20,
-    fontWeight: 700,
-    padding: 3,
+  container: {
+    paddingBottom: 20,
+    height:450
   },
 
-  second: {
-    height: 35,
-    width: "100%",
-    paddingLeft: 5,
-    paddingBottom: 5,
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
+  card: {
+    backgroundColor: "#fff",
+    marginHorizontal: 14,
+    marginVertical: 8,
+    padding: 14,
+    borderRadius: 14,
+    borderLeftWidth: 6,
+    elevation: 4,
   },
-  amm: {
-    padding: 3,
-    textTransform: "capitalize",
-    fontSize: 20,
-    fontWeight: 600,
-  },
-  third: {
-    height: 27,
-    width: "100%",
-    paddingLeft: 10,
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-  },
-  last: {
-    display: "flex",
+
+  row: {
     flexDirection: "row",
-    gap: 10,
-    // paddingTop:10 ,
-    paddingLeft: 10,
-    // paddingBottom:10,
-    // backgroundColor:'red'
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  income: {},
+
+  category: {
+    fontSize: 18,
+    fontWeight: "600",
+    textTransform: "capitalize",
+  },
+
+  amountBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+
+  amount: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  desc: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "#666",
+  },
+
+  date: {
+    marginTop: 8,
+    fontSize: 12,
+    color: "#999",
+  },
 });

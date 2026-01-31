@@ -74,8 +74,9 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(0,0,0,0.5)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 6,
+    
   },
-
+  
   button: {
     height: 45,
     width: 260,

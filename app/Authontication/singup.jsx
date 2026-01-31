@@ -309,7 +309,7 @@ export default Singup;
 
 const styles = StyleSheet.create({
   logo:{
-    width:250,height:250,alignSelf:'center',mixBlendMode:'multiply'
+    width:250,height:250,alignSelf:'center',mixBlendMode:'multiply',
   },
   inp: {
     width: 250,

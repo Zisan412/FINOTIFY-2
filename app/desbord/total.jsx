@@ -1,200 +1,194 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, ScrollView } from "react-native";
+import React from "react";
 
-const total = ({go}) => {
-  let i=0
-  let incomes=0
- let  expenss=0
-  
+const Total = ({ go }) => {
+  const categories = [
+    { key: "food 🍴", label: "Food" },
+    { key: "salary 💸", label: "Salary" },
+    { key: "shopping 🛍️", label: "Shopping" },
+    { key: "traveling 🧳", label: "Traveling" },
+    { key: "sports 🥎", label: "Sports" },
+    { key: "other ", label: "Others" },
+  ];
 
-  for(i=0;i<go.length;i++)
-  {
-    if(go[i].it=='income')
-    {
-      incomes+=go[i].amm
-    }
-    else if(go[i].it=='expenss')
-    {
-      expenss+=go[i].amm
-    }
-  }
-  console.log(incomes,expenss)
+  const summary = {};
+  categories.forEach(c => {
+    summary[c.key] = { income: 0, expense: 0 };
+  });
 
-  
- let food=0
- let salary=0
-  let shopping=0
-  let traveling=0
-  let household=0
-  let sports=0
-  let other=0
-  
-  
-  
- let food2=0
- let salary2=0
-  let shopping2=0
-  let traveling2=0
-  let household2=0
-  let sports2=0
-  let other2=0
-  
-  for(i=0;i<go.length;i++)
-  {
-    if(go[i].it=='income'){
-    if(go[i].cat=='food 🍴')
-    {
-      food+=go[i].amm
-      console.log(go[i].amm)
-    }
-    else if(go[i].cat=='salary 💸')
-    {
-      salary+=go[i].amm
-    }
-    else if(go[i].cat=='shopping 🛍️')
-    {
-      shopping+=go[i].amm
-    }
-    else if(go[i].cat=='traveling 🧳')
-    {
-      traveling+=go[i].amm
-    }
-    else if(go[i].cat=='household 🏠🏠')
-    {
-      household+=go[i].amm
-    }
-    else if(go[i].cat=='sports 🥎')
-    {
+  go.forEach(item => {
+    if (!summary[item.cat]) return;
+    if (item.it === "income") summary[item.cat].income += item.amm;
+    else summary[item.cat].expense += item.amm;
+  });
 
-      sports+=go[i].amm
-    }
-    else if(go[i].cat=='other ')
-    {
-      other+=go[i].amm
-    }
-  }
-  else if(go[i].it=='expenss'){
-    if(go[i].cat=='food 🍴')
-    {
-      food2+=go[i].amm
-      console.log(go[i].amm)
-    }
-    else if(go[i].cat=='salary 💸')
-    {
-      salary2+=go[i].amm
-    }
-    else if(go[i].cat=='shopping 🛍️')
-    {
-      shopping2+=go[i].amm
-    }
-    else if(go[i].cat=='traveling 🧳')
-    {
-      traveling2+=go[i].amm
-    }
-    else if(go[i].cat=='household 🏠🏠')
-    {
-      household2+=go[i].amm
-    }
-    else if(go[i].cat=='sports 🥎')
-    {
-
-      sports2+=go[i].amm
-    }
-    else if(go[i].cat=='other ')
-    {
-      other2+=go[i].amm
-    }
-  }
-  }
-
- let total=food+salary+shopping+traveling+household+other
- let total2=food2+salary2+shopping2+traveling2+household2+other2
+  const totalIncome = Object.values(summary).reduce(
+    (s, c) => s + c.income,
+    0
+  );
+  const totalExpense = Object.values(summary).reduce(
+    (s, c) => s + c.expense,
+    0
+  );
 
   return (
-    <View style={{height:450,width:350,marginLeft:7}}>
-      <View>
-        <Text>select a Date </Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* TITLE CARD */}
+      <View style={styles.headerCard}>
+        <Text style={styles.headerTitle}>Transaction Summary</Text>
+        <Text style={styles.headerSub}>
+          Income • Expense • Balance
+        </Text>
       </View>
-      <View style={styles.text}>
-        <Text style={{color:'white',fontSize:18,textTransform:'capitalize',fontFamily:'serif'}}>Summery of Your Transtions</Text>
+
+      {/* TABLE CARD */}
+      <View style={styles.card}>
+        <View style={styles.tableHeader}>
+          <Text style={styles.th}>Category</Text>
+          <Text style={styles.th}>Income</Text>
+          <Text style={styles.th}>Expense</Text>
+          <Text style={styles.th}>Balance</Text>
         </View>
-        <View style={styles.heading}>
-          <Text style={{color:'white',textTransform:'capitalize',width:70}}>category</Text>
-          <Text style={{color:'white',textTransform:'capitalize'}}> Income  </Text>
-          <Text style={{color:'white',textTransform:'capitalize'}}> Expense  </Text>
-          <Text style={{color:'white',textTransform:'capitalize'}}>Balance  </Text>
-          </View>
-          <View style={styles.balnce}>
-            <View style={{borderRightColor:'white',borderRightWidth:1}}>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>Food</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>salary</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>shopping</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>traveling</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>sports</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>others</Text>
+
+        {categories.map(cat => {
+          const data = summary[cat.key];
+          const balance = data.income - data.expense;
+
+          return (
+            <View key={cat.key} style={styles.tableRow}>
+              <Text style={styles.tdCat}>{cat.label}</Text>
+
+              <Text style={[styles.td, styles.income]}>
+                ₹ {data.income}
+              </Text>
+
+              <Text style={[styles.td, styles.expense]}>
+                ₹ {data.expense}
+              </Text>
+
+              <Text
+                style={[
+                  styles.td,
+                  { color: balance >= 0 ? "#2ecc71" : "#e74c3c" },
+                ]}
+              >
+                ₹ {balance}
+              </Text>
             </View>
-            <View>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{food}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{salary}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{shopping}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{traveling}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{sports}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'green'}}>{other}</Text>
-              </View>
-              <View>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{food2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{salary2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{shopping2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{traveling2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{sports2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16, color:'red'}}>{other2}</Text>
-              </View>
-              <View>
-                <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{food-food2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{salary-salary2}</Text>
-              <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{shopping-shopping2}</Text>
-                <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{traveling-traveling2}</Text>
-                <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{sports-sports2}</Text>
-                <Text style={{height:25,textTransform:'capitalize',fontSize:16,}}>{other-other2}</Text>
+          );
+        })}
 
-              </View>
-              </View>
-                             <View style={{borderTopWidth:1,paddingTop:10,borderTopColor:'black',marginTop:-80,width:320,display:'flex',flexDirection:'row',justifyContent:'space-around',marginLeft:20}}>
-                              <Text >             </Text>
-                              <Text style={{color:'green'}}>{food+salary+shopping+sports+traveling+other}</Text>
-                              <Text style={{color:'red'}}>{food2+salary2+shopping2+sports2+traveling2+other2}</Text>
-                              <Text>{total-total2}</Text>
-                             </View>
-
-    
+        {/* TOTAL FOOTER */}
+        <View style={styles.footerRow}>
+          <Text style={styles.totalText}>Total</Text>
+          <Text style={[styles.totalText, { color: "#2ecc71" }]}>
+            ₹ {totalIncome}
+          </Text>
+          <Text style={[styles.totalText, { color: "#e74c3c" }]}>
+            ₹ {totalExpense}
+          </Text>
+          <Text style={styles.totalText}>
+            ₹ {totalIncome - totalExpense}
+          </Text>
+        </View>
       </View>
-     
-  )
-}
+    </ScrollView>
+  );
+};
 
-export default total
-
+export default Total;
 const styles = StyleSheet.create({
-  text:{
-    backgroundColor:'#24a7ffbd',
-    height:30,alignItems:'center',
-    justifyContent:'center',
-    marginTop:10,
-    borderTopLeftRadius:5,
-    borderTopRightRadius:5
+  container: {
+    paddingBottom: 30,
+    backgroundColor: "#f5f7fb",
   },
-  heading:{
-    display:'flex',
-    flexDirection:'row',
-    justifyContent:'space-around',
-    backgroundColor:'#24a7ff70',
-    height:26,alignItems:'center'
-  },
-  balnce:{
-    display:'flex',
-  flexDirection:'row',
-  justifyContent:'space-around',height:250,
-  paddingTop:10,backgroundColor:'white',borderRadius:5,elevation:5
 
-  }
-})
+  headerCard: {
+    margin: 14,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#0a63bc",
+    elevation: 4,
+  },
+
+  headerTitle: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+
+  headerSub: {
+    color: "#e6e6e6",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 4,
+  },
+
+  card: {
+    backgroundColor: "#fff",
+    marginHorizontal: 14,
+    borderRadius: 16,
+    padding: 12,
+    elevation: 4,
+  },
+
+  tableHeader: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+    paddingBottom: 8,
+    marginBottom: 6,
+  },
+
+  th: {
+    width: "25%",
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: 13,
+    color: "#555",
+  },
+
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 8,
+    borderBottomWidth: 0.5,
+    borderColor: "#f0f0f0",
+  },
+
+  tdCat: {
+    width: "25%",
+    fontSize: 14,
+  },
+
+  td: {
+    width: "25%",
+    textAlign: "center",
+    fontSize: 14,
+  },
+
+  income: {
+    color: "#2ecc71",
+    fontWeight: "600",
+  },
+
+  expense: {
+    color: "#e74c3c",
+    fontWeight: "600",
+  },
+
+  footerRow: {
+    flexDirection: "row",
+    paddingTop: 10,
+    marginTop: 6,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+  },
+
+  totalText: {
+    width: "25%",
+    textAlign: "center",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+});
