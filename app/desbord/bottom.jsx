@@ -40,7 +40,7 @@ export default bottom
 const styles = StyleSheet.create({
       footer: {
     backgroundColor: "#0a63bcd5",
-    height:90,
+    height:100,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",

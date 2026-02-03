@@ -14,6 +14,7 @@ const Otpenter = () => {
     const [error,seterror]=useState('')
   let [timer,settimer]=useState(false)
 
+
   const sub=()=>{
     if(otp=="")
     {
@@ -107,11 +108,11 @@ const Otpenter = () => {
           <CountdownCircleTimer
     isPlaying
 
-    duration={15}
+    duration={60}
     remainingTime={10}
     
     size={50}
-    strokeWidth={6}
+    strokeWidth={0}
     colors={['#004777', '#F7B801', '#A30000', '#A30000']}
     colorsTime={[7, 5, 2, 0]}
     onComplete={() => settimer(true)}
@@ -120,7 +121,9 @@ const Otpenter = () => {
     
 
   >
-    {({ remainingTime }) => <Text>{remainingTime} :s</Text>
+    {({ remainingTime }) =><View style={{alignSelf:'center',justifyContent:'center',width:200,height:60}}>
+       <Text style={{color:'#0a63bcff',fontSize:14,textTransform:'capitalize',alignSelf:'center',height:'100%',justifyContent:'center',alignItems:'center'}}>  
+      <View style={{paddingTop:10,height:'100%'}}><MaterialIcons name="access-time" size={16} color="#0a63bcff"  /></View>  resend otp {Math.floor(remainingTime / 60)}m:{remainingTime % 60}s</Text></View>
 }
 </CountdownCircleTimer>}
       </View>

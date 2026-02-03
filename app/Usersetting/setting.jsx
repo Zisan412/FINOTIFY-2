@@ -23,10 +23,12 @@ const Settings = () => {
     <ScrollView style={styles.container}>
       {/* PROFILE CARD */}
       <View style={styles.profileCard}>
-        <Image
-          source={require("../../assets/ic.png")} // dummy image
+        <View
+           // dummy image
           style={styles.avatar}
-        />
+        >
+          <Text style={styles.avtarText}>M</Text>
+            </View>
 
         <View style={{ alignItems: "center" }}>
           <Text style={styles.name}>Musab Momin</Text>
@@ -87,12 +89,20 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 90,
-    height: 90,
+    width: 70,
+    height: 70,
     borderRadius: 45,
     marginBottom: 10,
+    backgroundColor:'#52a0ff',
+    justifyContent:'center',
+    alignItems:'center',
+    elevation:10
   },
+  avtarText:{  
+    textAlign:'center',
+    fontSize:30
 
+  },
   name: {
     color: "white",
     fontSize: 18,
