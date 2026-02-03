@@ -121,9 +121,10 @@ const Otpenter = () => {
     
 
   >
-    {({ remainingTime }) =><View style={{alignSelf:'center',justifyContent:'center',width:200,height:60}}>
-       <Text style={{color:'#0a63bcff',fontSize:14,textTransform:'capitalize',alignSelf:'center',height:'100%',justifyContent:'center',alignItems:'center'}}>  
-      <View style={{paddingTop:10,height:'100%'}}><MaterialIcons name="access-time" size={16} color="#0a63bcff"  /></View>  resend otp {Math.floor(remainingTime / 60)}m:{remainingTime % 60}s</Text></View>
+    {({ remainingTime }) =><View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:200,height:40}}>
+      <View style={{}}><MaterialIcons name="access-time" size={18} color="#0a63bcff"  /></View>
+              <Text style={{color:'#0a63bcff',fontSize:14,textTransform:'capitalize',paddingLeft:10}}>  
+   resend otp {Math.floor(remainingTime / 60)}m:{remainingTime % 60}s</Text></View>
 }
 </CountdownCircleTimer>}
       </View>

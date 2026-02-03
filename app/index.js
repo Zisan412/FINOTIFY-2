@@ -9,8 +9,10 @@ import {
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+// import {async} from '@react-native-async-storage/async-storage';
 
 const Mainpage = () => {
+
   return (
     <ImageBackground
       // source={require("../assets/ChatGPT Image Jan 21, 2026, 07_34_58 PM.png")}
@@ -24,7 +26,7 @@ const Mainpage = () => {
 
       {/* App Name */}
       <Text style={styles.title}>FINOTIFY</Text>
-
+      
       {/* Signup Button */}
       <Pressable
         style={[styles.button, styles.primaryBtn]}
@@ -46,6 +48,7 @@ const Mainpage = () => {
           Already have an account? Login
         </Text>
       </Pressable>
+
     </ImageBackground>
   );
 };

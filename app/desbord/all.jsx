@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View,Pressable } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const Items = ({ datas }) => {
   const date = new Date();
@@ -36,7 +37,22 @@ const Items = ({ datas }) => {
                 >
                   ₹ {i.amm}
                 </Text>
-                    <Pressable style={{marginLeft:10}}>
+                    <Pressable style={{marginLeft:10}}
+                     onPress={()=>router.push({pathname:'../desbord/adddata',
+                      params:{
+                      cat:i.cat,
+                      amm:i.amm,
+                      des:i.des,
+                      it:i.it
+                      }})
+                    }>
+                  <Ionicons
+                    name="pencil"
+                    size={20}
+                    color="#464646af"
+                  />
+                </Pressable>
+                  <Pressable style={{marginLeft:10}}>
                   <Ionicons
                     name="trash-outline"
                     size={20}

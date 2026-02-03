@@ -11,9 +11,12 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Danger from "../Modules/danger";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 const AddData = () => {
+
+  const {cat,amm,des,it} = useLocalSearchParams()
+
   const [showPicker, setShowPicker] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
 
@@ -90,7 +93,7 @@ const AddData = () => {
             placeholder="Amount"
             keyboardType="numeric"
             style={styles.input}
-            value={amount}
+            value={amount||amm}
             onChangeText={setAmount}
           />
         </View>
@@ -102,7 +105,7 @@ const AddData = () => {
         >
           <Ionicons name="apps-outline" size={20} color="#0a63bc" />
           <Text style={styles.inputText}>
-            {category || "Select Category"}
+            {category || cat || "Select Category"}
           </Text>
         </Pressable>
         
@@ -113,7 +116,7 @@ const AddData = () => {
           <TextInput
             placeholder="Description"
             style={styles.input}
-            value={desc}
+            value={desc||des}
             onChangeText={setDesc}
             multiline
           />

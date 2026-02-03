@@ -1,134 +1,139 @@
-import { StyleSheet, Text, View,ScrollView, ImageBackground } from 'react-native'
+import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import React from 'react'
 import PieChart from 'react-native-pie-chart'
-import { BarChart,RadarChart} from 'react-native-gifted-charts'
+import { BarChart } from 'react-native-gifted-charts'
 
-const headr = () => {
-       {
-    const widthAndHeight = 200
+const Header = () => {
+  const widthAndHeight = 180
 
-    const series = [
-      { value: 430, color: '#ED6665',label:'food'},
-      { value: 321, color: '#fff23f9d',label:'shopping'},
-      { value: 185, color: 'rgb(65, 166, 196)',label:'salary' },
-      { value: 123, color: 'rgba(144, 199, 255, 0.57)',label:'other' },
-    ]
-    const barData = [
-        {
-          value: 40,
-          label: 'Jan',
-          spacing: 2,
-          labelWidth:15,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 20, frontColor: '#ED6665'},
-        {
-          value: 50,
-          label: 'Feb',
-          spacing: 2,
-          labelWidth: 30,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 40, frontColor: '#ED6665'},
-        {
-          value: 75,
-          label: 'Mar',
-          spacing: 2,
-          labelWidth:30,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 25, frontColor: '#ED6665'},
-        {
-          value: 30,
-          label: 'Apr',
-          spacing: 2,
-          labelWidth: 30,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 20, frontColor: '#ED6665'},
-        {
-          value: 60,
-          label: 'May',
-          spacing: 2,
-          labelWidth: 30,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 40, frontColor: '#ED6665'},
-        {
-          value: 65,
-          label: 'Jun',
-          spacing: 2,
-          labelWidth: 30,
-          labelTextStyle: {color: 'gray'},
-          frontColor: '#177AD5',
-        },
-        {value: 30, frontColor: '#ED6665'},
-      ];
-      
+  const series = [
+    { value: 430, color: '#ED6665', label: 'Food' },
+    { value: 321, color: '#F4C430', label: 'Shopping' },
+    { value: 185, color: '#41A6C4', label: 'Salary' },
+    { value: 123, color: '#90C7FF', label: 'Other' },
+  ]
+
+  const barData = [
+    { value: 40, label: 'Jan', frontColor: '#0A63BC' },
+    { value: 50, label: 'Feb', frontColor: '#0A63BC' },
+    { value: 75, label: 'Mar', frontColor: '#0A63BC' },
+    { value: 30, label: 'Apr', frontColor: '#0A63BC' },
+    { value: 60, label: 'May', frontColor: '#0A63BC' },
+    { value: 65, label: 'Jun', frontColor: '#0A63BC' },
+  ]
+
   return (
-    <View style={{alignItems:'center',backgroundColor:''}}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
-        <View style={styles.chartsText}>
-            <Text style={{fontSize:20,fontFamily:'sens-serif',color:'white',textShadowColor:'grey',textShadowRadius:20}}>Transction charts</Text>
-            </View>
-            <View style={styles.PieChart}>
-              <PieChart cover={0.45} widthAndHeight={widthAndHeight } series={series} style={{marginTop:-30,marginLeft:20,
-                backgroundColor:'white',elevation:15,borderRadius:100}}></PieChart>
-                <View style={{display:'flex',flexDirection:'column',margin:5,height:80}}>
-              {series.map((i,key)=>(
-                    <View style={{display:'flex',flexDirection:'row'}}>
-                    <View style={{height:8,width:10,backgroundColor:`${i.color}`}}>
-                      </View>
-                           <Text style={{fontSize:14,color:'',marginTop:-3,height:30,fontFamily:'serif',textTransform:'capitalize',width:80}}>  {i.label}</Text>
-                        </View>
-                    
-              ))}
-            </View>
-            </View> 
-              <Text style={{position:'relative',top:-40,textTransform:'capitalize',width:348,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
-                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,}}>
-                pai chrats of category</Text>
-            <View>
-              <View style={[styles.PieChart,{marginTop:-10,height:350}]}>
-            <BarChart
-            isAnimated
-            data={barData}
-            width={290} 
-            height={200}    
-    />
-            </View>
-              <Text style={{position:'relative',top:-39,textTransform:'capitalize',width:348,height:38,borderBottomLeftRadius:20,borderBottomRightRadius:20,
-                textAlign:'center',color:'white',fontSize:16,backgroundColor:'#0a63bc',paddingTop:10,left:1.8}}>
-                pai chrats of category</Text>
-</View>
-    </View>
-    
+      {/* Title */}
+      <Text style={styles.title}>Transaction Analytics</Text>
+
+      {/* Pie Chart Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Category Breakdown</Text>
+
+        <View style={styles.pieRow}>
+          <PieChart
+            widthAndHeight={widthAndHeight}
+            series={series}
+            cover={0.5}
+          />
+
+          <View style={styles.legend}>
+            {series.map((item, index) => (
+              <View key={index} style={styles.legendRow}>
+                <View
+                  style={[
+                    styles.legendDot,
+                    { backgroundColor: item.color },
+                  ]}
+                />
+                <Text style={styles.legendText}>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {/* Bar Chart Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Monthly Spending</Text>
+
+        <BarChart
+          isAnimated
+          data={barData}
+          width={280}
+          height={200}
+          barWidth={28}
+          spacing={24}
+          hideRules
+          xAxisThickness={0}
+          yAxisThickness={0}
+          yAxisTextStyle={{ color: '#888' }}
+        />
+      </View>
+
+    </ScrollView>
   )
 }
-}
 
-export default headr;
-
+export default Header
 const styles = StyleSheet.create({
-  chartsText:{
-    marginTop:20,height:40,alignItems:'center',justifyContent:'center'
+  container: {
+    flex: 1,
+    backgroundColor: '#F4F6FA',
+    padding: 16,
   },
-  PieChart:{
-    display:'flex',
-    flexDirection:'row',
-    alignItems:'center',
-    height:300,
-    justifyContent:'center',
-    elevation:3,
-    width:350,
-    gap:40,
-    borderRadius:20,
-    borderColor:'#0a63bcb2',
-    borderWidth:2
-  }
+
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0A63BC',
+    marginBottom: 20,
+    marginTop:20,
+    textAlign: 'center',
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 4,
+  },
+
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#333',
+  },
+
+  pieRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  legend: {
+    marginLeft: 10,
+  },
+
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+
+  legendText: {
+    fontSize: 14,
+    color: '#555',
+  },
 })
