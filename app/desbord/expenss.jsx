@@ -1,64 +1,68 @@
-import { ScrollView, StyleSheet, Text, View,Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-
 import { styles } from "./all";
 
-const Income = ({ go }) => {
+const Expenss = ({ go }) => {
   const date = new Date();
-  console.log(go)
 
   return (
-<ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      showsVerticalScrollIndicator={false}
+    >
       {go.map((i, index) => {
         const isExpenss = i.it === "expenss";
 
+        if (!isExpenss) return null;
+
+        // Extract emoji if present, or use first letter
+        const emojiMatch = i.cat.match(/[\p{Emoji}\u200d]+/u);
+        const iconSign = emojiMatch ? emojiMatch[0] : i.cat.charAt(0);
+        const cleanCat = i.cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
+
         return (
-          isExpenss  && 
           <View
             key={index}
             style={[
               styles.card,
-              { borderLeftColor: isExpenss && "#e74c3c"  },
+              { borderLeftColor: "#ff4757" },
             ]}
           >
-            {/* Top Row */}
             <View style={styles.row}>
-              <Text style={styles.category}>{i.cat}</Text>
+              {/* Left Side: Icon & Info */}
+              <View style={styles.leftSection}>
+                <View style={styles.iconContainer}>
+                  <Text style={{ fontSize: 20 }}>{iconSign}</Text>
+                </View>
 
-              <View style={styles.amountBox}>
-                <Ionicons
-                  name={isExpenss && "arrow-down-circle"}
-                  size={18}
-                  color={isExpenss && "#e74c3c"}
-                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.category}>{cleanCat || i.cat}</Text>
+                  <Text style={styles.date}>
+                    {date.getDate()} {date.toLocaleString("default", { month: "short" })}, {date.getFullYear()}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Right Side: Amount & Actions */}
+              <View style={styles.rightSection}>
                 <Text
                   style={[
                     styles.amount,
-                    { color: isExpenss && "#e74c3c" },
+                    { color: "#ff4757" },
                   ]}
                 >
-                  ₹ {i.amm}
+                  -₹ {i.amm}
                 </Text>
-                    <Pressable style={{marginLeft:10}}>
-                  <Ionicons
-                    name="trash-outline"
-                    size={20}
-                    color="#ff3232af"
-                  />
-                </Pressable>
+
+                <View style={styles.actions}>
+                  <Pressable>
+                    <Ionicons name="trash-outline" size={18} color="#ff4757" />
+                  </Pressable>
+                </View>
               </View>
             </View>
-
-            {/* Description */}
-            <Text style={styles.desc}>{i.des}</Text>
-
-            {/* Date */}
-            <Text style={styles.date}>
-              {date.getDate()}{" "}
-              {date.toLocaleString("default", { month: "short" })},{" "}
-              {date.getFullYear()}
-            </Text>
           </View>
         );
       })}
@@ -66,4 +70,4 @@ const Income = ({ go }) => {
   );
 };
 
-export default Income;
+export default Expenss;

@@ -32,7 +32,11 @@ const Total = ({ go }) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* TITLE CARD */}
       <View style={styles.headerCard}>
         <Text style={styles.headerTitle}>Transaction Summary</Text>
@@ -97,10 +101,11 @@ const Total = ({ go }) => {
 };
 
 export default Total;
+
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 30,
-    backgroundColor: "#f5f7fb",
+    flex: 1,
+    backgroundColor: "#f8f9fa",
   },
 
   headerCard: {
@@ -128,6 +133,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     marginHorizontal: 14,
+    marginBottom: 20,
     borderRadius: 16,
     padding: 12,
     elevation: 4,
@@ -158,13 +164,15 @@ const styles = StyleSheet.create({
 
   tdCat: {
     width: "25%",
-    fontSize: 14,
+    fontSize: 13,
+    color: "#2f3640",
+    fontWeight: "500",
   },
 
   td: {
     width: "25%",
     textAlign: "center",
-    fontSize: 14,
+    fontSize: 13,
   },
 
   income: {
@@ -173,7 +181,7 @@ const styles = StyleSheet.create({
   },
 
   expense: {
-    color: "#e74c3c",
+    color: "#ff4757",
     fontWeight: "600",
   },
 
@@ -189,6 +197,6 @@ const styles = StyleSheet.create({
     width: "25%",
     textAlign: "center",
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 14,
   },
 });

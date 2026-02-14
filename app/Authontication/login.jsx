@@ -22,13 +22,14 @@ const Login = () => {
   const correctPassword = "123456";
 
   const submit = async () => {
-    let datas=await axios.post('http://localhost:3000/users/login',
-      {mobileno:mobile,
-        password:password
-      }).then((res)=>{
+    let datas = await axios.post('http://localhost:3000/users/login',
+      {
+        mobileno: mobile,
+        password: password
+      }).then((res) => {
         console.log(res.data)
         router.push('../desbord/desbord')
-      }).catch((error)=>{
+      }).catch((error) => {
         console.log(error)
       })
   };
@@ -38,69 +39,71 @@ const Login = () => {
   };
 
   return (
-    <View style={{backgroundColor: "#ffffff" }}>
-      {/* TOP IMAGE */}
-      <Image
-        source={require("../../assets/Login.png")}
-        style={styles.container2}
-      />
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View style={{ flex: 1 }}>
+        {/* TOP IMAGE */}
+        <Image
+          source={require("../../assets/Login.png")}
+          style={styles.container2}
+        />
 
-      {/* {error ? <Danger errror={error} /> : null} */}
+        {/* {error ? <Danger errror={error} /> : null} */}
 
-      <Text style={styles.heading}>Login Here</Text>
+        <Text style={styles.heading}>Login Here</Text>
 
-      {/* INPUTS */}
-      <View style={styles.inputWrap}>
-        {/* MOBILE */}
-        <View style={styles.inputBox}>
-          <Ionicons name="call" size={24} color="#0a63bcd5" />
-          <TextInput
-            style={styles.inp}
-            placeholder="Mobile no"
-            keyboardType="numeric"
-            value={mobile}
-            onChangeText={setMobile}
-            onFocus={() => setActiveInput(1)}
-            onBlur={() => setActiveInput(0)}
-          />
-        </View>
-
-        {/* PASSWORD */}
-        <View style={styles.inputBox}>
-          <MaterialIcons name="security" size={24} color="#0a63bcd5" />
-          <TextInput
-            style={styles.inp}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            onFocus={() => setActiveInput(2)}
-            onBlur={() => setActiveInput(0)}
-          />
-
-          <Pressable onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? "lock-open" : "lock-closed"}
-              size={22}
-              color="gray"
+        {/* INPUTS */}
+        <View style={styles.inputWrap}>
+          {/* MOBILE */}
+          <View style={styles.inputBox}>
+            <Ionicons name="call" size={24} color="#0a63bcd5" />
+            <TextInput
+              style={styles.inp}
+              placeholder="Mobile no"
+              keyboardType="numeric"
+              value={mobile}
+              onChangeText={setMobile}
+              onFocus={() => setActiveInput(1)}
+              onBlur={() => setActiveInput(0)}
             />
+          </View>
+
+          {/* PASSWORD */}
+          <View style={styles.inputBox}>
+            <MaterialIcons name="security" size={24} color="#0a63bcd5" />
+            <TextInput
+              style={styles.inp}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              onFocus={() => setActiveInput(2)}
+              onBlur={() => setActiveInput(0)}
+            />
+
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? "lock-open" : "lock-closed"}
+                size={22}
+                color="gray"
+              />
+            </Pressable>
+          </View>
+
+          {/* LOGIN BUTTON */}
+          <Pressable
+            style={styles.btn}
+            onPress={submit}
+            onPressIn={() => setActiveInput(6)}
+            onPressOut={() => setActiveInput(0)}
+          >
+            <Text style={{ color: "white" }}>Login Here</Text>
+          </Pressable>
+
+          {/* FORGOT */}
+          <Pressable onPress={() => router.push("./forgget")}>
+            <Text style={styles.forgot}>Forgot Password?</Text>
           </Pressable>
         </View>
-
-        {/* LOGIN BUTTON */}
-        <Pressable
-          style={styles.btn}
-          onPress={submit}
-          onPressIn={() => setActiveInput(6)}
-          onPressOut={() => setActiveInput(0)}
-        >
-          <Text style={{ color: "white" }}>Login Here</Text>
-        </Pressable>
-
-        {/* FORGOT */}
-        <Pressable onPress={() => router.push("./forgget")}>
-          <Text style={styles.forgot}>Forgot Password?</Text>
-        </Pressable>
       </View>
 
       {/* FOOTER */}
@@ -120,14 +123,14 @@ export default Login;
 
 const styles = StyleSheet.create({
   container2: {
-    height:250,
+    height: 250,
     width: 250,
-    alignSelf:'center',
-    justifyContent:'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
     marginTop: 50,
     resizeMode: "cover",
-  Radius:20,
-   
+    Radius: 20,
+
   },
 
   heading: {
@@ -178,7 +181,6 @@ const styles = StyleSheet.create({
   footer: {
     backgroundColor: "#0a63bcd5",
     height: 60,
-    marginTop:113,
     justifyContent: "center",
     alignItems: "center",
   },

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View,Pressable } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -7,70 +7,69 @@ const Items = ({ datas }) => {
   const date = new Date();
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      showsVerticalScrollIndicator={false}
+    >
       {datas.map((i, index) => {
         const isIncome = i.it === "income";
+
+        // Extract emoji if present, or use first letter
+        const emojiMatch = i.cat.match(/[\p{Emoji}\u200d]+/u);
+        const iconSign = emojiMatch ? emojiMatch[0] : i.cat.charAt(0);
+        const cleanCat = i.cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
 
         return (
           <View
             key={index}
             style={[
               styles.card,
-              { borderLeftColor: isIncome ? "#2ecc71" : "#e74c3c" },
+              { borderLeftColor: isIncome ? "#2ecc71" : "#ff4757" },
             ]}
           >
-            {/* Top Row */}
             <View style={styles.row}>
-              <Text style={styles.category}>{i.cat}</Text>
+              {/* Left Side: Icon & Info */}
+              <View style={styles.leftSection}>
+                <View style={styles.iconContainer}>
+                  <Text style={{ fontSize: 20 }}>{iconSign}</Text>
+                </View>
 
-              <View style={styles.amountBox}>
-                <Ionicons
-                  name={isIncome ? "arrow-up-circle" : "arrow-down-circle"}
-                  size={18}
-                  color={isIncome ? "#2ecc71" : "#e74c3c"}
-                />
+                <View style={styles.textContainer}>
+                  <Text style={styles.category}>{cleanCat || i.cat}</Text>
+                  <Text style={styles.date}>
+                    {date.getDate()} {date.toLocaleString("default", { month: "short" })}, {date.getFullYear()}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Right Side: Amount & Actions */}
+              <View style={styles.rightSection}>
                 <Text
                   style={[
                     styles.amount,
-                    { color: isIncome ? "#2ecc71" : "#e74c3c" },
+                    { color: isIncome ? "#2ecc71" : "#ff4757" },
                   ]}
                 >
-                  ₹ {i.amm}
+                  {isIncome ? "+" : "-"}₹ {i.amm}
                 </Text>
-                    <Pressable style={{marginLeft:10}}
-                     onPress={()=>router.push({pathname:'../desbord/adddata',
-                      params:{
-                      cat:i.cat,
-                      amm:i.amm,
-                      des:i.des,
-                      it:i.it
-                      }})
-                    }>
-                  <Ionicons
-                    name="pencil"
-                    size={20}
-                    color="#464646af"
-                  />
-                </Pressable>
-                  <Pressable style={{marginLeft:10}}>
-                  <Ionicons
-                    name="trash-outline"
-                    size={20}
-                    color="#ff3232af"
-                  />
-                </Pressable>
+
+                {/* Actions (Edit/Delete) - Mini Row */}
+                <View style={styles.actions}>
+                  <Pressable
+                    onPress={() => router.push({
+                      pathname: '../desbord/adddata',
+                      params: { cat: i.cat, amm: i.amm, des: i.des, it: i.it }
+                    })}
+                  >
+                    <Ionicons name="create-outline" size={18} color="#95a5a6" />
+                  </Pressable>
+                  <Pressable>
+                    <Ionicons name="trash-outline" size={18} color="#ff4757" />
+                  </Pressable>
+                </View>
               </View>
             </View>
-
-            {/* Description */}
-            <Text style={styles.desc}>{i.des}</Text>
-
-            
-            <Text style={styles.date}>
-              {date.getDate()}{" "}
-              {date.toLocaleString("default", { month: "short" })},{" "}
-              {date.getFullYear()}
-            </Text>
           </View>
         );
       })}
@@ -79,20 +78,24 @@ const Items = ({ datas }) => {
 };
 
 export default Items;
+
 export const styles = StyleSheet.create({
   container: {
-    paddingBottom: 20,
-    height:450
+    paddingHorizontal: 10,
+    backgroundColor: "#F8F9FA", // Consistent background
   },
 
   card: {
     backgroundColor: "#fff",
-    marginHorizontal: 14,
-    marginVertical: 8,
-    padding: 14,
-    borderRadius: 14,
-    borderLeftWidth: 6,
-    elevation: 4,
+    marginVertical: 6,
+    padding: 16,
+    borderRadius: 20,
+    borderLeftWidth: 4,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
 
   row: {
@@ -101,32 +104,54 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  category: {
-    fontSize: 18,
-    fontWeight: "600",
-    textTransform: "capitalize",
-  },
-
-  amountBox: {
+  leftSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 14,
+    flex: 1,
   },
 
-  amount: {
-    fontSize: 18,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#f1f2f6",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  textContainer: {
+    justifyContent: "center",
+  },
+
+  category: {
+    fontSize: 16,
     fontWeight: "700",
-  },
-
-  desc: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#666",
+    color: "#2f3640",
+    textTransform: "capitalize",
+    marginBottom: 2,
   },
 
   date: {
-    marginTop: 8,
     fontSize: 12,
-    color: "#999",
+    color: "#a4b0be",
+    fontWeight: "500",
   },
+
+  rightSection: {
+    alignItems: "flex-end",
+  },
+
+  amount: {
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: 0.3,
+  },
+
+  actions: {
+    flexDirection: "row",
+    marginTop: 6,
+    gap: 12,
+    opacity: 0.8
+  }
 });
