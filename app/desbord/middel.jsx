@@ -59,12 +59,13 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#f1f2f6", // Very light grey
+    backgroundColor: "#f1f2f6",
     marginHorizontal: 16,
-    marginVertical: 16, // More breathing room
+    marginTop: 12, // Reduced top margin
+    marginBottom: 8, // Significantly reduced bottom margin to bring list closer
     padding: 6,
-    borderRadius: 20,
-    height: 56,
+    borderRadius: 18,
+    height: 52,
   },
   btn: {
     flex: 1,
@@ -91,6 +92,6 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
   },
   contentContainer: {
-    paddingBottom: 40,
+    flex: 1,
   }
 });

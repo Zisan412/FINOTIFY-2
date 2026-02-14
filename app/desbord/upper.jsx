@@ -1,8 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Upper = ({ totalBalance, income, expense }) => {
+const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress }) => {
   return (
     <View style={styles.container}>
       {/* TOP HEADER */}
@@ -48,8 +48,12 @@ const Upper = ({ totalBalance, income, expense }) => {
           placeholder="Search items..."
           placeholderTextColor="#a4b0be"
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={onSearchChange}
         />
-        <Ionicons name="options-outline" size={20} color="#bdc3c7" />
+        <TouchableOpacity onPress={onFilterPress}>
+          <Ionicons name="options-outline" size={20} color="#bdc3c7" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -61,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   upper: {
-    paddingTop: 40, // More top padding to clear status bar
+    paddingTop: 10,
     paddingHorizontal: 16,
     paddingBottom: 5,
   },
