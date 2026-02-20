@@ -1,8 +1,57 @@
-import React from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress }) => {
+  const [displayName, setDisplayName] = useState("");
+  const fullUsername = "mominmusabkin"; // This could come from a user context
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const waveAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // 1. Initial Fade and Wave Animation for Emoji
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.sequence([
+        Animated.delay(300),
+        Animated.timing(waveAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.timing(waveAnim, { toValue: -1, duration: 400, useNativeDriver: true }),
+        Animated.timing(waveAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.timing(waveAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+      ])
+    ]).start();
+
+    // 2. Typing effect for username, starts slightly after greeting
+    const startTyping = setTimeout(() => {
+      let index = 0;
+      const timer = setInterval(() => {
+        setDisplayName(fullUsername.substring(0, index + 1));
+        index++;
+        if (index >= fullUsername.length) clearInterval(timer);
+      }, 70); // Smooth typing speed
+
+      return () => clearInterval(timer);
+    }, 600);
+
+    return () => clearTimeout(startTyping);
+  }, []);
+
+  const waveStyle = {
+    transform: [
+      {
+        rotate: waveAnim.interpolate({
+          inputRange: [-1, 1],
+          outputRange: ["-15deg", "15deg"],
+        }),
+      },
+    ],
+  };
+
   return (
     <View style={styles.container}>
       {/* TOP HEADER */}
@@ -11,8 +60,13 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
         {/* Header Row: Greeting & Notification */}
         <View style={styles.headerRow}>
           <View style={styles.greetingObj}>
-            <Text style={styles.greetingText}>Good Morning,</Text>
-            <Text style={styles.username}>mominmusabkin</Text>
+            <View style={styles.greetingWrapper}>
+              <Text style={styles.greetingText}>Hi</Text>
+              <Animated.View style={[waveStyle, { opacity: fadeAnim }]}>
+                <Text style={styles.greetingEmoji}>👋</Text>
+              </Animated.View>
+            </View>
+            <Text style={styles.username}>{displayName}</Text>
           </View>
 
           <View style={styles.notificationBox}>
@@ -65,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   upper: {
-    paddingTop: 10,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 10 : 10,
     paddingHorizontal: 16,
     paddingBottom: 5,
   },
@@ -74,24 +128,36 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12, // Reduced margin
+    marginBottom: 12,
   },
 
   greetingObj: {
     flex: 1,
   },
 
+  greetingWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+
   greetingText: {
-    fontSize: 12, // Smaller label
+    fontSize: 14,
     color: "#a4b0be",
-    fontWeight: "500",
+    fontWeight: "600",
+  },
+
+  greetingEmoji: {
+    fontSize: 18,
+    marginLeft: 6,
   },
 
   username: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#2f3640",
     textTransform: "capitalize",
+    letterSpacing: -0.5,
   },
 
   notificationBox: {

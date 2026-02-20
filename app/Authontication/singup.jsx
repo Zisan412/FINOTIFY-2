@@ -30,24 +30,11 @@ const Singup = () => {
 
   const [error, seterror] = useState('')
 
-  // const senddata = () => {
-  //   {
-  //     axios.post('http://localhost:3000/users/useradd', {
-  //       username: username,
-  //       mobileno: mobile,
-  //       email: email,
-  //       password: pass
-  //     }).then((res) => {
-  //       console.log(res.massage)
+  const senddata = () => {
+    // Temporarily disabled for testing
+    router.replace('/desbord/desbord');
+  };
 
-  //       router.push('../desbord/desbord')
-  //     }).catch((error) => {
-  //       console.log(error)
-  //     }
-  //     )
-  //   }
-  // }
-  router.push('../desbord/desbord')
   const hideing = () => {
     setchnage(true);
     sethide(9);
@@ -85,9 +72,8 @@ const Singup = () => {
       }, 2000)
     }
     else {
-      router.push('/desbord')
+      router.replace('/desbord/desbord')
     }
-    router.push('../desbord/desbord')
   }
 
   return (

@@ -5,26 +5,36 @@ import {
   TextInput,
   View,
   ScrollView,
-  ImageBackground,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+  KeyboardAvoidingView,
+  Animated,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import Danger from "../Modules/danger";
 import { router, useLocalSearchParams } from "expo-router";
 
 const AddData = () => {
-
-  const {cat,amm,des,it} = useLocalSearchParams()
+  const { cat, amm, des } = useLocalSearchParams();
 
   const [showPicker, setShowPicker] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
 
   const [date, setDate] = useState(new Date());
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [desc, setDesc] = useState("");
-  const [error, setError] = useState("");
+  const [amount, setAmount] = useState(amm || "");
+  const [category, setCategory] = useState(cat || "");
+  const [desc, setDesc] = useState(des || "");
+
+  const [activeInput, setActiveInput] = useState(null);
+  const [loading, setLoading] = useState(null); // 'income' | 'expense' | null
+  const [errors, setErrors] = useState({});
+  const [showToast, setShowToast] = useState(false);
+
+  const toastY = useRef(new Animated.Value(-100)).current;
+  const toastOpacity = useRef(new Animated.Value(0)).current;
 
   const categories = [
     "Food 🍔",
@@ -35,253 +45,578 @@ const AddData = () => {
     "Other 📦",
   ];
 
+  const triggerToast = () => {
+    setShowToast(true);
+    Animated.parallel([
+      Animated.timing(toastY, {
+        toValue: 20,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(toastOpacity, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(toastY, {
+          toValue: -100,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(toastOpacity, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setShowToast(false));
+    }, 2500);
+  };
+
   const submit = (type) => {
-    if (!amount || !category || !desc) {
-      setError("Please fill all fields ❌");
-      setTimeout(() => setError(""), 2000);
+    const newErrors = {};
+    if (!amount) newErrors.amount = "Please enter amount";
+    if (!category) newErrors.category = "Please select a category";
+    if (!desc) newErrors.desc = "Please add a description";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    console.log({
-      type,
-      date,
-      amount,
-      category,
-      desc,
-    });
+    setErrors({});
+    setLoading(type);
 
-    setError("Data saved successfully ✅");
-    setTimeout(() => setError(""), 2000);
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(null);
+      triggerToast();
 
-    setAmount("");
-    setCategory("");
-    setDesc("");
+      console.log({
+        type,
+        date,
+        amount,
+        category,
+        desc,
+      });
+
+      setTimeout(() => {
+        router.back();
+      }, 1500);
+    }, 800);
   };
 
   return (
-    <ImageBackground
-      // source={require("../../assets/ChatGPT Image Jan 21, 2026, 07_34_58 PM.png")}
-      style={styles.bg}
-    >
-
-      {/* HEADER */}
-      <Text style={styles.title}>Add Income / Expense</Text>
-
-      {/* CARD */}
-      <View style={styles.card}>
-        {/* DATE */}
-        <Pressable style={styles.inputRow} onPress={() => setShowPicker(true)}>
-          <Ionicons name="calendar-outline" size={20} color="#0a63bc" />
-          <Text style={styles.inputText}>{date.toDateString()}</Text>
-        </Pressable>
-
-        {showPicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            onChange={(e, d) => {
-              setShowPicker(false);
-              d && setDate(d);
-            }}
-          />
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        {/* PREMIUM TOAST */}
+        {showToast && (
+          <Animated.View
+            style={[
+              styles.toastContainer,
+              { transform: [{ translateY: toastY }], opacity: toastOpacity }
+            ]}
+          >
+            <View style={styles.toastContent}>
+              <View style={styles.toastIcon}>
+                <Ionicons name="checkmark-circle" size={24} color="#fff" />
+              </View>
+              <View>
+                <Text style={styles.toastTitle}>Transaction Added</Text>
+                <Text style={styles.toastSub}>Your record has been saved successfully!</Text>
+              </View>
+            </View>
+          </Animated.View>
         )}
 
-        {/* AMOUNT */}
-        <View style={styles.inputRow}>
-          <Ionicons name="cash-outline" size={20} color="#0a63bc" />
-          <TextInput
-            placeholder="Amount"
-            keyboardType="numeric"
-            style={styles.input}
-            value={amount||amm}
-            onChangeText={setAmount}
-          />
-        </View>
-
-        {/* CATEGORY */}
-        <Pressable
-          style={styles.inputRow}
-          onPress={() => setShowCategory(true)}
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <Ionicons name="apps-outline" size={20} color="#0a63bc" />
-          <Text style={styles.inputText}>
-            {category || cat || "Select Category"}
-          </Text>
-        </Pressable>
-        
+          {/* HEADER SECTION */}
+          <View style={styles.header}>
+            <Pressable onPress={() => router.back()} style={styles.backBtn}>
+              <Ionicons name="arrow-back" size={24} color="#1e293b" />
+            </Pressable>
+            <View style={styles.headerText}>
+              <Text style={styles.title}>New Transaction</Text>
+              <Text style={styles.subtitle}>Track your income and expenses easily</Text>
+            </View>
+          </View>
 
-        {/* DESCRIPTION */}
-        <View style={styles.inputRow}>
-          <Ionicons name="document-text-outline" size={20} color="#0a63bc" />
-          <TextInput
-            placeholder="Description"
-            style={styles.input}
-            value={desc||des}
-            onChangeText={setDesc}
-            multiline
-          />
-        </View>
-
-        {/* BUTTONS */}
-        <View style={styles.row}>
-          <Pressable
-            style={[styles.btn, styles.income]}
-            onPress={() => submit("income")}
-          >
-            <Text style={styles.btnText}>Income</Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.btn, styles.expense]}
-            onPress={() => submit("expense")}
-          >
-            <Text style={styles.btnText}>Expense</Text>
-          </Pressable>
-        </View>
-
-      
-      </View>
-          <Pressable
-          style={[ styles.due]}
-          onPress={() => {submit("due") ,router.push('../DuePyment/addduepy')}}
-        >
-          <Text style={styles.btnText}>Add Due Payment</Text>
-          <Ionicons name="add-outline" size={18} color="#fff" />
-        </Pressable>
-      {/* CATEGORY MODAL */}
-      {showCategory && (
-        <View style={styles.modal}>
-          <Text style={styles.modalTitle}>Select Category</Text>
-          <Ionicons name="close-circle-outline" size={24} color="#555" style={{position:'absolute',right:20,top:20}} onPress={()=>setShowCategory(false)}/>
-          <ScrollView>
-            {categories.map((item, i) => (
+          {/* FORM CARD */}
+          <View style={styles.card}>
+            {/* DATE INPUT */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Transaction Date</Text>
               <Pressable
-                key={i}
-                style={styles.cat}
-                onPress={() => {
-                  setCategory(item);
-                  setShowCategory(false);
-                }}
+                style={[
+                  styles.inputBox,
+                  activeInput === 'date' && styles.activeBox
+                ]}
+                onPress={() => setShowPicker(true)}
               >
-                <Text style={styles.catText}>{item}</Text>
+                <Ionicons name="calendar" size={20} color="#0a63bc" />
+                <Text style={styles.inputText}>{date.toDateString()}</Text>
               </Pressable>
-            ))}
-          </ScrollView>
+            </View>
+
+            {showPicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                onChange={(e, d) => {
+                  setShowPicker(false);
+                  d && setDate(d);
+                }}
+              />
+            )}
+
+            {/* AMOUNT INPUT */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Amount</Text>
+              <View style={[
+                styles.inputBox,
+                activeInput === 'amount' && styles.activeBox,
+                errors.amount && styles.errorBox
+              ]}>
+                <Ionicons name="card" size={20} color={errors.amount ? "#ef4444" : "#0a63bc"} />
+                <TextInput
+                  placeholder="₹ 0.00"
+                  keyboardType="numeric"
+                  style={styles.input}
+                  value={amount}
+                  onChangeText={(val) => {
+                    setAmount(val);
+                    if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                  }}
+                  onFocus={() => setActiveInput('amount')}
+                  onBlur={() => setActiveInput(null)}
+                />
+              </View>
+              {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
+            </View>
+
+            {/* CATEGORY INPUT */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Category</Text>
+              <Pressable
+                style={[
+                  styles.inputBox,
+                  activeInput === 'category' && styles.activeBox,
+                  errors.category && styles.errorBox
+                ]}
+                onPress={() => setShowCategory(true)}
+              >
+                <Ionicons name="grid" size={20} color={errors.category ? "#ef4444" : "#0a63bc"} />
+                <Text style={styles.inputText}>
+                  {category || "Select Category"}
+                </Text>
+                <Ionicons name="chevron-down" size={18} color="#94a3b8" style={{ marginLeft: 'auto' }} />
+              </Pressable>
+              {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
+            </View>
+
+            {/* DESCRIPTION INPUT */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Notes</Text>
+              <View style={[
+                styles.inputBox,
+                styles.textArea,
+                activeInput === 'desc' && styles.activeBox,
+                errors.desc && styles.errorBox
+              ]}>
+                <Ionicons name="document-text" size={20} color={errors.desc ? "#ef4444" : "#0a63bc"} style={{ marginTop: 2 }} />
+                <TextInput
+                  placeholder="What was this for?"
+                  style={[styles.input, { textAlignVertical: 'top' }]}
+                  value={desc}
+                  onChangeText={(val) => {
+                    setDesc(val);
+                    if (errors.desc) setErrors(prev => ({ ...prev, desc: null }));
+                  }}
+                  multiline
+                  onFocus={() => setActiveInput('desc')}
+                  onBlur={() => setActiveInput(null)}
+                />
+              </View>
+              {errors.desc && <Text style={styles.errorText}>{errors.desc}</Text>}
+            </View>
+
+            {/* PRIMARY BUTTONS */}
+            <View style={styles.buttonRow}>
+              <Pressable
+                disabled={loading !== null}
+                style={({ pressed }) => [
+                  styles.mainBtn,
+                  styles.incomeBtn,
+                  (pressed || loading === 'income') && styles.btnPressed
+                ]}
+                onPress={() => submit("income")}
+              >
+                {loading === 'income' ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <>
+                    <Ionicons name="trending-up" size={18} color="#fff" />
+                    <Text style={styles.btnText}>Income</Text>
+                  </>
+                )}
+              </Pressable>
+
+              <Pressable
+                disabled={loading !== null}
+                style={({ pressed }) => [
+                  styles.mainBtn,
+                  styles.expenseBtn,
+                  (pressed || loading === 'expense') && styles.btnPressed
+                ]}
+                onPress={() => submit("expense")}
+              >
+                {loading === 'expense' ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <>
+                    <Ionicons name="trending-down" size={18} color="#fff" />
+                    <Text style={styles.btnText}>Expense</Text>
+                  </>
+                )}
+              </Pressable>
+            </View>
+          </View>
+
+          {/* SECONDARY ACTION */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.dueAction,
+              pressed && styles.btnPressed
+            ]}
+            onPress={() => router.push('/DuePyment/addduepy')}
+          >
+            <View style={styles.dueIconBox}>
+              <Ionicons name="time" size={20} color="#0a63bc" />
+            </View>
+            <View>
+              <Text style={styles.dueTitle}>Add Due Payment</Text>
+              <Text style={styles.dueSub}>Track money pending with others</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#94a3b8" style={{ marginLeft: 'auto' }} />
+          </Pressable>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* CATEGORY BOTTOM SHEET SIMULATION */}
+      {showCategory && (
+        <View style={styles.modalOverlay}>
+          <Pressable style={styles.modalCloseArea} onPress={() => setShowCategory(false)} />
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHandle} />
+              <Text style={styles.modalTitle}>Select Category</Text>
+            </View>
+            <ScrollView style={styles.modalList}>
+              {categories.map((item, i) => (
+                <Pressable
+                  key={i}
+                  style={styles.catItem}
+                  onPress={() => {
+                    setCategory(item);
+                    if (errors.category) setErrors(prev => ({ ...prev, category: null }));
+                    setShowCategory(false);
+                  }}
+                >
+                  <Text style={styles.catText}>{item}</Text>
+                  {category === item && <Ionicons name="checkmark-circle" size={20} color="#0a63bc" />}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
         </View>
       )}
-      
-    </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 export default AddData;
 
 const styles = StyleSheet.create({
-  bg: {
+  safeArea: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#f8fafc",
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
   },
-
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 25,
+    marginTop: 10,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+  },
+  headerText: {
+    marginLeft: 15,
+  },
   title: {
     fontSize: 22,
-    fontWeight: "600",
-    textAlign: "center",
-    marginVertical: 20,
+    fontWeight: "800",
+    color: "#1e293b",
   },
-
+  subtitle: {
+    fontSize: 13,
+    color: "#94a3b8",
+    marginTop: 2,
+  },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 20,
-    elevation: 6,
-    height: "55%",
+    borderRadius: 24,
+    padding: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 20,
   },
-
-  inputRow: {
+  inputGroup: {
+    marginBottom: 18,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#64748b',
+    marginBottom: 8,
+    marginLeft: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  inputBox: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    borderBottomWidth: 1,
-    borderColor: "#e0e0e0",
-    paddingVertical: 14,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    height: 58,
+    borderWidth: 1.5,
+    borderColor: "transparent",
   },
-
+  activeBox: {
+    borderColor: "#0a63bc",
+    backgroundColor: "#fff",
+  },
+  errorBox: {
+    borderColor: "#fecaca",
+    backgroundColor: "#fff5f5",
+  },
+  errorText: {
+    color: "#ef4444",
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 6,
+    marginLeft: 6,
+  },
+  textArea: {
+    height: 100,
+    alignItems: 'flex-start',
+    paddingTop: 14,
+  },
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 16,
+    color: "#1e293b",
+    fontWeight: '600',
+    marginLeft: 12,
   },
-
   inputText: {
-    fontSize: 15,
-    color: "#555",
+    fontSize: 16,
+    color: "#1e293b",
+    fontWeight: '600',
+    marginLeft: 12,
   },
-
-  row: {
+  buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 25,
+    marginTop: 10,
+    gap: 12,
   },
-
-  btn: {
-    height: 45,
-    borderRadius: 12,
+  mainBtn: {
+    flex: 1,
+    height: 58,
+    borderRadius: 18,
+    flexDirection: 'row',
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
-    marginHorizontal: 5,
+    gap: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
   },
-
-  income: {
+  incomeBtn: {
     backgroundColor: "#0a63bc",
   },
-
-  expense: {
-    backgroundColor: "#ff3b3b",
+  expenseBtn: {
+    backgroundColor: "#ef4444",
   },
-
-  due: {
-    backgroundColor: "#1343ac",
-    marginTop: 15,
-    height:45,
-    borderRadius:12,
-    justifyContent:'center',
-    alignItems:'center',
-    flexDirection:'row',
-    gap:6,
-  },
-
   btnText: {
     color: "#fff",
-    fontWeight: "600",
+    fontWeight: "800",
+    fontSize: 16,
+    letterSpacing: 0.3,
   },
-
-  modal: {
-    position:'absolute',
-    bottom: 0,
+  btnPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.96 }],
+  },
+  dueAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    marginTop: 20,
+    padding: 18,
+    borderRadius: 22,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  dueIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: '#e0f2fe',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  dueTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1e293b',
+  },
+  dueSub: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#ffffff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius:20,
-    padding: 20,
-    elevation: 10,
+    bottom: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    justifyContent: 'flex-end',
+    zIndex: 1000,
   },
-
+  modalCloseArea: {
+    flex: 1,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingBottom: 40,
+    maxHeight: '75%',
+    elevation: 20,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  modalHandle: {
+    width: 36,
+    height: 5,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 3,
+    marginBottom: 15,
+  },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 10,
-    textAlign: "center",
-  
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1e293b',
   },
-
-  cat: {
-    padding: 14,
+  modalList: {
+    paddingHorizontal: 20,
+  },
+  catItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 18,
     borderBottomWidth: 1,
-    borderColor: "#eee",
+    borderBottomColor: '#f8fafc',
   },
-
   catText: {
     fontSize: 16,
+    color: '#334155',
+    fontWeight: '600',
+  },
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    zIndex: 9999,
+  },
+  toastContent: {
+    backgroundColor: '#10b981',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 15,
+  },
+  toastIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  toastTitle: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  toastSub: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 1,
   },
 });

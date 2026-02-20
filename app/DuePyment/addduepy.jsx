@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useState } from "react";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 const AddDuePayment = () => {
@@ -15,10 +16,20 @@ const AddDuePayment = () => {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
 
+  const handleSave = () => {
+    // Save logic would go here
+    router.back();
+  };
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
-      <Text style={styles.title}>Add Due Payment</Text>
+      <View style={styles.headerRow}>
+        <Pressable onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#111" />
+        </Pressable>
+        <Text style={styles.title}>Add Due Payment</Text>
+      </View>
       <Text style={styles.subtitle}>
         Track money you need to receive or pay
       </Text>
@@ -85,6 +96,7 @@ const AddDuePayment = () => {
 
       {/* Save */}
       <Pressable
+        onPress={handleSave}
         style={[
           styles.saveBtn,
           type === "receive" ? styles.receiveBtn : styles.payBtn,
@@ -102,6 +114,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f7f9fc",
     padding: 20,
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+    marginBottom: 4,
   },
 
   title: {

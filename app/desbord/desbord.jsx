@@ -1,14 +1,21 @@
 import { StyleSheet, View, SafeAreaView } from "react-native";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
 
 const desbord = () => {
+  const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
+
+  useEffect(() => {
+    if (params.tab) {
+      setActiveTab(parseInt(params.tab));
+    }
+  }, [params.tab]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [filters, setFilters] = useState({

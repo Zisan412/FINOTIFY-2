@@ -11,27 +11,30 @@ const bottom = () => {
   return (
     <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
       <View style={styles.footer}>
-        <Pressable style={styles.foot} onPress={() => router.push('../desbord')} >
+        <Pressable
+          style={styles.foot}
+          onPress={() => router.replace('/desbord/desbord')}
+        >
           <MaterialIcons name="home-filled" size={26} color="white" />
           <Text style={styles.fonts}>Home</Text>
         </Pressable>
 
-        <Pressable style={styles.foot} onPress={() => router.push('../charts/headr')}>
+        <Pressable style={styles.foot} onPress={() => router.replace('/charts/headr')}>
           <Ionicons name="stats-chart" size={26} color="white" />
           <Text style={styles.fonts}>Stats</Text>
         </Pressable>
 
         <View style={styles.addBtnContainer}>
-          <Pressable style={styles.addbtn} onPress={() => router.push('../desbord/adddata')}>
+          <Pressable style={styles.addbtn} onPress={() => router.push('/desbord/adddata')}>
             <Ionicons name="add" size={50} color="white" />
           </Pressable>
         </View>
 
-        <Pressable style={styles.foot} onPress={() => router.push('../DuePyment/due')}>
+        <Pressable style={styles.foot} onPress={() => router.replace('/DuePyment/due')}>
           <Ionicons name="time" size={26} color="white" />
           <Text style={styles.fonts}>Due</Text>
         </Pressable>
-        <Pressable style={styles.foot} onPress={() => router.push('../Usersetting/setting')}>
+        <Pressable style={styles.foot} onPress={() => router.replace('/Usersetting/setting')}>
           <Ionicons name="settings-sharp" size={26} color="white" />
           <Text style={styles.fonts}>Setting</Text>
         </Pressable>
