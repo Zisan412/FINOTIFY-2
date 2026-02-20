@@ -65,6 +65,31 @@ const Header = () => {
 
   const total = pieData.reduce((acc, curr) => acc + curr.value, 0);
 
+  // Clean, minimal data for PieChart with external labels
+  const minimalPieData = useMemo(() => {
+    return pieData.map(item => {
+      const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+      const isIncome = item.label === 'Income';
+
+      return {
+        ...item,
+        // No text inside the chart
+        text: "",
+        labelComponent: () => (
+          <View style={[
+            styles.externalLabel,
+            { alignItems: isIncome ? 'flex-start' : 'flex-end' }
+          ]}>
+            <Text style={[styles.extLabelTitle, { color: item.color }]}>
+              {item.label} <Text style={styles.extLabelAmm}>₹{item.value}</Text>
+            </Text>
+            <Text style={styles.extLabelPerc}>{percentage}%</Text>
+          </View>
+        ),
+      };
+    });
+  }, [pieData, total]);
+
   const formatDate = (date) => {
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
   };
@@ -133,10 +158,10 @@ const Header = () => {
                 style={styles.chartInteractiveArea}
               >
                 <PieChart
-                  data={pieData}
+                  data={minimalPieData}
                   donut
-                  radius={120}
-                  innerRadius={80}
+                  radius={90}
+                  innerRadius={65}
                   innerCircleColor={'#ffffff'}
                   centerLabelComponent={() => (
                     <View style={styles.centerLabel}>
@@ -144,6 +169,12 @@ const Header = () => {
                       <Text style={styles.centerSub}>Total Flow</Text>
                     </View>
                   )}
+                  showText={false}
+                  showLine
+                  lineColor="#cbd5e1"
+                  lineThickness={1}
+                  lineLength={25}
+                  labelsPosition="outward"
                 />
               </Pressable>
             </View>
@@ -344,5 +375,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1565c0',
     lineHeight: 20,
-  }
+  },
+  externalLabel: {
+    paddingHorizontal: 15,
+    justifyContent: 'center',
+    minWidth: 100,
+  },
+  extLabelTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  extLabelAmm: {
+    color: '#1e293b',
+    fontWeight: '700',
+  },
+  extLabelPerc: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
 })
