@@ -13,10 +13,27 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 const ManageEntries = () => {
-    // Dummy data for demonstration
     const [entries, setEntries] = useState([
-        { id: 1, cat: "Salary 💰", amm: 50000, des: "Monthly Salary", it: "income", date: new Date() },
-        { id: 2, cat: "Food 🍔", amm: 1200, des: "Dinner with friends", it: "expense", date: new Date() },
+        {
+            id: 1,
+            cat: "Salary 💰",
+            amm: 50000,
+            des: "Monthly Salary",
+            it: "income",
+            date: new Date(),
+            bankName: "HDFC Bank",
+            upiId: "company@hdfcbank",
+        },
+        {
+            id: 2,
+            cat: "Food 🍔",
+            amm: 1200,
+            des: "Dinner with friends",
+            it: "expense",
+            date: new Date(),
+            bankName: "Kotak Bank",
+            upiId: "friend@oksbi",
+        },
         { id: 3, cat: "Travel ✈️", amm: 3000, des: "Office commute", it: "expense", date: new Date() },
         { id: 4, cat: "Shopping 🛍️", amm: 4500, des: "New shoes", it: "expense", date: new Date() },
     ]);
@@ -50,38 +67,65 @@ const ManageEntries = () => {
                 ) : (
                     entries.map((item) => {
                         const isIncome = item.it === "income";
+                        const emojiMatch = item.cat.match(/[\p{Emoji}\u200d]+/u);
+                        const iconSign = emojiMatch ? emojiMatch[0] : item.cat.charAt(0);
+                        const cleanCat = item.cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
+                        const dateStr = `${item.date.getDate().toString().padStart(2, '0')}-${(item.date.getMonth() + 1).toString().padStart(2, '0')}-${item.date.getFullYear().toString().slice(-2)}`;
+
                         return (
                             <View key={item.id} style={styles.entryCard}>
                                 <View style={[styles.indicator, { backgroundColor: isIncome ? "#22c55e" : "#ef4444" }]} />
                                 <View style={styles.cardContent}>
-                                    <View style={styles.cardHeader}>
-                                        <Text style={styles.catText}>{item.cat}</Text>
-                                        <Text style={[styles.ammText, { color: isIncome ? "#22c55e" : "#ef4444" }]}>
-                                            {isIncome ? "+" : "-"}₹{item.amm}
-                                        </Text>
-                                    </View>
-                                    <Text style={styles.desText}>{item.des}</Text>
-                                    <View style={styles.cardFooter}>
-                                        <Text style={styles.dateText}>
-                                            {item.date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                                        </Text>
-                                        <View style={styles.actionRow}>
-                                            <Pressable
-                                                style={styles.actionBtn}
-                                                onPress={() => router.push({
-                                                    pathname: '../desbord/adddata',
-                                                    params: { cat: item.cat, amm: item.amm, des: item.des, it: item.it }
-                                                })}
-                                            >
-                                                <Ionicons name="create-outline" size={20} color="#0a63bc" />
-                                            </Pressable>
-                                            <Pressable
-                                                style={[styles.actionBtn, styles.deleteBtn]}
-                                                onPress={() => handleDelete(item.id)}
-                                            >
-                                                <Ionicons name="trash-outline" size={20} color="#ef4444" />
-                                            </Pressable>
+                                    <View style={styles.row}>
+
+                                        {/* ── LEFT: icon column ── */}
+                                        <View style={styles.iconColumn}>
+                                            <Text style={styles.categoryIcon}>{iconSign}</Text>
+                                            <Text style={styles.categoryName} numberOfLines={1}>
+                                                {cleanCat || item.cat}
+                                            </Text>
                                         </View>
+
+                                        {/* ── CENTER: main info ── */}
+                                        <View style={styles.centerSection}>
+                                            <Text style={styles.description} numberOfLines={1}>
+                                                {item.des}
+                                            </Text>
+                                            <Text style={styles.subDetail} numberOfLines={1}>
+                                                {item.bankName || 'Cash'}
+                                            </Text>
+                                            {item.bankName && item.upiId ? (
+                                                <Text style={styles.subDetail} numberOfLines={1}>
+                                                    {item.upiId}
+                                                </Text>
+                                            ) : null}
+                                            <Text style={styles.dateText}>{dateStr}</Text>
+                                        </View>
+
+                                        {/* ── RIGHT: amount + actions (untouched) ── */}
+                                        <View style={styles.rightSection}>
+                                            <Text style={[styles.ammText, { color: isIncome ? "#22c55e" : "#ef4444" }]}>
+                                                {isIncome ? "+" : "-"}₹{item.amm}
+                                            </Text>
+                                            <View style={styles.actionRow}>
+                                                <Pressable
+                                                    style={styles.actionBtn}
+                                                    onPress={() => router.push({
+                                                        pathname: '../desbord/adddata',
+                                                        params: { cat: item.cat, amm: item.amm, des: item.des, it: item.it }
+                                                    })}
+                                                >
+                                                    <Ionicons name="create-outline" size={18} color="#0a63bc" />
+                                                </Pressable>
+                                                <Pressable
+                                                    style={[styles.actionBtn, styles.deleteBtn]}
+                                                    onPress={() => handleDelete(item.id)}
+                                                >
+                                                    <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                                                </Pressable>
+                                            </View>
+                                        </View>
+
                                     </View>
                                 </View>
                             </View>
@@ -134,69 +178,96 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        padding: 20,
+        padding: 16,
         paddingBottom: 40,
     },
     entryCard: {
         backgroundColor: '#fff',
-        borderRadius: 20,
-        marginBottom: 15,
+        borderRadius: 16,
+        marginBottom: 10,
         flexDirection: 'row',
         overflow: 'hidden',
-        elevation: 3,
+        borderLeftWidth: 3,
+        elevation: 1,
         shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 10,
+        shadowOpacity: 0.04,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 4,
     },
     indicator: {
-        width: 6,
+        width: 0,
     },
     cardContent: {
         flex: 1,
-        padding: 16,
+        paddingVertical: 11,
+        paddingHorizontal: 12,
     },
-    cardHeader: {
+    row: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 4,
+        gap: 10,
     },
-    catText: {
-        fontSize: 16,
+
+    /* ── LEFT icon column ── */
+    iconColumn: {
+        alignItems: 'center',
+        width: 44,
+    },
+    categoryIcon: {
+        fontSize: 22,
+        lineHeight: 28,
+    },
+    categoryName: {
+        fontSize: 9,
+        color: '#a4b0be',
+        fontWeight: '600',
+        textTransform: 'capitalize',
+        textAlign: 'center',
+        marginTop: 1,
+    },
+
+    /* ── CENTER details ── */
+    centerSection: {
+        flex: 1,
+        paddingRight: 6,
+    },
+    description: {
+        fontSize: 14,
         fontWeight: '700',
-        color: '#1e293b',
+        color: '#2C3A47',
+        marginBottom: 2,
     },
-    ammText: {
-        fontSize: 17,
-        fontWeight: '800',
-    },
-    desText: {
-        fontSize: 13,
-        color: '#64748b',
-        marginBottom: 12,
-    },
-    cardFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
-        paddingTop: 12,
+    subDetail: {
+        fontSize: 11,
+        color: '#8395a7',
+        marginBottom: 1,
     },
     dateText: {
-        fontSize: 12,
-        color: '#94a3b8',
-        fontWeight: '600',
+        fontSize: 10,
+        color: '#c8d6e5',
+        fontWeight: '500',
+        marginTop: 2,
+    },
+
+    /* ── RIGHT section ── */
+    rightSection: {
+        alignItems: 'flex-end',
+    },
+    ammText: {
+        fontSize: 16,
+        fontWeight: '800',
+        letterSpacing: 0.2,
     },
     actionRow: {
         flexDirection: 'row',
-        gap: 12,
+        gap: 8,
+        marginTop: 6,
+        opacity: 0.85,
     },
     actionBtn: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
+        width: 32,
+        height: 32,
+        borderRadius: 8,
         backgroundColor: '#f1f5f9',
         justifyContent: 'center',
         alignItems: 'center',
@@ -204,6 +275,7 @@ const styles = StyleSheet.create({
     deleteBtn: {
         backgroundColor: '#fef2f2',
     },
+
     emptyState: {
         alignItems: 'center',
         justifyContent: 'center',

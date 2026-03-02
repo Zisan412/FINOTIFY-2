@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress }) => {
+const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh }) => {
   const [displayName, setDisplayName] = useState("");
   const fullUsername = "mominmusabkin"; // This could come from a user context
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const waveAnim = useRef(new Animated.Value(0)).current;
+  const spinAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // 1. Initial Fade and Wave Animation for Emoji
@@ -52,6 +53,26 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
     ],
   };
 
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg']
+  });
+
+  const handleSyncPress = () => {
+    // 1. Replay spin animation
+    spinAnim.setValue(0);
+    Animated.timing(spinAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+
+    // 2. Call external refresh to reload state
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* TOP HEADER */}
@@ -69,10 +90,15 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
             <Text style={styles.username}>{displayName}</Text>
           </View>
 
-          <View style={styles.notificationBox}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
-            <View style={styles.badge} />
-          </View>
+          <TouchableOpacity
+            style={styles.notificationBox}
+            activeOpacity={0.7}
+            onPress={handleSyncPress}
+          >
+            <Animated.View style={{ transform: [{ rotate: spin }] }}>
+              <Ionicons name="sync-outline" size={24} color="#333" />
+            </Animated.View>
+          </TouchableOpacity>
         </View>
 
         {/* Compact Balance Card */}
@@ -119,16 +145,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
   },
   upper: {
-    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 10 : 10,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 6 : 6,
     paddingHorizontal: 16,
-    paddingBottom: 5,
+    paddingBottom: 4,
   },
 
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
 
   greetingObj: {
@@ -153,7 +179,7 @@ const styles = StyleSheet.create({
   },
 
   username: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#2f3640",
     textTransform: "capitalize",
@@ -183,18 +209,19 @@ const styles = StyleSheet.create({
   // Compact Balance Card
   balanceCard: {
     backgroundColor: "#0a63bc",
-    borderRadius: 18, // Slightly more rounded
-    padding: 14, // Even more compact padding
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     shadowColor: "#0a63bc",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
     elevation: 4,
   },
 
   cardLabel: {
     color: "rgba(255,255,255,0.7)",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "600",
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -202,18 +229,18 @@ const styles = StyleSheet.create({
 
   cardAmount: {
     color: "white",
-    fontSize: 26, // Slightly smaller amount
+    fontSize: 22,
     fontWeight: "bold",
-    marginTop: 2,
+    marginTop: 1,
   },
 
   cardRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 7,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
-    paddingTop: 8,
+    borderTopColor: "rgba(255,255,255,0.12)",
+    paddingTop: 6,
   },
 
   summaryItem: {
@@ -238,10 +265,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    height: 44, // More compact
+    height: 40,
     marginHorizontal: 16,
-    marginTop: 10,
-    marginBottom: 4,
+    marginTop: 8,
+    marginBottom: 2,
     borderRadius: 10,
     paddingHorizontal: 12,
     borderWidth: 1,

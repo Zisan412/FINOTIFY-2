@@ -28,12 +28,54 @@ const desbord = () => {
   const data = new Date();
 
   const datas = useMemo(() => [
-    { date: data, cat: 'food 🍴', amm: 200, des: 'this for food', it: 'expenss' },
-    { date: data, cat: 'salary 💸', amm: 2000, des: 'this is salary', it: 'income' },
-    { date: data, cat: 'salary 💸', amm: 20000, des: 'this is monthly salary', it: 'income' },
-    { date: data, cat: 'other ', amm: 20, des: 'mene pese diye chai me', it: 'expenss' },
-    { date: data, cat: 'other ', amm: 80, des: 'dost ne pese diye', it: 'income' },
-    { date: data, cat: 'shopping 🛍️', amm: 800, des: 'hum kharidi karne guy', it: 'expenss' },
+    {
+      date: data,
+      cat: 'transport 🚕',
+      amm: 150,
+      des: 'Petrol',
+      it: 'expenss',
+      bankName: 'Kotak Bank',
+      upiId: 'shaihnihal652@oksbi',
+    },
+    {
+      date: data,
+      cat: 'salary 💸',
+      amm: 50000,
+      des: 'Monthly Salary',
+      it: 'income',
+      bankName: 'HDFC Bank',
+      upiId: 'company@hdfcbank',
+    },
+    {
+      date: data,
+      cat: 'food 🍴',
+      amm: 320,
+      des: 'Dinner with team',
+      it: 'expenss',
+      bankName: 'SBI',
+      upiId: 'restaurant@upi',
+    },
+    {
+      date: data,
+      cat: 'other 💡',
+      amm: 99,
+      des: 'Netflix subscription',
+      it: 'expenss',
+    },
+    {
+      date: data,
+      cat: 'freelance 💼',
+      amm: 8000,
+      des: 'Design project',
+      it: 'income',
+    },
+    {
+      date: data,
+      cat: 'shopping 🛍️',
+      amm: 1400,
+      des: 'New shoes',
+      it: 'expenss',
+    },
   ], []);
 
   // Filtered and Sorted data
@@ -45,7 +87,8 @@ const desbord = () => {
       const query = searchQuery.toLowerCase();
       result = result.filter(item =>
         item.cat.toLowerCase().includes(query) ||
-        item.des.toLowerCase().includes(query)
+        item.des.toLowerCase().includes(query) ||
+        item.amm.toString().includes(query)
       );
     }
 
@@ -110,6 +153,18 @@ const desbord = () => {
     };
   }, [datas]);
 
+  const handleRefresh = () => {
+    // Reset dashboard state to refresh UI
+    setSearchQuery("");
+    setFilters({
+      type: "All",
+      category: "All",
+      dateRange: "All",
+      sortBy: "Latest",
+    });
+    setActiveTab(1);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* 1. FIXED HEADER SECTION */}
@@ -121,6 +176,7 @@ const desbord = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
+          onRefresh={handleRefresh}
         />
       </View>
 

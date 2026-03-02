@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
+import { ScrollView, Text, View, Pressable } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./all";
@@ -13,11 +13,8 @@ const Income = ({ go }) => {
       showsVerticalScrollIndicator={false}
     >
       {go.map((i, index) => {
-        const isIncome = i.it === "income";
+        if (i.it !== "income") return null;
 
-        if (!isIncome) return null;
-
-        // Extract emoji if present, or use first letter
         const emojiMatch = i.cat.match(/[\p{Emoji}\u200d]+/u);
         const iconSign = emojiMatch ? emojiMatch[0] : i.cat.charAt(0);
         const cleanCat = i.cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
@@ -25,43 +22,48 @@ const Income = ({ go }) => {
         return (
           <View
             key={index}
-            style={[
-              styles.card,
-              { borderLeftColor: "#2ecc71" },
-            ]}
+            style={[styles.card, { borderLeftColor: "#2ecc71" }]}
           >
             <View style={styles.row}>
-              {/* Left Side: Icon & Info */}
-              <View style={styles.leftSection}>
-                <View style={styles.iconContainer}>
-                  <Text style={{ fontSize: 20 }}>{iconSign}</Text>
-                </View>
 
-                <View style={styles.textContainer}>
-                  <Text style={styles.category}>{cleanCat || i.cat}</Text>
-                  <Text style={styles.date}>
-                    {date.getDate()} {date.toLocaleString("default", { month: "short" })}, {date.getFullYear()}
-                  </Text>
-                </View>
+              {/* ── LEFT: icon column ── */}
+              <View style={styles.iconColumn}>
+                <Text style={styles.categoryIcon}>{iconSign}</Text>
+                <Text style={styles.categoryName} numberOfLines={1}>
+                  {cleanCat || i.cat}
+                </Text>
               </View>
 
-              {/* Right Side: Amount & Actions */}
+              {/* ── CENTER: main info ── */}
+              <View style={styles.centerSection}>
+                <Text style={styles.description} numberOfLines={1}>
+                  {i.des}
+                </Text>
+                <Text style={styles.subDetail} numberOfLines={1}>
+                  {i.bankName || 'Cash'}
+                </Text>
+                {i.bankName && i.upiId ? (
+                  <Text style={styles.subDetail} numberOfLines={1}>
+                    {i.upiId}
+                  </Text>
+                ) : null}
+                <Text style={styles.dateText}>
+                  {`${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear().toString().slice(-2)}`}
+                </Text>
+              </View>
+
+              {/* ── RIGHT: amount + actions ── */}
               <View style={styles.rightSection}>
-                <Text
-                  style={[
-                    styles.amount,
-                    { color: "#2ecc71" },
-                  ]}
-                >
+                <Text style={[styles.amount, { color: "#2ecc71" }]}>
                   +₹ {i.amm}
                 </Text>
-
                 <View style={styles.actions}>
                   <Pressable>
                     <Ionicons name="trash-outline" size={18} color="#ff4757" />
                   </Pressable>
                 </View>
               </View>
+
             </View>
           </View>
         );
