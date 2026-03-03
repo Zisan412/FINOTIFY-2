@@ -1,16 +1,6 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  ScrollView,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-  KeyboardAvoidingView,
-  Animated,
-  ActivityIndicator,
+ActivityIndicator,
+  Dimensions,
+  Keyboard,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -78,10 +68,11 @@ const AddData = () => {
   const [newCatLabel, setNewCatLabel] = useState('');
   const [newCatIcon, setNewCatIcon] = useState('📌');
 
-  const slideAnim = useRef(new Animated.Value(400)).current;
+  const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
   const openCategory = () => {
-    slideAnim.setValue(400);
+    slideAnim.setValue(SCREEN_HEIGHT);
     setShowCategory(true);
     Animated.spring(slideAnim, {
       toValue: 0,
@@ -93,8 +84,8 @@ const AddData = () => {
 
   const closeCategory = () => {
     Animated.timing(slideAnim, {
-      toValue: 400,
-      duration: 220,
+      toValue: SCREEN_HEIGHT,
+      duration: 250,
       useNativeDriver: true,
     }).start(() => setShowCategory(false));
   };
@@ -410,6 +401,21 @@ const AddData = () => {
           </Pressable>
 
         </ScrollView>
+
+        {/* KEYBOARD ACCESSORY BAR — only for Notes/Desc */}
+        {activeInput === 'desc' && (
+          <View style={styles.keyboardAccessory}>
+            <Pressable
+              onPress={() => Keyboard.dismiss()}
+              style={({ pressed }) => [
+                styles.doneBtn,
+                pressed && { opacity: 0.7 }
+              ]}
+            >
+              <Text style={styles.doneBtnText}>Done</Text>
+            </Pressable>
+          </View>
+        )}
       </KeyboardAvoidingView>
 
       {/* CATEGORY BOTTOM SHEET — animated grid with add/delete */}
@@ -421,7 +427,7 @@ const AddData = () => {
             {/* ── Header toolbar ── */}
             <View style={styles.modalHandle} />
             <View style={styles.catSheetHeader}>
-              <Text style={styles.modalTitle}>Category</Text>
+              <Text style={styles.modalTitle}>Select Category</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 {/* Delete / Done toggle */}
                 {deleteMode ? (
@@ -960,7 +966,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'flex-end',
     zIndex: 1000,
   },
@@ -969,26 +975,31 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingBottom: 40,
-    maxHeight: '75%',
-    elevation: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingBottom: 25,
+    maxHeight: '65%',
+    elevation: 25,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: -4 },
+    shadowRadius: 15,
   },
   modalHeader: {
     alignItems: 'center',
     paddingVertical: 15,
   },
   modalHandle: {
-    width: 36,
-    height: 5,
+    width: 38,
+    height: 4,
     backgroundColor: '#e2e8f0',
-    borderRadius: 3,
-    marginBottom: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignSelf: 'center',
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#1e293b',
   },
   modalList: {
@@ -997,20 +1008,21 @@ const styles = StyleSheet.create({
   catGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    paddingBottom: 32,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     gap: 12,
   },
   catGridItem: {
-    width: '30%',
+    width: '30.6%',
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-    borderRadius: 16,
-    borderWidth: 1.5,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    borderWidth: 1,
     borderColor: '#f1f5f9',
-    gap: 6,
+    gap: 4,
+    marginBottom: 4,
   },
   catGridSelected: {
     backgroundColor: '#eff6ff',
@@ -1024,6 +1036,7 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontWeight: '600',
     textAlign: 'center',
+    marginTop: 2,
   },
   bankSectionLabel: {
     fontSize: 10,
@@ -1067,20 +1080,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: 24,
+    paddingTop: 15,
+    paddingBottom: 15,
   },
   catToolBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   catToolLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#64748b',
   },
@@ -1168,5 +1184,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     marginTop: 1,
+  },
+  keyboardAccessory: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  doneBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  doneBtnText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0a63bc',
   },
 });
