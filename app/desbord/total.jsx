@@ -34,7 +34,7 @@ const Total = ({ go }) => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: 100 }}
+      contentContainerStyle={{ paddingBottom: 120 }}
       showsVerticalScrollIndicator={false}
     >
       {/* TITLE CARD */}

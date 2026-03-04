@@ -119,7 +119,7 @@ const Settings = () => {
             <Text style={styles.logoutText}>Logout from Finotify</Text>
           </Pressable>
 
-          <View style={styles.bottomSpace} />
+          <View style={{ height: 120 }} />
         </ScrollView>
 
         {/* FIXED BOTTOM NAVIGATION */}

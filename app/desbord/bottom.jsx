@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View, Platform } from 'react-native'
 import React from 'react'
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -9,7 +9,12 @@ const bottom = () => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
+    <View style={[
+      styles.footerContainer,
+      {
+        paddingBottom: Platform.OS === 'ios' ? insets.bottom : Math.max(insets.bottom, 15)
+      }
+    ]}>
       <View style={styles.footer}>
         <Pressable
           style={styles.foot}
@@ -57,10 +62,11 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   footer: {
-    height: 65,
+    height: 70,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    paddingHorizontal: 8,
   },
   fonts: {
     fontSize: 10,
@@ -80,10 +86,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addbtn: {
-    marginTop: -45,
-    width: 65,
-    height: 65,
-    borderRadius: 33,
+    marginTop: -48,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: "#0a63bc",
     justifyContent: "center",
     alignItems: "center",
