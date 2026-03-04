@@ -31,10 +31,26 @@ const Singup = () => {
   const [error, seterror] = useState('')
 
   const senddata = () => {
+    console.log('yess')
     // Temporarily disabled for testing
-    router.replace('/desbord/desbord');
-  };
-
+     axios.post('http://192.168.43.242:3000/user/register', {
+      name: username,
+      phonenumber: mobile,
+      email: email,
+      password: pass
+    })
+    .then((res) => {
+      console.log(res.data);
+      router.replace('/desbord/desbord')
+    })
+    .catch((err) => {
+      console.log(err);
+      seterror('Registration failed. Please try again.');
+      setTimeout(() => {
+        seterror('');
+      }, 2000);
+    });
+  }
   const hideing = () => {
     setchnage(true);
     sethide(9);

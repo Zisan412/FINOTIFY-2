@@ -21,12 +21,12 @@ const Login = () => {
 
   const correctPassword = "123456";
 
-  const submit = async () => {
+  const submit =  () => {
     // Temporarily disabled for testing
-    /*
-    let datas = await axios.post('http://localhost:3000/users/login',
+    
+     axios.post('http://192.168.43.242:3000/user/login',
       {
-        mobileno: mobile,
+        phonenumber: mobile,
         password: password
       }).then((res) => {
         console.log(res.data)
@@ -34,8 +34,8 @@ const Login = () => {
       }).catch((error) => {
         console.log(error)
       })
-    */
-    router.replace('/desbord/desbord');
+    
+    // router.replace('/desbord/desbord');
   };
 
   const clearError = () => {
