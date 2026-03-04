@@ -1,4 +1,16 @@
-ActivityIndicator,
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+  KeyboardAvoidingView,
+  Animated,
+  ActivityIndicator,
   Dimensions,
   Keyboard,
 } from "react-native";

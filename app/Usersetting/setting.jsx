@@ -76,11 +76,6 @@ const Settings = () => {
                 value={currency}
                 onPress={handleCurrencyChange}
               />
-              <SettingItem
-                icon="list-outline"
-                title="Manage Entries"
-                onPress={() => router.push("../Usersetting/ManageEntries")}
-              />
             </View>
           </View>
 
