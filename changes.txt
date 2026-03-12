@@ -1,1 +1,6 @@
 changes in login footer 
+
+MONGO_URI="mongodb+srv://user:musab2005@finotify.erxji0b.mongodb.net/?appName=FINOTIFY"
+EMAIL_PASSWORD='tnzd lskx phya oiub'
+EMAIL="musabmomin234@gmail.com"
+IP_ADDRESS="192.168.43.125"

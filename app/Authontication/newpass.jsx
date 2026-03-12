@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Danger from "../Modules/danger";
+import { useLocalSearchParams } from "expo-router";
+import axios from 'axios'
 const Newpass = () => {
   const [press, setpress] = useState(0);
   const [chnage, setchnage] = useState(false);
@@ -23,6 +25,7 @@ const Newpass = () => {
   const [mobile, setmobile] = useState("");
   const [pass, setpass] = useState("");
   const [pass2, setpass2] = useState("");
+  const email = useLocalSearchParams().email;
 
   const hideing = () => {
     setchnage(true);
@@ -43,22 +46,18 @@ const Newpass = () => {
     sethide2(12);
   };
 
-  const sub = () => {
-    if (mobile == "" || pass == "" || pass2 == "") {
-      alert("please enter a valid detail");
+ const sub = () => {
+    axios.post(`http://localhost:3000/user/newpass/${email}`,
+      {
+        password:pass2
+      }
+    ).then((res)=>{
+      console.log(JSON.stringify(res.data.message))
+      router.push('./login')
+    }).catch((error)=>{
+      console.log(JSON.stringify(error.response.data))
+    })
 
-      setTimeout(() => {
-        seterror("");
-      }, 2000);
-    } else if (pass != pass2) {
-      seterror("no match password");
-
-      setTimeout(() => {
-        seterror("");
-      }, 2000);
-    } else {
-      router.push("./login");
-    }
   };
 
   return (
@@ -81,37 +80,7 @@ const Newpass = () => {
         </Text>
       </View>
       <View style={styles.input}>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: "80%",
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 14,
-            marginTop: 10,
-            elevation: 3,
-            backgroundColor: "white",
-            height: "14%",
-          }}
-        >
-          <Ionicons
-            name={"call"}
-            size={24}
-            color={"#0a63bcd5"}
-            style={{}}
-          ></Ionicons>
-
-          <TextInput
-            style={[styles.inp, press == 1 && { opacity: 1 }]}
-            onFocus={() => setpress(1)}
-            onBlur={() => setpress(0)}
-            placeholder="mobile number"
-            keyboardType="numeric"
-            value={mobile}
-            onChangeText={setmobile}
-          ></TextInput>
-        </View>
+    
         <View
           style={{
             display: "flex",

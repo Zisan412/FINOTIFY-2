@@ -19,23 +19,22 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const correctPassword = "123456";
 
   const submit =  () => {
     // Temporarily disabled for testing
     
-     axios.post('http://192.168.43.242:3000/user/login',
+     axios.post('http://localhost:3000/user/login',
       {
         phonenumber: mobile,
         password: password
       }).then((res) => {
-        console.log(res.data)
+
+        console.log(JSON.stringify(res.data.massage));
         router.push('../desbord/desbord')
       }).catch((error) => {
-        console.log(error)
+        console.log(JSON.stringify(error.response.data))
       })
     
-    // router.replace('/desbord/desbord');
   };
 
   const clearError = () => {

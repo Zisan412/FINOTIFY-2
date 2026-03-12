@@ -33,18 +33,18 @@ const Singup = () => {
   const senddata = () => {
     console.log('yess')
     // Temporarily disabled for testing
-     axios.post('http://192.168.43.242:3000/user/register', {
+     axios.post('http://localhost:3000/user/register', {
       name: username,
       phonenumber: mobile,
       email: email,
       password: pass
     })
     .then((res) => {
-      console.log(res.data);
-      router.replace('/desbord/desbord')
+      console.log(JSON.stringify(res.data));
+      router.push('../desbord/desbord');
     })
     .catch((err) => {
-      console.log(err);
+      console.log(JSON.stringify(err.response.data));
       seterror('Registration failed. Please try again.');
       setTimeout(() => {
         seterror('');

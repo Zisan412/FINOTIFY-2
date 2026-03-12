@@ -3,39 +3,30 @@ import { StyleSheet, Text, View ,Image} from "react-native";
 import { useState } from "react";
 import { TextInput, Pressable } from "react-native";
 import Upper from "../Modules/Upper";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/danger";
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
+import axios from 'axios'
+import { jsx } from "react/jsx-runtime";
 const Otpenter = () => {
     const [otp,setotp]=useState('')
   const [press, setpress] = useState(0);
     const [yes,setyes]=useState('')
     const [error,seterror]=useState('')
   let [timer,settimer]=useState(false)
+  const email=useLocalSearchParams().email
 
 
-  const sub=()=>{
-    if(otp=="")
-    {
-        alert('please enter a valid detail ')  
-      setTimeout(() => {
-        seterror('')
-      }, 2000)
-    }
-    else if(otp!='12345')
-      {
-          alert('no match otp')  
-    
-      setTimeout(() => {
-        seterror('')
-      }, 2000)
-      }
-    
-    else{
-      router.push('./newpass')
-      settimer(true)
-    }
+  const sub=async()=>{
+    await axios.post('http://localhost:3000/user/otp',
+      {otp:otp}
+    ).then((res)=>{
+      console.log(JSON.stringify(res.data.message))
+        router.push({ pathname: './newpass', params: { email: email } })
+    }).catch((error)=>{
+        console.log(JSON.stringify(error.response.data.message))
+    })
   }
 
   const timerfun=()=>{
@@ -97,37 +88,7 @@ const Otpenter = () => {
             Submit
           </Text>
         </Pressable>
-       <View style={styles.otpresend}  >
-          {timer==true?
-          <Pressable onPress={()=>timerfun()}>
-          <Text style={{color:'#0a63bcff',fontSize:16,textTransform:'capitalize',width:100}}>resend otp</Text>
-                   </Pressable>
-
-          :
-          
-          <CountdownCircleTimer
-    isPlaying
-
-    duration={60}
-    remainingTime={10}
-    
-    size={50}
-    strokeWidth={0}
-    colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-    colorsTime={[7, 5, 2, 0]}
-    onComplete={() => settimer(true)}
-
-            
-    
-
-  >
-    {({ remainingTime }) =><View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:200,height:40}}>
-      <View style={{}}><MaterialIcons name="access-time" size={18} color="#0a63bcff"  /></View>
-              <Text style={{color:'#0a63bcff',fontSize:14,textTransform:'capitalize',paddingLeft:10}}>  
-   resend otp {Math.floor(remainingTime / 60)}m:{remainingTime % 60}s</Text></View>
-}
-</CountdownCircleTimer>}
-      </View>
+       
 
     </View>
     </View>

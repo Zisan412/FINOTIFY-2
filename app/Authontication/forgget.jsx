@@ -5,7 +5,7 @@ import Upper from "../Modules/Upper";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/danger";
-
+import axios from 'axios'
 
 
 const Forgget = () => {
@@ -14,20 +14,26 @@ const Forgget = () => {
     const [error,seterror]=useState('')
 
 
-  const sub=()=>{
-      if(email=="")
-      {
-        // seterror('please enter a valid detail')  
-        alert('please enter a valid detail ')    
-      setTimeout(() => {
-       seterror('')
-      }, 2000)
-      }
-      else{
-        router.push('./otpenter')
-      }
-  }
 
+  const sub= async ()=>{
+    console.log(email)
+        await axios.post('http://localhost:3000/user/email',
+          {email:email}
+        )
+        .then(async (res)=>{
+          console.log(JSON.stringify(res.data.massage))
+          router.push({ pathname: './otpenter', params: { email: email } })
+        })
+        .catch((error)=>{
+          console.log(JSON.stringify(error.response.data))
+          seterror('Email not found')
+          setTimeout(() => {
+            seterror('')
+          }, 2000)
+        })
+          
+
+  }
   return (
     <View style={{backgroundColor: "#ffffff", height:'100%' }}>
           {/* TOP IMAGE */}

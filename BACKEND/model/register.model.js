@@ -16,6 +16,10 @@ const RegisterSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    since:{
+        type:Date,
+        default:Date.now
     }
 })
 
