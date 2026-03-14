@@ -14,6 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Danger from "../Modules/danger";
 import axios from "axios";
+import asyncstorage from '@react-native-async-storage/async-storage'
 
 const Singup = () => {
   const [press, setpress] = useState(0);
@@ -33,23 +34,27 @@ const Singup = () => {
   const senddata = () => {
     console.log('yess')
     // Temporarily disabled for testing
-     axios.post('http://localhost:3000/user/register', {
+     axios.post('http://192.168.43.141:3000/user/register', {
       name: username,
       phonenumber: mobile,
       email: email,
       password: pass
     })
-    .then((res) => {
+    .then(async (res) => {
       console.log(JSON.stringify(res.data));
+      await asyncstorage.setItem('token', res.data.token);
+      
       router.push('../desbord/desbord');
+      
     })
     .catch((err) => {
-      console.log(JSON.stringify(err.response.data));
+    //  alert(JSON.stringify(err.response.data.message).replace(/"/g, ''));
       seterror('Registration failed. Please try again.');
       setTimeout(() => {
         seterror('');
       }, 2000);
-    });
+    
+  })
   }
   const hideing = () => {
     setchnage(true);

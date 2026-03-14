@@ -6,14 +6,21 @@ import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
+import  BackHandler from "react-native";
 
 const desbord = () => {
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
 
+
+ 
+
   useEffect(() => {
+
     if (params.tab) {
       setActiveTab(parseInt(params.tab));
+          
+      
     }
   }, [params.tab]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +33,7 @@ const desbord = () => {
   });
 
   const data = new Date();
+
 
   const datas = useMemo(() => [
     {

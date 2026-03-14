@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 
+
 import {
   Poppins_400Regular,
   Poppins_600SemiBold,
@@ -18,6 +19,7 @@ export default function Layout() {
     Inter_400Regular,
     Inter_600SemiBold,
   });
+
 
   if (!fontsLoaded) {
     return null; // ya <Text>Loading...</Text>

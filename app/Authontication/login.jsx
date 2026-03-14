@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import Danger from "../Modules/danger";
 import axios from 'axios'
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const [activeInput, setActiveInput] = useState(0);
@@ -23,16 +25,26 @@ const Login = () => {
   const submit =  () => {
     // Temporarily disabled for testing
     
-     axios.post('http://localhost:3000/user/login',
+     axios.post('http://192.168.43.141:3000/user/login',
       {
         phonenumber: mobile,
         password: password
-      }).then((res) => {
+      }).then(async(res) => {
 
         console.log(JSON.stringify(res.data.massage));
+        await AsyncStorage.setItem('token', res.data.token);
+        
         router.push('../desbord/desbord')
+         await AsyncStorage.getItem('token').then((token) => {
+          console.log('Token stored in AsyncStorage:', token);
+        }).catch((error) => {
+          console.error('Error retrieving token from AsyncStorage:', error);
+        });
       }).catch((error) => {
-        console.log(JSON.stringify(error.response.data))
+        setError('Login failed. Please check your credentials and try again.');
+        setTimeout(() => {
+          setError('');
+        }, 2000);
       })
     
   };
@@ -42,15 +54,18 @@ const Login = () => {
   };
 
   return (
+    
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+       
       <View style={{ flex: 1 }}>
         {/* TOP IMAGE */}
+   
         <Image
           source={require("../../assets/Login.png")}
           style={styles.container2}
         />
 
-        {/* {error ? <Danger errror={error} /> : null} */}
+        {error ? <Danger errror={error} /> : null}
 
         <Text style={styles.heading}>Login Here</Text>
 

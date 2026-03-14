@@ -19,13 +19,16 @@ const Otpenter = () => {
 
 
   const sub=async()=>{
-    await axios.post('http://localhost:3000/user/otp',
+    await axios.post('http://192.168.43.141:3000/user/otp',
       {otp:otp}
     ).then((res)=>{
       console.log(JSON.stringify(res.data.message))
         router.push({ pathname: './newpass', params: { email: email } })
     }).catch((error)=>{
-        console.log(JSON.stringify(error.response.data.message))
+      seterror('OTP is incorrect. Please try again.');
+      setTimeout(() => {
+        seterror('');
+      }, 2000);
     })
   }
 
@@ -48,7 +51,8 @@ const Otpenter = () => {
             source={require("../../assets/Forgget.png")}
             style={styles.container2}
           />   */}
-           <View style={{paddingTop:0,marginTop:100}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
+              {error ? <Danger errror={error} /> : null}
+           <View style={{paddingTop:0,marginTop:150}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
                enter code sent on email {'\n'} musabmomin234@gmail.com</Text></View>
       <View style={styles.input}>
                  <View style={{display:'flex',flexDirection:'row',width:'80%',justifyContent:'center',alignItems:'center',borderRadius:14,marginTop:0,elevation:3,backgroundColor:'white'}}>

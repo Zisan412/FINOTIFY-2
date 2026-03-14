@@ -47,7 +47,13 @@ const Newpass = () => {
   };
 
  const sub = () => {
-    axios.post(`http://localhost:3000/user/newpass/${email}`,
+  if(pass!=pass2)
+  {
+     seterror('enter a correct password')
+    
+  }
+  else{
+    axios.post(`http://192.168.43.141:3000/user/newpass/${email}`,
       {
         password:pass2
       }
@@ -55,9 +61,12 @@ const Newpass = () => {
       console.log(JSON.stringify(res.data.message))
       router.push('./login')
     }).catch((error)=>{
-      console.log(JSON.stringify(error.response.data))
+      seterror('password not update');
+      setTimeout(() => {
+        seterror('');
+      }, 2000);
     })
-
+  }
   };
 
   return (
@@ -67,7 +76,9 @@ const Newpass = () => {
         source={require("../../assets/Forgget.png")}
         style={styles.container2}
       /> */}
-      <View style={{ paddingTop: 0,marginTop: 100 }}>
+              {error ? <Danger errror={error} /> : ''}
+
+      <View style={{ paddingTop: 0,marginTop: 150 }}>
         <Text
           style={{
             textAlign: "center",

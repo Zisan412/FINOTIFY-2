@@ -17,7 +17,7 @@ const Forgget = () => {
 
   const sub= async ()=>{
     console.log(email)
-        await axios.post('http://localhost:3000/user/email',
+        await axios.post('http://192.168.43.141:3000/user/email',
           {email:email}
         )
         .then(async (res)=>{
@@ -25,11 +25,11 @@ const Forgget = () => {
           router.push({ pathname: './otpenter', params: { email: email } })
         })
         .catch((error)=>{
-          console.log(JSON.stringify(error.response.data))
-          seterror('Email not found')
+          seterror('Failed to send OTP. Please check your email and try again.');
           setTimeout(() => {
-            seterror('')
-          }, 2000)
+            seterror('');
+          }, 2000);
+
         })
           
 
@@ -41,7 +41,8 @@ const Forgget = () => {
             source={require("../../assets/Forgget.png")}
             style={styles.container2}
           /> */}
-      <View style={{paddingTop:0,marginTop:100}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
+              {error ? <Danger errror={error} /> : null}
+      <View style={{paddingTop:0,marginTop:150}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
         enter email id to send a code {'\n'}
         for recover password</Text></View>
       <View style={styles.input}>

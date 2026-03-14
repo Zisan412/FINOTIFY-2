@@ -1,34 +1,58 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Animated, Easing } from 'react-native'
+import React, { useEffect, useRef } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 
-const danger = ({errror}) => {
+const Danger = ({ errror, visible = true }) => {
+ 
+
+  
+
   return (
-    <View style={styles.danger}>
-        <Text style={{textTransform:'capitalize',color:'white',backgroundColor:'transparent'}}>{errror} <Ionicons name="arrow-up-right-box-sharp"></Ionicons></Text>
+    <View
+      style={[
+        styles.container,
+        // { transform: [{ translateY: slideAnim }], opacity: opacityAnim },
+      ]}
+    >
+      <View style={styles.dot} />
+      <Text style={styles.text}>{errror}</Text>
     </View>
   )
 }
 
-export default danger
+export default Danger
 
 const styles = StyleSheet.create({
-    danger:{
-        backgroundColor:'#235f23f5',
-        height:35,
-    
-        width:205,
-        color:'white',
-        position:'absolute',
-        borderColor:'green',
-        borderWidth:1,
-        left:70,
-        top:80,
-        justifyContent:'center',
-        alignItems:'center',
-        borderRadius:20,
-        elevation:10,
-        
-        
-    }
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    backgroundColor: '#ff0000',
+    borderColor: '#de4a4a',
+    borderWidth: 1,
+    borderRadius: 999,
+    position: 'absolute',
+    alignSelf: 'center',
+    top: 80,
+    elevation: 12,
+    shadowColor: '#de4a4a',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#ff0000',
+  },
+  text: {
+    color: '#fcdcdc',
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+    textTransform: 'capitalize',
+  },
 })

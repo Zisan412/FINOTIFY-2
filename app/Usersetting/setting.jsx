@@ -13,6 +13,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Bottom from "../desbord/bottom";
 import Confermation from "../Modules/confermation";
+import asy from '@react-native-async-storage/async-storage'
 
 const SettingItem = ({ icon, title, value, onPress, color = "#0a63bc", trailing = true }) => (
   <Pressable style={styles.item} onPress={onPress}>
@@ -35,6 +36,15 @@ const Settings = () => {
     // Logic for currency change can be added here
     alert("Currency selection coming soon!");
   };
+
+  const logout= async ()=>{
+     setShowLogoutConfirm(true)
+     if(showLogoutConfirm){
+      await asy.removeItem('token');
+    
+     }
+
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -113,7 +123,7 @@ const Settings = () => {
           {/* LOGOUT BUTTON */}
           <Pressable
             style={styles.logoutBtn}
-            onPress={() => setShowLogoutConfirm(true)}
+            onPress={() => logout()}
           >
             <Ionicons name="log-out-outline" size={20} color="#ef4444" />
             <Text style={styles.logoutText}>Logout from Finotify</Text>
