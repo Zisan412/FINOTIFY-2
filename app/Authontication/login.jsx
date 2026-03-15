@@ -10,6 +10,8 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Login = () => {
   const [activeInput, setActiveInput] = useState(0);
@@ -28,13 +30,15 @@ const Login = () => {
       {
         phonenumber: mobile,
         password: password
-      }).then((res) => {
+      }).then(async(res) => {
         console.log(res.data)
+        await AsyncStorage.setItem('userName', res.data.name);
+        await AsyncStorage.setItem('userEmail', res.data.email);
+
         router.push('../desbord/desbord')
       }).catch((error) => {
         console.log(error)
       })
-    
     // router.replace('/desbord/desbord');
   };
 

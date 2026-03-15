@@ -32,7 +32,7 @@ router.post('/login',async (req,res)=>{
        return res.send('usename and password is not corrt')
     }
      let token = jwt.sign({ id: finddata._id }, process.env.JWT_TOKEN);
-    res.status(200).json({ message: "User login successfully", token: token });
+    res.status(200).json({ message: "User login successfully", token: token ,name: finddata.name, email: finddata.email}); 
     console.log(token);
 
 

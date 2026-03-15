@@ -30,7 +30,7 @@ const Singup = () => {
 
   const [error, seterror] = useState('')
 
-  const senddata = () => {
+  const senddata = async() => {
     console.log('yess')
     // Temporarily disabled for testing
      axios.post('http://192.168.43.242:3000/user/register', {
@@ -50,7 +50,8 @@ const Singup = () => {
         seterror('');
       }, 2000);
     });
-  }
+ await AsyncStorage.setItem('userName', response.data.name); }
+  
   const hideing = () => {
     setchnage(true);
     sethide(9);
