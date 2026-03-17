@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform
 import { Ionicons } from "@expo/vector-icons";
 
 const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh,data }) => {
-  const [displayName, setDisplayName] = useState();
+  const [displayName, setDisplayName] = useState('');
   console.log('Upper component received data:', displayName); // Debugging log
  // This could come from a user context
 
@@ -11,25 +11,26 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
   const waveAnim = useRef(new Animated.Value(0)).current;
   const spinAnim = useRef(new Animated.Value(0)).current;
 
-useEffect(() => {
-  // ✅ Guard clause - data ya data.name nahi hai toh return
-  if (!data?.name) return;
+  // Re-run if name changes
+   useEffect(() => {
+    // ✅ Guard - data ya name nahi hai toh skip
+    if (!data?.name) return;
 
-  const targetName = data.name;
+    const targetName = data.name; // ✅ Object se name nikalo
 
-  const startTyping = setTimeout(() => {
-    let index = 0;
-    const timer = setInterval(() => {
-      setDisplayName(targetName.substring(0, index + 1));
-      index++;
-      if (index >= targetName.length) clearInterval(timer);
-    }, 70);
+    const startTyping = setTimeout(() => {
+      let index = 0;
+      const timer = setInterval(() => {
+        setDisplayName(targetName.substring(0, index + 1));
+        index++;
+        if (index >= targetName.length) clearInterval(timer);
+      }, 70);
 
-    return () => clearInterval(timer);
-  }, 600);
+      return () => clearInterval(timer);
+    }, 600);
 
-  return () => clearTimeout(startTyping);
-}, [data?.name]); // ✅ Re-run jab bhi name aaye// Re-run if name changes
+    return () => clearTimeout(startTyping);
+  }, [data?.name]);
 
   const waveStyle = {
     transform: [

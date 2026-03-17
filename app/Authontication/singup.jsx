@@ -31,7 +31,7 @@ const Singup = () => {
 
   const [error, seterror] = useState('')
 
-  const senddata = () => {
+  const senddata = async() => {
     console.log('yess')
     // Temporarily disabled for testing
      axios.post('http://192.168.43.141:3000/user/register', {
@@ -43,11 +43,17 @@ const Singup = () => {
     .then(async (res) => {
       console.log(JSON.stringify(res.data));
       await asyncstorage.setItem('token', res.data.token);
+      await asyncstorage.setItem('email', res.data.email);
       
-     
+     await asyncstorage.setItem('id', res.data.id);
+     await asyncstorage.getItem('id').then((id) => {
+        console.log('ID stored in AsyncStorage:', id);
+      }).catch((error) => {
+        console.error('Error retrieving ID from AsyncStorage:', error);
+      });
       
       
-      router.push({pathname:'../desbord/desbord',params:{id:res.data.id}});
+      router.replace({pathname:'../desbord/desbord'});
       
     })
     .catch((err) => {
@@ -56,9 +62,11 @@ const Singup = () => {
       setTimeout(() => {
         seterror('');
       }, 2000);
-    
   })
   }
+    ;
+
+  
   const hideing = () => {
     setchnage(true);
     sethide(9);
@@ -99,6 +107,7 @@ const Singup = () => {
       router.replace('/desbord/desbord')
     }
   }
+
 
   return (
     <View style={{ backgroundColor: 'white', flex: 1, justifyContent: 'space-between' }}>

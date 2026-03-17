@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     console.log(name, phonenumber, email, hashpassword);
     // res.send("User registered successfully");
     let token = jwt.sign({ id: user._id }, "mysecretkey");
-    res.status(200).json({ message: "User registered successfully", token: token, id: user._id });
+    res.status(200).json({ message: "User registered successfully", token: token, id: user._id, email: user.email});
     console.log(token);
 })
 
@@ -35,8 +35,9 @@ router.post('/login',async (req,res)=>{
     if(!checklogin){
         return res.status(400).json({message:'username and password is not correct'})
     }
-     let token = jwt.sign({ id: finddata._id }, "mysecretkey");
-    res.status(200).json({ message: "User login successfully", token: token });
+   
+     let token = jwt.sign({ id: finddata._id },"MYSECRETKEY");
+    res.status(200).json({ message: "User login successfully", token: token ,name: finddata.name, email: finddata.email}); 
     console.log(token);
 
 

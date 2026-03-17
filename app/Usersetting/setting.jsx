@@ -8,11 +8,13 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Bottom from "../desbord/bottom";
 import Confermation from "../Modules/confermation";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const SettingItem = ({ icon, title, value, onPress, color = "#0a63bc", trailing = true }) => (
   <Pressable style={styles.item} onPress={onPress}>
@@ -31,6 +33,13 @@ const Settings = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [currency, setCurrency] = useState("INR (₹)");
 
+const [userName, setUserName] = useState("");
+const [userEmail, setUserEmail] = useState("");
+
+useEffect(() => {
+  AsyncStorage.getItem('userName').then(name => { if(name) setUserName(name); });
+  AsyncStorage.getItem('userEmail').then(email => { if(email) setUserEmail(email); });
+}, []);
   const handleCurrencyChange = () => {
     // Logic for currency change can be added here
     alert("Currency selection coming soon!");
@@ -59,17 +68,15 @@ const Settings = () => {
           <View style={styles.profileCard}>
             <View style={styles.profileInfo}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>Z</Text>
+                <Text style={styles.avatarText}>{userName.charAt(0).toUpperCase()}</Text>
                 <View style={styles.onlineStatus} />
               </View>
               <View>
-                <Text style={styles.userName}>Zisan 412</Text>
-                <Text style={styles.userEmail}>zisan@finotify.app</Text>
+                <Text style={styles.userName}>{userName}</Text>
+                <Text style={styles.userEmail}>{userEmail}</Text>
               </View>
             </View>
-            <Pressable style={styles.editProfileBtn}>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
-            </Pressable>
+            
           </View>
 
           {/* SETTINGS GROUPS */}

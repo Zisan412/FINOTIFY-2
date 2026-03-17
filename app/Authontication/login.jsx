@@ -13,6 +13,7 @@ import Danger from "../Modules/danger";
 import axios from 'axios'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const Login = () => {
   const [activeInput, setActiveInput] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,9 +32,14 @@ const Login = () => {
         password: password
       }).then(async(res) => {
 
+
         console.log(JSON.stringify(res.data.massage));
         await AsyncStorage.setItem('token', res.data.token);
-        
+
+        console.log(res.data)
+        await AsyncStorage.setItem('userName', res.data.name);
+        await AsyncStorage.setItem('userEmail', res.data.email);
+
         router.push('../desbord/desbord')
          await AsyncStorage.getItem('token').then((token) => {
           console.log('Token stored in AsyncStorage:', token);
@@ -46,7 +52,7 @@ const Login = () => {
           setError('');
         }, 2000);
       })
-    
+
   };
 
   const clearError = () => {

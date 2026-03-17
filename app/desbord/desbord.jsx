@@ -6,35 +6,47 @@ import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "axios";
 
 
 const desbord = () => {
-  const id = useLocalSearchParams().id;
+// let id = useLocalSearchParams().id;
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
 let [datastore, setdatastore] = useState(null);
-let [storetoken,setstoretoken]=useState();
+// let [storetoken,setstoretoken]=useState(id);
 
 useEffect(() => {
   const fetchData = async () => {
-    console.log('Fetching data for ID:', id);
-    setstoretoken({id:id}); // Store the token for later use
-      console.log('Store token:', storetoken); // Store token for later use
+    const storetoken = await asyncStorage.getItem('id');
+    console.log('Fetching data for ID:',storetoken); // Debugging log
+     if (!storetoken) {
+      console.log('No token found in AsyncStorage');
+      return;
+    }
+     // Store the token for later use
+
+ // Store token for later use
+      // Store token for later use
     try {
       const res = await axios.get(`http://192.168.43.141:3000/desbord/desbord/${storetoken}`);
-
-      setdatastore({ name: res.data.data.name });
-      console.log('Data fetched successfully 1:', res.data); 
+  
+      let name = res.data.data.name; // Assuming the name is in this path
+      setdatastore({ name: name }); // Store the name in state
+      console.log('Data fetched successfully 1:', res.data.data.name); 
+      console.log('Store token after setting:', storetoken); // Store token for later use
+     // Store the token in state
       console.log(datastore); // This might still show old value due to async state update
     } catch (error) {
       console.error('Error fetching data:', error);
     }
+
   };
 
   fetchData();
-}, [id]);
+}, []);
 
 
   useEffect(() => {
@@ -207,7 +219,7 @@ useEffect(() => {
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
-           data={datastore || { name: '' }}
+           data={datastore}
         />
       </View>
 
