@@ -44,7 +44,10 @@ const Singup = () => {
       console.log(JSON.stringify(res.data));
       await asyncstorage.setItem('token', res.data.token);
       
-      router.push('../desbord/desbord');
+     
+      
+      
+      router.push({pathname:'../desbord/desbord',params:{id:res.data.id}});
       
     })
     .catch((err) => {

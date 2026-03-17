@@ -9,14 +9,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Mainpage = () => {
   const [loading, setLoading] = useState(true);
 
-  // Back button block karo
-  // useEffect(() => {
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     () => true // back press block
-  //   );
-  //   // return () => backHandler.remove();
-  // }, []);
+    // Back button block karo
+    // useEffect(() => {
+    //   const backHandler = BackHandler.addEventListener(
+    //     'hardwareBackPress',
+    //     () => true // back press block
+    //   );
+    //   // return () => backHandler.remove();
+    // }, []);
 
   // Token check
   useEffect(() => {

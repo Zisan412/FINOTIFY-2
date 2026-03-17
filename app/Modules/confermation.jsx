@@ -2,6 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View, Animated, Pressable } from 'r
 import React, { useEffect, useRef } from 'react'
 import { router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import asy from '@react-native-async-storage/async-storage'
+
 
 const Confirmation = ({ isPressed, setIsPressed }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -37,9 +39,11 @@ const Confirmation = ({ isPressed, setIsPressed }) => {
                 useNativeDriver: true,
             }),
         ]).start(() => setIsPressed(false));
+        return; // back press block
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await asy.removeItem('token');
         router.replace("../Authontication/login");
     };
 

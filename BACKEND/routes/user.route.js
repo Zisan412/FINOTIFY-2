@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     console.log(name, phonenumber, email, hashpassword);
     // res.send("User registered successfully");
     let token = jwt.sign({ id: user._id }, "mysecretkey");
-    res.status(200).json({ message: "User registered successfully", token: token });
+    res.status(200).json({ message: "User registered successfully", token: token, id: user._id });
     console.log(token);
 })
 

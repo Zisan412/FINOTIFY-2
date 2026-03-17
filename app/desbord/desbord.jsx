@@ -6,14 +6,36 @@ import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
-import  BackHandler from "react-native";
+
+import axios from "axios";
+
 
 const desbord = () => {
+  const id = useLocalSearchParams().id;
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
+let [datastore, setdatastore] = useState(null);
+let [storetoken,setstoretoken]=useState();
 
+useEffect(() => {
+  const fetchData = async () => {
+    console.log('Fetching data for ID:', id);
+    setstoretoken({id:id}); // Store the token for later use
+      console.log('Store token:', storetoken); // Store token for later use
+    try {
+      const res = await axios.get(`http://192.168.43.141:3000/desbord/desbord/${storetoken}`);
 
- 
+      setdatastore({ name: res.data.data.name });
+      console.log('Data fetched successfully 1:', res.data); 
+      console.log(datastore); // This might still show old value due to async state update
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  fetchData();
+}, [id]);
+
 
   useEffect(() => {
 
@@ -185,6 +207,7 @@ const desbord = () => {
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
+           data={datastore || { name: '' }}
         />
       </View>
 

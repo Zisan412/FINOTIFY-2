@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("../db/db");
 const env = require("dotenv")
 const cors = require("cors")
+const desbordrouter = require("../routes/desbord.route")
 
 env.config()
 
@@ -15,5 +16,7 @@ connectDB()
 app.use(express.json());
 
 app.use("/user",register)
+app.use("/desbord",desbordrouter)
+
 
 module.exports = app;

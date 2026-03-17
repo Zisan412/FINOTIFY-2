@@ -1,44 +1,37 @@
 {
   "expo": {
-    "name": "Finotify",
-    "slug": "Finotify",
+    "name": "finotify",
+    "slug": "finotify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/ic.png",
-    "scheme": "finotify",
+    "image": "./assets/ic.png",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "backgroundColor": "#0A63BC",
-
     "splash": {
       "image": "./assets/ic.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A63BC"
+      "backgroundColor": "#0a63bcd5"
     },
-
     "ios": {
-      "supportsTablet": true,
-      "backgroundColor": "#0A63BC"
+      "supportsTablet": true
     },
-
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/ic.png",
-        "backgroundColor": "#0A63BC"
+        "backgroundColor": "#000"
       },
-      "backgroundColor": "#0A63BC",
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.myapp"
     },
-
     "web": {
       "favicon": "./assets/ic.png"
+      
     },
-
     "plugins": [
       "expo-router",
       "expo-font"
     ],
-
     "extra": {
       "router": {},
       "eas": {

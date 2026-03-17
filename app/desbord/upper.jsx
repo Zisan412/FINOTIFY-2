@@ -2,45 +2,34 @@ import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh }) => {
-  const [displayName, setDisplayName] = useState("");
-  const fullUsername = "mominmusabkin"; // This could come from a user context
+const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh,data }) => {
+  const [displayName, setDisplayName] = useState();
+  console.log('Upper component received data:', displayName); // Debugging log
+ // This could come from a user context
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const waveAnim = useRef(new Animated.Value(0)).current;
   const spinAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    // 1. Initial Fade and Wave Animation for Emoji
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.delay(300),
-        Animated.timing(waveAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-        Animated.timing(waveAnim, { toValue: -1, duration: 400, useNativeDriver: true }),
-        Animated.timing(waveAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-        Animated.timing(waveAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
-      ])
-    ]).start();
+useEffect(() => {
+  // ✅ Guard clause - data ya data.name nahi hai toh return
+  if (!data?.name) return;
 
-    // 2. Typing effect for username, starts slightly after greeting
-    const startTyping = setTimeout(() => {
-      let index = 0;
-      const timer = setInterval(() => {
-        setDisplayName(fullUsername.substring(0, index + 1));
-        index++;
-        if (index >= fullUsername.length) clearInterval(timer);
-      }, 70); // Smooth typing speed
+  const targetName = data.name;
 
-      return () => clearInterval(timer);
-    }, 600);
+  const startTyping = setTimeout(() => {
+    let index = 0;
+    const timer = setInterval(() => {
+      setDisplayName(targetName.substring(0, index + 1));
+      index++;
+      if (index >= targetName.length) clearInterval(timer);
+    }, 70);
 
-    return () => clearTimeout(startTyping);
-  }, []);
+    return () => clearInterval(timer);
+  }, 600);
+
+  return () => clearTimeout(startTyping);
+}, [data?.name]); // ✅ Re-run jab bhi name aaye// Re-run if name changes
 
   const waveStyle = {
     transform: [
