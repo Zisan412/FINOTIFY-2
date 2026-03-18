@@ -45,6 +45,8 @@ const Confirmation = ({ isPressed, setIsPressed }) => {
     const logout = async () => {
         await asy.removeItem('token');
         router.replace("../Authontication/login");
+        await asy.removeItem('userName');
+        await asy.removeItem('userEmail');
     };
 
     if (!isPressed) return null;

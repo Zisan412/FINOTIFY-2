@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Danger from "../Modules/danger";
 import axios from "axios";
-import asyncstorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Singup = () => {
   const [press, setpress] = useState(0);
@@ -31,37 +31,47 @@ const Singup = () => {
 
   const [error, seterror] = useState('')
 
-  const senddata = async() => {
+  const senddata = () => {
+    if(username == '' || mobile == '' || email == '' || paas2 == '' || pass == ''){  
+      seterror('please enter a valid detail')
+      return
+    }
+    else if(pass != paas2){
+      seterror('no match password')
+      return
+    }
+    else{
+    
     console.log('yess')
+    seterror('')
+    
     // Temporarily disabled for testing
      axios.post('http://192.168.43.141:3000/user/register', {
       name: username,
       phonenumber: mobile,
       email: email,
       password: pass
-    })
-    .then(async (res) => {
-      console.log(JSON.stringify(res.data));
-     
-      
-     await asyncstorage.setItem('id', res.data.id);
-     await asyncstorage.getItem('id').then((id) => {
-        console.log('ID stored in AsyncStorage:', id);
+    }).then(async(res) => {
+  console.log(JSON.stringify(res.data.massage));
+        await AsyncStorage.setItem('token', res.data.token);
+
+        console.log(res.data)
+        await AsyncStorage.setItem('userName', res.data.name);
+        await AsyncStorage.setItem('userEmail', res.data.email);
+
+        router.replace('../desbord/desbord')
+         await AsyncStorage.getItem('token').then((token) => {
+          console.log('Token stored in AsyncStorage:', token);
+        }).catch((error) => {
+          console.error('Error retrieving token from AsyncStorage:', error);
+        });
       }).catch((error) => {
-        console.error('Error retrieving ID from AsyncStorage:', error);
-      });
-      
-      
-      router.replace({pathname:'../desbord/desbord'});
-      
-    })
-    .catch((err) => {
-    //  alert(JSON.stringify(err.response.data.message).replace(/"/g, ''));
-      seterror('Registration failed. Please try again.');
-      setTimeout(() => {
-        seterror('');
-      }, 2000);
-  })
+        seterror('Registration failed. Please try again.');
+        setTimeout(() => {
+          seterror('');
+        }, 2000);
+      })
+    }
   }
     ;
 

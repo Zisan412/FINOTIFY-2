@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
-const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh,data }) => {
-  const [displayName, setDisplayName] = useState('');
+
+const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh }) => {
+  const [displayName, setDisplayName] = useState(''); // Default to 'User' if name not found
   console.log('Upper component received data:', displayName); // Debugging log
  // This could come from a user context
 
@@ -12,25 +14,31 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
   const spinAnim = useRef(new Animated.Value(0)).current;
 
   // Re-run if name changes
-   useEffect(() => {
-    // ✅ Guard - data ya name nahi hai toh skip
-    if (!data?.name) return;
+useEffect(() => {
+  let startTyping;
+  let timer;
 
-    const targetName = data.name; // ✅ Object se name nikalo
-
-    const startTyping = setTimeout(() => {
+  asyncStorage.getItem('userName').then((storedName) => {
+    const targetName = storedName || 'User'; // fallback if null
+    
+    startTyping = setTimeout(() => {
       let index = 0;
-      const timer = setInterval(() => {
-        setDisplayName(targetName.substring(0, index + 1));
+      timer = setInterval(() => {
+        setDisplayName(targetName.substring(0, index + 1)); // ✅ Now targetName is a real string
         index++;
         if (index >= targetName.length) clearInterval(timer);
       }, 70);
-
-      return () => clearInterval(timer);
     }, 600);
+  });
 
-    return () => clearTimeout(startTyping);
-  }, [data?.name]);
+  // ✅ Cleanup both timers on unmount
+  return () => {
+    clearTimeout(startTyping);
+    clearInterval(timer);
+  };
+
+}, []); // ✅ Runs once on mount only
+
 
   const waveStyle = {
     transform: [

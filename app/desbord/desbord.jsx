@@ -6,7 +6,6 @@ import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
-import asyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "axios";
 
@@ -14,10 +13,10 @@ const desbord = () => {
   // let id = useLocalSearchParams().id;
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
-  let [datastore, setdatastore] = useState(null);
+  // let [datastore, setdatastore] = useState(null);
   // let [storetoken,setstoretoken]=useState(id);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       const storetoken = await asyncStorage.getItem("id");
       console.log("Fetching data for ID:", storetoken); // Debugging log
@@ -36,10 +35,9 @@ const desbord = () => {
 
         let name = res.data.data.name; // Assuming the name is in this path
         setdatastore({ name: name }); // Store the name in state
-        console.log("Data fetched successfully 1:", res.data.data.name);
-        console.log("Store token after setting:", storetoken);
-         await asyncstorage.setItem('token', res.data.token);
-      await asyncstorage.setItem('email', res.data.email); // Store token for later use
+       // Store token for later use
+           await asyncStorage.setItem('userName', res.data.name);
+            await asyncStorage.setItem('userEmail', res.data.email);
         // Store the token in state
         console.log(datastore); // This might still show old value due to async state update
       } catch (error) {
@@ -48,7 +46,7 @@ const desbord = () => {
     };
 
     fetchData();
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     if (params.tab) {
@@ -227,7 +225,7 @@ const desbord = () => {
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
-          data={datastore}
+          // data={datastore}
         />
       </View>
 
