@@ -33,11 +33,12 @@ const Singup = () => {
 
   const senddata = () => {
     if(username == '' || mobile == '' || email == '' || paas2 == '' || pass == ''){  
-      seterror('please enter a valid detail')
+    
       return
     }
+      
+     
     else if(pass != paas2){
-      seterror('no match password')
       return
     }
     else{

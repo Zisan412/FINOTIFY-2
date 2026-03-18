@@ -25,6 +25,17 @@ const Login = () => {
 
   const submit =  () => {
     // Temporarily disabled for testing
+    if (mobile == "" || password == "") {
+      setError("Please enter both mobile number and password.");
+      clearError();
+      return;
+    }
+    else if (mobile.length < 10) {
+      setError("Please enter a valid 10-digit mobile number.");
+      clearError();
+      return;
+    }
+    else{
     
      axios.post('http://192.168.43.141:3000/user/login',
       {
@@ -52,7 +63,7 @@ const Login = () => {
           setError('');
         }, 2000);
       })
-
+    }
   };
 
   const clearError = () => {
