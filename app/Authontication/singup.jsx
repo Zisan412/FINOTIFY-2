@@ -42,8 +42,7 @@ const Singup = () => {
     })
     .then(async (res) => {
       console.log(JSON.stringify(res.data));
-      await asyncstorage.setItem('token', res.data.token);
-      await asyncstorage.setItem('email', res.data.email);
+     
       
      await asyncstorage.setItem('id', res.data.id);
      await asyncstorage.getItem('id').then((id) => {

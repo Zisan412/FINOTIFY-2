@@ -40,7 +40,7 @@ const Login = () => {
         await AsyncStorage.setItem('userName', res.data.name);
         await AsyncStorage.setItem('userEmail', res.data.email);
 
-        router.push('../desbord/desbord')
+        router.replace('../desbord/desbord')
          await AsyncStorage.getItem('token').then((token) => {
           console.log('Token stored in AsyncStorage:', token);
         }).catch((error) => {

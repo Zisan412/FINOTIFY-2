@@ -10,51 +10,49 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "axios";
 
-
 const desbord = () => {
-// let id = useLocalSearchParams().id;
+  // let id = useLocalSearchParams().id;
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
-let [datastore, setdatastore] = useState(null);
-// let [storetoken,setstoretoken]=useState(id);
-
-useEffect(() => {
-  const fetchData = async () => {
-    const storetoken = await asyncStorage.getItem('id');
-    console.log('Fetching data for ID:',storetoken); // Debugging log
-     if (!storetoken) {
-      console.log('No token found in AsyncStorage');
-      return;
-    }
-     // Store the token for later use
-
- // Store token for later use
-      // Store token for later use
-    try {
-      const res = await axios.get(`http://192.168.43.141:3000/desbord/desbord/${storetoken}`);
-  
-      let name = res.data.data.name; // Assuming the name is in this path
-      setdatastore({ name: name }); // Store the name in state
-      console.log('Data fetched successfully 1:', res.data.data.name); 
-      console.log('Store token after setting:', storetoken); // Store token for later use
-     // Store the token in state
-      console.log(datastore); // This might still show old value due to async state update
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-
-  };
-
-  fetchData();
-}, []);
-
+  let [datastore, setdatastore] = useState(null);
+  // let [storetoken,setstoretoken]=useState(id);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const storetoken = await asyncStorage.getItem("id");
+      console.log("Fetching data for ID:", storetoken); // Debugging log
+      if (!storetoken) {
+        console.log("No token found in AsyncStorage");
+        return;
+      }
+      // Store the token for later use
 
+      // Store token for later use
+      // Store token for later use
+      try {
+        const res = await axios.get(
+          `http://192.168.43.141:3000/desbord/desbord/${storetoken}`,
+        );
+
+        let name = res.data.data.name; // Assuming the name is in this path
+        setdatastore({ name: name }); // Store the name in state
+        console.log("Data fetched successfully 1:", res.data.data.name);
+        console.log("Store token after setting:", storetoken);
+         await asyncstorage.setItem('token', res.data.token);
+      await asyncstorage.setItem('email', res.data.email); // Store token for later use
+        // Store the token in state
+        console.log(datastore); // This might still show old value due to async state update
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     if (params.tab) {
       setActiveTab(parseInt(params.tab));
-          
-      
     }
   }, [params.tab]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -68,57 +66,59 @@ useEffect(() => {
 
   const data = new Date();
 
-
-  const datas = useMemo(() => [
-    {
-      date: data,
-      cat: 'transport 🚕',
-      amm: 150,
-      des: 'Petrol',
-      it: 'expenss',
-      bankName: 'Kotak Bank',
-      upiId: 'shaihnihal652@oksbi',
-    },
-    {
-      date: data,
-      cat: 'salary 💸',
-      amm: 50000,
-      des: 'Monthly Salary',
-      it: 'income',
-      bankName: 'HDFC Bank',
-      upiId: 'company@hdfcbank',
-    },
-    {
-      date: data,
-      cat: 'food 🍴',
-      amm: 320,
-      des: 'Dinner with team',
-      it: 'expenss',
-      bankName: 'SBI',
-      upiId: 'restaurant@upi',
-    },
-    {
-      date: data,
-      cat: 'other 💡',
-      amm: 99,
-      des: 'Netflix subscription',
-      it: 'expenss',
-    },
-    {
-      date: data,
-      cat: 'freelance 💼',
-      amm: 8000,
-      des: 'Design project',
-      it: 'income',
-    },
-    {
-      date: data,
-      cat: 'shopping 🛍️',
-      amm: 1400,
-      des: 'New shoes',
-      it: 'expenss',
-    },
-  ], []);
+  const datas = useMemo(
+    () => [
+      {
+        date: data,
+        cat: "transport 🚕",
+        amm: 150,
+        des: "Petrol",
+        it: "expenss",
+        bankName: "Kotak Bank",
+        upiId: "shaihnihal652@oksbi",
+      },
+      {
+        date: data,
+        cat: "salary 💸",
+        amm: 50000,
+        des: "Monthly Salary",
+        it: "income",
+        bankName: "HDFC Bank",
+        upiId: "company@hdfcbank",
+      },
+      {
+        date: data,
+        cat: "food 🍴",
+        amm: 320,
+        des: "Dinner with team",
+        it: "expenss",
+        bankName: "SBI",
+        upiId: "restaurant@upi",
+      },
+      {
+        date: data,
+        cat: "other 💡",
+        amm: 99,
+        des: "Netflix subscription",
+        it: "expenss",
+      },
+      {
+        date: data,
+        cat: "freelance 💼",
+        amm: 8000,
+        des: "Design project",
+        it: "income",
+      },
+      {
+        date: data,
+        cat: "shopping 🛍️",
+        amm: 1400,
+        des: "New shoes",
+        it: "expenss",
+      },
+    ],
+    [],
+  );
 
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
@@ -127,10 +127,11 @@ useEffect(() => {
     // 1. Search Query Filter - Apply globally if search text exists
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(item =>
-        item.cat.toLowerCase().includes(query) ||
-        item.des.toLowerCase().includes(query) ||
-        item.amm.toString().includes(query)
+      result = result.filter(
+        (item) =>
+          item.cat.toLowerCase().includes(query) ||
+          item.des.toLowerCase().includes(query) ||
+          item.amm.toString().includes(query),
       );
     }
 
@@ -138,13 +139,14 @@ useEffect(() => {
     if (activeTab === 1) {
       // Transaction Type Filter
       if (filters.type !== "All") {
-        const typeKey = filters.type.toLowerCase() === "income" ? "income" : "expenss";
-        result = result.filter(item => item.it === typeKey);
+        const typeKey =
+          filters.type.toLowerCase() === "income" ? "income" : "expenss";
+        result = result.filter((item) => item.it === typeKey);
       }
 
       // Category Filter
       if (filters.category !== "All") {
-        result = result.filter(item => {
+        result = result.filter((item) => {
           const itemCatLower = item.cat.toLowerCase();
           const filterCatLower = filters.category.toLowerCase();
           return itemCatLower.includes(filterCatLower);
@@ -157,11 +159,13 @@ useEffect(() => {
         if (filters.dateRange === "Last 7 Days") {
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(now.getDate() - 7);
-          result = result.filter(item => item.date >= sevenDaysAgo);
+          result = result.filter((item) => item.date >= sevenDaysAgo);
         } else if (filters.dateRange === "This Month") {
-          result = result.filter(item => {
-            return item.date.getMonth() === now.getMonth() &&
-              item.date.getFullYear() === now.getFullYear();
+          result = result.filter((item) => {
+            return (
+              item.date.getMonth() === now.getMonth() &&
+              item.date.getFullYear() === now.getFullYear()
+            );
           });
         }
       }
@@ -186,12 +190,16 @@ useEffect(() => {
 
   // Calculate dynamic balance totals (always from full data)
   const totals = useMemo(() => {
-    const income = datas.filter(i => i.it === 'income').reduce((s, j) => s + j.amm, 0);
-    const expense = datas.filter(i => i.it === 'expenss').reduce((s, k) => s + k.amm, 0);
+    const income = datas
+      .filter((i) => i.it === "income")
+      .reduce((s, j) => s + j.amm, 0);
+    const expense = datas
+      .filter((i) => i.it === "expenss")
+      .reduce((s, k) => s + k.amm, 0);
     return {
       balance: income - expense,
       income: income,
-      expense: expense
+      expense: expense,
     };
   }, [datas]);
 
@@ -219,7 +227,7 @@ useEffect(() => {
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
-           data={datastore}
+          data={datastore}
         />
       </View>
 
@@ -252,13 +260,13 @@ export default desbord;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   headerWrapper: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     zIndex: 10,
   },
   content: {
     flex: 1,
-  }
+  },
 });
