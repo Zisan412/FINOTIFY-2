@@ -1,0 +1,32 @@
+[33m496bd9c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m asyncstorage removed,ip change
+[33m4e87460[m some changes on database
+[33mba76b2e[m log out feature
+[33m0ef0c77[m autho is complated & desbord show username
+[33m90785f7[m autho is complated & desbord show username
+[33m1aa6527[m autho is complated
+[33m5813ad0[m dyanmic name
+[33mf4d81c9[m autho is complated
+[33mb169fd9[m autho is complated
+[33md13b78e[m login and signup
+[33me879031[m bottom UI changes
+[33m35cad42[m Finalized UI
+[33mcbb364f[m Frontend changes
+[33m2e63c45[m dasboard changes
+[33mee2df7e[m ui semifinal
+[33m28790fb[m[33m ([m[1;31morigin/Zisan412-patch-1[m[33m)[m new ui changes
+[33ma346ed5[m dashboard changes filter
+[33ma0d4c94[m dashboard changes
+[33mf92d847[m work?
+[33m180aee5[m work?
+[33m05d64cb[m dont chnages
+[33ma0b430c[m create a route and jwt token user register succesfully
+[33m920d2fc[m start backend and write a connection and create routes
+[33m2583621[m create a conframtion page for logout
+[33m7a6c5ef[m change resend otp
+[33m10b57fe[m change setting user name styles
+[33macea0da[m create a due pyment & profile page
+[33m50b67b7[m desbord chnage and otp enter ui chnage
+[33med61b88[m desbord bottom change & charts background image removed
+[33m4ab7ebc[m feature addded
+[33mf9886dd[m Added app assets and initial files
+[33mb9d4e92[m Initial commit

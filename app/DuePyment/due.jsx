@@ -12,6 +12,7 @@ const DUE_DATA = [
     type: "receive",
     date: "15 Feb 2026",
     category: "Lent",
+    note: "Lunch money lent last week",
   },
   {
     id: "2",
@@ -20,6 +21,7 @@ const DUE_DATA = [
     type: "pay",
     date: "10 Feb 2026",
     category: "Utility",
+    note: "February month electricity",
   },
   {
     id: "3",
@@ -28,6 +30,7 @@ const DUE_DATA = [
     type: "receive",
     date: "18 Feb 2026",
     category: "Food",
+    note: "Shared dinner bill",
   },
   {
     id: "4",
@@ -36,6 +39,7 @@ const DUE_DATA = [
     type: "pay",
     date: "20 Feb 2026",
     category: "Entertainment",
+    note: "Monthly subscription renewal",
   },
 ];
 
@@ -73,6 +77,12 @@ const DueDashboard = () => {
                 <Ionicons name="calendar-outline" size={12} color="#94A3B8" />
                 <Text style={styles.date}>{item.date}</Text>
               </View>
+              {item.note ? (
+                <View style={styles.noteRow}>
+                  <Ionicons name="document-text-outline" size={12} color="#94A3B8" />
+                  <Text style={styles.noteText}>{item.note}</Text>
+                </View>
+              ) : null}
             </View>
           </View>
 
@@ -336,5 +346,19 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     padding: 4,
-  }
+  },
+  noteRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 4,
+    marginTop: 4,
+  },
+  noteText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '500',
+    fontStyle: 'italic',
+    flex: 1,
+    flexWrap: 'wrap',
+  },
 });

@@ -76,18 +76,18 @@ const AddDuePayment = () => {
     setTimeout(() => {
       setLoading(false);
       triggerToast('success', 'Due added successfully');
-
+      console.log({
+        type,
+        name,
+        amount,
+        note,
+      });
       setTimeout(() => {
         router.push('/DuePyment/due');
       }, 1500);
     }, 800);
   };
-console.log({
-        Date,
-        name,
-        amount,
-        note,
-      });
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {toast.visible && (
@@ -200,7 +200,7 @@ console.log({
 
           {/* Note */}
           <View style={styles.inputBox}>
-            <Text style={styles.label}>NOTE (OPTIONAL)</Text>
+            <Text style={styles.label}>NOTE</Text>
             <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
               <Ionicons name="document-text-outline" size={20} color="#64748b" style={{ marginTop: 12 }} />
               <TextInput

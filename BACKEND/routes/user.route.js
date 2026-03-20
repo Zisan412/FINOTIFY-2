@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Register = require("../model/register.model");
+const Due = require("../model/due.model");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
@@ -123,5 +124,22 @@ router.post('/newpass/:email',async(req,res)=>{
         console.log(error)
         res.status(500).json({message:'failed to update password'})
     })
+})
+
+//due logic
+
+router.post('/adddue',async(req,res)=>{
+    const {type,name,amount,note,date,user}=req.body
+    const due=await Due.create({type,name,amount,note,date,user})
+    res.status(200).json({message:'due created successfully',due})
+})
+router.delete('/deletedue/:id',async(req,res)=>{
+    const {id}=req.params
+    const due=await Due.findByIdAndDelete(id)
+    res.status(200).json({message:'due deleted successfully',due})
+})  
+router.get('/getdue',async(req,res)=>{
+    const due=await Due.find()
+    res.status(200).json({message:'due fetched successfully',due})
 })
 module.exports = router;
