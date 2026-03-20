@@ -129,14 +129,20 @@ router.post('/newpass/:email',async(req,res)=>{
 //due logic
 
 router.post('/adddue',async(req,res)=>{
-    const {type,name,amount,note,date,user}=req.body
+  
+    const {type,name,amount,note,date,user}=await req.body
     const due=await Due.create({type,name,amount,note,date,user})
+    
     res.status(200).json({message:'due created successfully',due})
 })
 router.delete('/deletedue/:id',async(req,res)=>{
-    const {id}=req.params
-    const due=await Due.findByIdAndDelete(id)
+    try{
+    const due=await Due.findByIdAndDelete(req.params.id)
     res.status(200).json({message:'due deleted successfully',due})
+  }
+  catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 })  
 router.get('/getdue',async(req,res)=>{
     const due=await Due.find()

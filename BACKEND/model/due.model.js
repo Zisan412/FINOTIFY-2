@@ -4,7 +4,7 @@ const dueSchema = new mongoose.Schema({
     type: String,
     name: String,
     amount: Number,
-    note: String,
+    note: {type:String,max:20},
  date: { type: Date, default: Date.now },
     user: {
         type: mongoose.Schema.Types.ObjectId,

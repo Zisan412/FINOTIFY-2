@@ -11,9 +11,14 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
+
 import React, { useState, useRef } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import axios from 'axios';
+
+const API_URL = 'http://192.168.43.242:3000/user/adddue';
+
 
 const AddDuePayment = () => {
   const [type, setType] = useState("receive"); // receive | pay
@@ -58,35 +63,38 @@ const AddDuePayment = () => {
     }, 2500);
   };
 
-  const handleSave = () => {
-    const newErrors = {};
-    if (!name.trim()) newErrors.name = true;
-    if (!amount.trim()) newErrors.amount = true;
+ const handleSave = async () => {
+  const newErrors = {};
+  if (!name.trim()) newErrors.name = true;
+  if (!amount.trim()) newErrors.amount = true;
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      triggerToast('error', 'Please fill all required fields');
-      return;
-    }
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    triggerToast('error', 'Please fill all required fields');
+    return;
+  }
 
-    setErrors({});
-    setLoading(true);
+  setErrors({});
+  setLoading(true);
 
-    // Simulate saving
+  try {
+    await axios.post(`http://192.168.43.242:3000/user/adddue`, {
+      type,
+      name,
+      amount: parseFloat(amount),
+      note,
+    });
+    triggerToast('success', 'Due added successfully');
     setTimeout(() => {
-      setLoading(false);
-      triggerToast('success', 'Due added successfully');
-      console.log({
-        type,
-        name,
-        amount,
-        note,
-      });
-      setTimeout(() => {
-        router.push('/DuePyment/due');
-      }, 1500);
-    }, 800);
-  };
+      router.push('/DuePyment/due');
+    }, 1500);
+  } catch (err) {
+    triggerToast('error', 'Failed to save');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -209,6 +217,7 @@ const AddDuePayment = () => {
                 onChangeText={setNote}
                 style={[styles.input, styles.textArea]}
                 multiline
+                maxLength={45}
               />
             </View>
           </View>
