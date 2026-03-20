@@ -17,7 +17,7 @@ const Forgget = () => {
 
   const sub= async ()=>{
     console.log(email)
-        await axios.post('http://192.168.43.141:3000/user/email',
+        await axios.post('http://192.168.43.242:3000/user/email',
           {email:email}
         )
         .then(async (res)=>{

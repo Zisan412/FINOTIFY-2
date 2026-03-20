@@ -53,7 +53,7 @@ const Newpass = () => {
     
   }
   else{
-    axios.post(`http://192.168.43.141:3000/user/newpass/${email}`,
+    axios.post(`http://192.168.43.242:3000/user/newpass/${email}`,
       {
         password:pass2
       }

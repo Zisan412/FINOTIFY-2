@@ -47,25 +47,25 @@ const Singup = () => {
     seterror('')
     
     // Temporarily disabled for testing
-     axios.post('http://192.168.43.141:3000/user/register', {
+     axios.post('http://192.168.43.242:3000/user/register', {
       name: username,
       phonenumber: mobile,
       email: email,
       password: pass
     }).then(async(res) => {
   console.log(JSON.stringify(res.data.massage));
-        await AsyncStorage.setItem('token', res.data.token);
+        // await AsyncStorage.setItem('token', res.data.token);
 
         console.log(res.data)
         await AsyncStorage.setItem('userName', res.data.name);
         await AsyncStorage.setItem('userEmail', res.data.email);
 
         router.replace('../desbord/desbord')
-         await AsyncStorage.getItem('token').then((token) => {
-          console.log('Token stored in AsyncStorage:', token);
-        }).catch((error) => {
-          console.error('Error retrieving token from AsyncStorage:', error);
-        });
+        //  await AsyncStorage.getItem('token').then((token) => {
+        //   console.log('Token stored in AsyncStorage:', token);
+        // }).catch((error) => {
+        //   console.error('Error retrieving token from AsyncStorage:', error);
+        // });
       }).catch((error) => {
         seterror('Registration failed. Please try again.');
         setTimeout(() => {
@@ -109,7 +109,7 @@ const Singup = () => {
 
     else if (pass != paas2) {
       seterror('no match password')
-      setTimeout(() => {
+      setTimeout(() => {''
         seterror('')
       }, 2000)
     }

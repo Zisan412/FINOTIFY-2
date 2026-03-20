@@ -1,12 +1,9 @@
 const mongoose = require("mongoose");
 
-async function connectDB() {
-    try {
-        await mongoose.connect("mongodb+srv://user:musab2005@finotify.erxji0b.mongodb.net/?appName=FINOTIFY")
+function connectDB() {
+        mongoose.connect(process.env.MONGODB_URI)
         console.log("Connected to database");
-    } catch (error) {
-        console.log(error);
-    }
+
 };
 
 module.exports = connectDB;

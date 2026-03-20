@@ -37,7 +37,7 @@ const Login = () => {
     }
     else{
     
-     axios.post('http://192.168.43.141:3000/user/login',
+     axios.post('http://192.168.43.242:3000/user/login',
       {
         phonenumber: mobile,
         password: password

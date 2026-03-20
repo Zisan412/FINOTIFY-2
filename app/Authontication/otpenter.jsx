@@ -19,7 +19,7 @@ const Otpenter = () => {
 
 
   const sub=async()=>{
-    await axios.post('http://192.168.43.141:3000/user/otp',
+    await axios.post('http://192.168.43.242:3000/user/otp',
       {otp:otp}
     ).then((res)=>{
       console.log(JSON.stringify(res.data.message))

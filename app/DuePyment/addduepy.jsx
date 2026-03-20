@@ -82,7 +82,12 @@ const AddDuePayment = () => {
       }, 1500);
     }, 800);
   };
-
+console.log({
+        Date,
+        name,
+        amount,
+        note,
+      });
   return (
     <SafeAreaView style={styles.safeArea}>
       {toast.visible && (
