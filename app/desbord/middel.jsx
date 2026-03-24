@@ -1,94 +1,125 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { Pressable, StyleSheet, Text, View, Animated, Dimensions } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import All from './all'
 import Income from './income'
 import Expenss from './expenss'
 import Total from './total'
-const middel = ({ activeTab, onTabChange, datas }) => {
+
+const { width } = Dimensions.get('window');
+// Calculate width available for tabs
+const TAB_BAR_MARGIN = 16;
+const TAB_BAR_PADDING = 6;
+const TAB_BAR_WIDTH = width - (TAB_BAR_MARGIN * 2);
+const TAB_WIDTH = (TAB_BAR_WIDTH - (TAB_BAR_PADDING * 2)) / 4;
+
+const Middel = ({ activeTab, onTabChange, datas, onDelete }) => {
+  // Animation for the tab selector slider
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  // Animation for the content fade
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // 1. Slide the active indicator
+    Animated.spring(slideAnim, {
+      toValue: (activeTab - 1) * TAB_WIDTH,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 10,
+    }).start();
+
+    // 2. Fade in transition for content
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab]);
+
   return (
     <View style={{ flex: 1 }}>
+      {/* TAB BAR */}
       <View style={styles.allbtn}>
-        {/* All Tab */}
-        <Pressable
-          style={[styles.btn, activeTab == 1 && styles.activeBtn]}
-          onPress={() => onTabChange(1)}
-        >
+        {/* Animated Background Selector */}
+        <Animated.View 
+          style={[
+            styles.activeSlider, 
+            { 
+              width: TAB_WIDTH,
+              transform: [{ translateX: slideAnim }] 
+            }
+          ]} 
+        />
+
+        <Pressable style={styles.btn} onPress={() => onTabChange(1)}>
           <Text style={[styles.innerText, activeTab == 1 && styles.activeText]}>All</Text>
         </Pressable>
 
-        {/* Income Tab */}
-        <Pressable
-          style={[styles.btn, activeTab == 2 && styles.activeBtn]}
-          onPress={() => onTabChange(2)}
-        >
+        <Pressable style={styles.btn} onPress={() => onTabChange(2)}>
           <Text style={[styles.innerText, activeTab == 2 && styles.activeText]}>Income</Text>
         </Pressable>
 
-        {/* Expense Tab */}
-        <Pressable
-          style={[styles.btn, activeTab == 3 && styles.activeBtn]}
-          onPress={() => onTabChange(3)}
-        >
+        <Pressable style={styles.btn} onPress={() => onTabChange(3)}>
           <Text style={[styles.innerText, activeTab == 3 && styles.activeText]}>Expense</Text>
         </Pressable>
 
-        {/* Total Tab */}
-        <Pressable
-          style={[styles.btn, activeTab == 4 && styles.activeBtn]}
-          onPress={() => onTabChange(4)}
-        >
+        <Pressable style={styles.btn} onPress={() => onTabChange(4)}>
           <Text style={[styles.innerText, activeTab == 4 && styles.activeText]}>Total</Text>
         </Pressable>
       </View>
 
-      <View style={[styles.contentContainer, { flex: 1 }]}>
-        {activeTab == 1 && <All datas={datas} />}
-        {activeTab == 2 && <Income go={datas} />}
-        {activeTab == 3 && <Expenss go={datas} />}
+      {/* CONTENT AREA WITH FADE */}
+      <Animated.View style={[styles.contentContainer, { opacity: fadeAnim }]}>
+        {activeTab == 1 && <All datas={datas} onDelete={onDelete} />}
+        {activeTab == 2 && <Income go={datas} onDelete={onDelete} />}
+        {activeTab == 3 && <Expenss go={datas} onDelete={onDelete} />}
         {activeTab == 4 && <Total go={datas} />}
-      </View>
+      </Animated.View>
     </View>
   );
 };
 
-export default middel;
+export default Middel;
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   allbtn: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     backgroundColor: "#f1f2f6",
     marginHorizontal: 16,
-    marginTop: 12, // Reduced top margin
-    marginBottom: 8, // Significantly reduced bottom margin to bring list closer
+    marginTop: 12,
+    marginBottom: 8,
     padding: 6,
     borderRadius: 18,
     height: 52,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  activeSlider: {
+    position: 'absolute',
+    left: 6,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 14,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
   btn: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 16,
     height: "100%",
-  },
-  activeBtn: {
-    backgroundColor: "white",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    zIndex: 1, // Ensure text is above activeSlider
   },
   innerText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
     color: "#a4b0be",
   },
   activeText: {
-    color: "#2f3640",
+    color: "#1e2a35",
     fontWeight: "800",
   },
   contentContainer: {

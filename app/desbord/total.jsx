@@ -3,12 +3,13 @@ import React from "react";
 
 const Total = ({ go }) => {
   const categories = [
-    { key: "food 🍴", label: "Food" },
-    { key: "salary 💸", label: "Salary" },
-    { key: "shopping 🛍️", label: "Shopping" },
-    { key: "traveling 🧳", label: "Traveling" },
-    { key: "sports 🥎", label: "Sports" },
-    { key: "other ", label: "Others" },
+    { key: "🍔 Food", label: "Food" },
+    { key: "💰 Salary", label: "Salary" },
+    { key: "🛍️ Shopping", label: "Shopping" },
+    { key: "✈️ Travel", label: "Travel" },
+    { key: "🏀 Sports", label: "Sports" },
+    { key: "🏠 House", label: "House" },
+    { key: "📦 Other", label: "Others" },
   ];
 
   const summary = {};
@@ -17,9 +18,11 @@ const Total = ({ go }) => {
   });
 
   go.forEach(item => {
-    if (!summary[item.cat]) return;
-    if (item.it === "income") summary[item.cat].income += item.amm;
-    else summary[item.cat].expense += item.amm;
+    // Exact match with DB category name (e.g. "🍔 Food")
+    if (summary[item.category]) {
+      if (item.type === "income") summary[item.category].income += item.amount;
+      else summary[item.category].expense += item.amount;
+    }
   });
 
   const totalIncome = Object.values(summary).reduce(
@@ -63,11 +66,11 @@ const Total = ({ go }) => {
               <Text style={styles.tdCat}>{cat.label}</Text>
 
               <Text style={[styles.td, styles.income]}>
-                ₹ {data.income}
+                ₹{data.income}
               </Text>
 
               <Text style={[styles.td, styles.expense]}>
-                ₹ {data.expense}
+                ₹{data.expense}
               </Text>
 
               <Text
@@ -76,7 +79,7 @@ const Total = ({ go }) => {
                   { color: balance >= 0 ? "#2ecc71" : "#e74c3c" },
                 ]}
               >
-                ₹ {balance}
+                ₹{balance}
               </Text>
             </View>
           );
@@ -86,13 +89,13 @@ const Total = ({ go }) => {
         <View style={styles.footerRow}>
           <Text style={styles.totalText}>Total</Text>
           <Text style={[styles.totalText, { color: "#2ecc71" }]}>
-            ₹ {totalIncome}
+            ₹{totalIncome}
           </Text>
           <Text style={[styles.totalText, { color: "#e74c3c" }]}>
-            ₹ {totalExpense}
+            ₹{totalExpense}
           </Text>
           <Text style={styles.totalText}>
-            ₹ {totalIncome - totalExpense}
+            ₹{totalIncome - totalExpense}
           </Text>
         </View>
       </View>

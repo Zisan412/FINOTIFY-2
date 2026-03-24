@@ -4,6 +4,7 @@ const Register = require("../model/register.model");
 const Due = require("../model/due.model");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const Dashboard = require("../model/dashboard.model");
 
 const jwt = require("jsonwebtoken");
 
@@ -148,4 +149,60 @@ router.get('/getdue',async(req,res)=>{
     const due=await Due.find()
     res.status(200).json({message:'due fetched successfully',due})
 })
+
+//main dashboard logic
+
+router.post('/adddashboardentry',async(req,res)=>{
+  try {
+    const {amount,bankName,category,type,date,desc,upiId,user} = req.body
+    console.log('Received:', req.body)
+
+    const entry = { 
+      amount: Number(amount), 
+      bankName, 
+      category, 
+      type, 
+      date: date || new Date(), 
+      desc, 
+      upiId 
+    }
+    if (user) entry.user = user
+
+    const dashboard = await Dashboard.create(entry)
+    res.status(200).json({message:'Entry Added successfully', dashboard})
+  } catch(err) {
+    console.log('Error in adddashboardentry:', err.message)
+    res.status(500).json({message: err.message})
+  }
+})
+router.get('/getdashboardentry', async (req, res) => {
+  try {
+    const dashboard = await Dashboard.find().sort({ date: -1 });
+    res.status(200).json({ message: 'Entry fetched successfully', dashboard });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+router.patch('/updatedashboardentry/:id', async (req, res) => {
+  try {
+    const updated = await Dashboard.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+    res.status(200).json({ message: 'Entry updated successfully', updated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+router.delete('/deletedashboardentry/:id',async(req,res)=>{
+    try{
+    const dashboard=await Dashboard.findByIdAndDelete(req.params.id)
+    res.status(200).json({message:' Entry deleted successfully',dashboard})
+  }
+  catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})  
+
 module.exports = router;

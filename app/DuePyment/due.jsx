@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Platform, StatusBar } from "react-native";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import Bottom from "../desbord/bottom";
 import axios from 'axios';
 
@@ -10,32 +10,44 @@ const API_URL = 'http://192.168.43.242:3000/user';
 const DueDashboard = () => {
   const [dueData, setDueData] = useState([]);
 
-  useEffect(() => {
+  const fetchDue = useCallback(() => {
     axios.get(`${API_URL}/getdue`)
-      .then(res => setDueData(res.data.due))
+      .then(res => {
+        if (res.data && res.data.due) {
+          setDueData(res.data.due);
+        }
+      })
       .catch(err => console.log(err));
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDue();
+    }, [fetchDue])
+  );
 
   const totals = useMemo(() => {
     const toReceive = dueData.filter(item => item.type === 'receive').reduce((sum, item) => sum + item.amount, 0);
     const toPay = dueData.filter(item => item.type === 'pay').reduce((sum, item) => sum + item.amount, 0);
     return { toReceive, toPay };
   }, [dueData]);
- const handleDelete = (id) => {
-  axios.delete(`http://192.168.43.242:3000/user/deletedue/${id}`)
-    .then(() => {
-      setDueData(prev => prev.filter(item => item._id !== id));
-    })
-    .catch(err => console.log(err));
-};  const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
-};
 
+  const handleDelete = (id) => {
+    axios.delete(`http://192.168.43.242:3000/user/deletedue/${id}`)
+      .then(() => {
+        setDueData(prev => prev.filter(item => item._id !== id));
+      })
+      .catch(err => console.log(err));
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
 
   const renderItem = ({ item }) => {
     const isReceive = item.type === "receive";

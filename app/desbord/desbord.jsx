@@ -1,7 +1,7 @@
 import { StyleSheet, View, SafeAreaView } from "react-native";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
@@ -10,49 +10,9 @@ import FilterBottomSheet from "./FilterBottomSheet";
 import axios from "axios";
 
 const desbord = () => {
-  // let id = useLocalSearchParams().id;
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
-  // let [datastore, setdatastore] = useState(null);
-  // let [storetoken,setstoretoken]=useState(id);
-
-  /*useEffect(() => {
-    const fetchData = async () => {
-      const storetoken = await asyncStorage.getItem("id");
-      console.log("Fetching data for ID:", storetoken); // Debugging log
-      if (!storetoken) {
-        console.log("No token found in AsyncStorage");
-        return;
-      }
-      // Store the token for later use
-
-      // Store token for later use
-      // Store token for later use
-      try {
-        const res = await axios.get(
-          `http://192.168.43.141:3000/desbord/desbord/${storetoken}`,
-        );
-
-        let name = res.data.data.name; // Assuming the name is in this path
-        setdatastore({ name: name }); // Store the name in state
-       // Store token for later use
-           await asyncStorage.setItem('userName', res.data.name);
-            await asyncStorage.setItem('userEmail', res.data.email);
-        // Store the token in state
-        console.log(datastore); // This might still show old value due to async state update
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);*/
-
-  useEffect(() => {
-    if (params.tab) {
-      setActiveTab(parseInt(params.tab));
-    }
-  }, [params.tab]);
+  const [datas, setDatas] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [filters, setFilters] = useState({
@@ -62,138 +22,96 @@ const desbord = () => {
     sortBy: "Latest",
   });
 
-  const data = new Date();
+  useEffect(() => {
+    if (params.tab) {
+      setActiveTab(parseInt(params.tab));
+    }
+  }, [params.tab]);
 
-  const datas = useMemo(
-    () => [
-      {
-        date: data,
-        cat: "transport 🚕",
-        amm: 150,
-        des: "Petrol",
-        it: "expenss",
-        bankName: "Kotak Bank",
-        upiId: "shaihnihal652@oksbi",
-      },
-      {
-        date: data,
-        cat: "salary 💸",
-        amm: 50000,
-        des: "Monthly Salary",
-        it: "income",
-        bankName: "HDFC Bank",
-        upiId: "company@hdfcbank",
-      },
-      {
-        date: data,
-        cat: "food 🍴",
-        amm: 320,
-        des: "Dinner with team",
-        it: "expenss",
-        bankName: "SBI",
-        upiId: "restaurant@upi",
-      },
-      {
-        date: data,
-        cat: "other 💡",
-        amm: 99,
-        des: "Netflix subscription",
-        it: "expenss",
-      },
-      {
-        date: data,
-        cat: "freelance 💼",
-        amm: 8000,
-        des: "Design project",
-        it: "income",
-      },
-      {
-        date: data,
-        cat: "shopping 🛍️",
-        amm: 1400,
-        des: "New shoes",
-        it: "expenss",
-      },
-    ],
-    [],
+  const fetchData = useCallback(() => {
+    axios.get('http://192.168.43.242:3000/user/getdashboardentry')
+      .then(res => {
+        if (res.data && res.data.dashboard) {
+          setDatas(res.data.dashboard);
+        }
+      })
+      .catch(err => console.log(err));
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
   );
 
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
     let result = [...datas];
 
-    // 1. Search Query Filter - Apply globally if search text exists
+    // 1. Search Query Filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
-          item.cat.toLowerCase().includes(query) ||
-          item.des.toLowerCase().includes(query) ||
-          item.amm.toString().includes(query),
+          item.category.toLowerCase().includes(query) ||
+          item.desc.toLowerCase().includes(query) ||
+          item.amount.toString().includes(query),
       );
     }
 
     // 2. Advanced Filters - ONLY apply when 'All' tab is active
     if (activeTab === 1) {
-      // Transaction Type Filter
       if (filters.type !== "All") {
-        const typeKey =
-          filters.type.toLowerCase() === "income" ? "income" : "expenss";
-        result = result.filter((item) => item.it === typeKey);
+        const typeKey = filters.type.toLowerCase() === "income" ? "income" : "expense";
+        result = result.filter((item) => item.type === typeKey);
       }
 
-      // Category Filter
       if (filters.category !== "All") {
         result = result.filter((item) => {
-          const itemCatLower = item.cat.toLowerCase();
+          const itemCatLower = item.category.toLowerCase();
           const filterCatLower = filters.category.toLowerCase();
           return itemCatLower.includes(filterCatLower);
         });
       }
 
-      // Date Filter
       if (filters.dateRange !== "All") {
         const now = new Date();
         if (filters.dateRange === "Last 7 Days") {
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(now.getDate() - 7);
-          result = result.filter((item) => item.date >= sevenDaysAgo);
+          result = result.filter((item) => new Date(item.date) >= sevenDaysAgo);
         } else if (filters.dateRange === "This Month") {
           result = result.filter((item) => {
+            const itemDate = new Date(item.date);
             return (
-              item.date.getMonth() === now.getMonth() &&
-              item.date.getFullYear() === now.getFullYear()
+              itemDate.getMonth() === now.getMonth() &&
+              itemDate.getFullYear() === now.getFullYear()
             );
           });
         }
       }
 
-      // Sorting
       if (filters.sortBy === "Amount: High to Low") {
-        result.sort((a, b) => b.amm - a.amm);
+        result.sort((a, b) => b.amount - a.amount);
       } else if (filters.sortBy === "Amount: Low to High") {
-        result.sort((a, b) => a.amm - b.amm);
+        result.sort((a, b) => a.amount - b.amount);
       } else {
-        result.sort((a, b) => b.date - a.date);
+        result.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
     } else {
-      // For Income, Expense, and Total tabs:
-      // Always show relevant items (handled by child components)
-      // but keep latest sorting as default
-      result.sort((a, b) => b.date - a.date);
+      result.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
 
     return result;
   }, [datas, searchQuery, filters, activeTab]);
 
-  // Calculate dynamic balance totals (always from full data)
   const totals = useMemo(() => {
     const income = datas
-      .filter((i) => i.it === "income")
-      .reduce((s, j) => s + j.amm, 0);
+      .filter((i) => i.type === "income")
+      .reduce((s, j) => s + j.amount, 0);
     const expense = datas
-      .filter((i) => i.it === "expenss")
-      .reduce((s, k) => s + k.amm, 0);
+      .filter((i) => i.type === "expense")
+      .reduce((s, k) => s + k.amount, 0);
     return {
       balance: income - expense,
       income: income,
@@ -202,7 +120,6 @@ const desbord = () => {
   }, [datas]);
 
   const handleRefresh = () => {
-    // Reset dashboard state to refresh UI
     setSearchQuery("");
     setFilters({
       type: "All",
@@ -211,11 +128,11 @@ const desbord = () => {
       sortBy: "Latest",
     });
     setActiveTab(1);
+    fetchData();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 1. FIXED HEADER SECTION */}
       <View style={styles.headerWrapper}>
         <Upper
           totalBalance={totals.balance}
@@ -225,23 +142,20 @@ const desbord = () => {
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
-          // data={datastore}
         />
       </View>
 
-      {/* 2. MID SECTION - Scrollable Content */}
       <View style={styles.content}>
         <Middel
           activeTab={activeTab}
           onTabChange={setActiveTab}
           datas={filteredDatas}
+          onDelete={fetchData}
         />
       </View>
 
-      {/* 3. FIXED BOTTOM NAVIGATION */}
       <Bottom />
 
-      {/* 4. FILTER BOTTOM SHEET - Root Level Modal */}
       <FilterBottomSheet
         visible={isFilterVisible}
         onClose={() => setIsFilterVisible(false)}

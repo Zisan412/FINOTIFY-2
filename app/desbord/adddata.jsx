@@ -18,6 +18,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useLocalSearchParams } from "expo-router";
+import axios from "axios";
 
 // ── Constants outside component (stable references) ──────────────────
 const DEFAULT_CATEGORIES = [
@@ -42,7 +43,8 @@ const ICON_PICKER = [
 
 
 const AddData = () => {
-  const { cat, amm, des } = useLocalSearchParams();
+  
+  const { cat, amm, des, editId, bankN, upi, dat, it } = useLocalSearchParams();
 
   const [showPicker, setShowPicker] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
@@ -54,8 +56,19 @@ const AddData = () => {
   const [amount, setAmount] = useState(amm || "");
   const [category, setCategory] = useState(cat || "");
   const [desc, setDesc] = useState(des || "");
-  const [bankName, setBankName] = useState("");
-  const [upiId, setUpiId] = useState("");
+  const [bankName, setBankName] = useState(bankN || "");
+  const [upiId, setUpiId] = useState(upi || "");
+
+  useEffect(() => {
+    if (editId) {
+      if (dat) setDate(new Date(dat));
+      if (amm) setAmount(amm);
+      if (cat) setCategory(cat);
+      if (des) setDesc(des);
+      if (bankN) setBankName(bankN === 'Cash' ? '' : bankN);
+      if (upi) setUpiId(upi);
+    }
+  }, [editId]);
 
   const DEFAULT_BANKS = ['SBI', 'HDFC', 'Bank of Baroda'];
   const [customBanks, setCustomBanks] = useState([]);
@@ -93,6 +106,7 @@ const AddData = () => {
       friction: 11,
     }).start();
   };
+  
 
   const closeCategory = () => {
     Animated.timing(slideAnim, {
@@ -147,25 +161,37 @@ const AddData = () => {
     setErrors({});
     setLoading(type);
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(null);
-      triggerToast();
+    // Use patch if editId exists, else use post
+    const apiCall = editId 
+      ? axios.patch(`http://192.168.43.242:3000/user/updatedashboardentry/${editId}`, {
+          type,
+          date: date.toISOString(),
+          amount,
+          category,
+          bankName: bankName || 'Cash',
+          upiId,
+          desc,
+        })
+      : axios.post('http://192.168.43.242:3000/user/adddashboardentry',{
+          type,
+          date: date.toISOString(),
+          amount,
+          category,
+          bankName: bankName || 'Cash',
+          upiId,
+          desc,
+        });
 
-      console.log({
-        type,
-        date,
-        amount,
-        category,
-        bankName: bankName || 'Cash',
-        upiId,
-        desc,
+    apiCall
+      .then(() => {
+        setLoading(null);
+        triggerToast();
+        setTimeout(() => router.back(), 1500);
+      })
+      .catch(err => {
+        console.log(err);
+        setLoading(null);
       });
-
-      setTimeout(() => {
-        router.back();
-      }, 1500);
-    }, 800);
   };
 
   return (
@@ -187,8 +213,8 @@ const AddData = () => {
                 <Ionicons name="checkmark-circle" size={24} color="#fff" />
               </View>
               <View>
-                <Text style={styles.toastTitle}>Transaction Added</Text>
-                <Text style={styles.toastSub}>Your record has been saved successfully!</Text>
+                <Text style={styles.toastTitle}>{editId ? 'Transaction Updated' : 'Transaction Added'}</Text>
+                <Text style={styles.toastSub}>{editId ? 'Your record has been updated successfully!' : 'Your record has been saved successfully!'}</Text>
               </View>
             </View>
           </Animated.View>
@@ -205,8 +231,8 @@ const AddData = () => {
               <Ionicons name="arrow-back" size={24} color="#1e293b" />
             </Pressable>
             <View style={styles.headerText}>
-              <Text style={styles.title}>New Transaction</Text>
-              <Text style={styles.subtitle}>Track your income and expenses easily</Text>
+              <Text style={styles.title}>{editId ? 'Update Transaction' : 'New Transaction'}</Text>
+              <Text style={styles.subtitle}>{editId ? 'Modify your existing record' : 'Track your income and expenses easily'}</Text>
             </View>
           </View>
 
@@ -353,45 +379,69 @@ const AddData = () => {
             </View>
 
             {/* PRIMARY BUTTONS */}
-            <View style={styles.buttonRow}>
-              <Pressable
-                disabled={loading !== null}
-                style={({ pressed }) => [
-                  styles.mainBtn,
-                  styles.incomeBtn,
-                  (pressed || loading === 'income') && styles.btnPressed
-                ]}
-                onPress={() => submit("income")}
-              >
-                {loading === 'income' ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <>
-                    <Ionicons name="trending-up" size={18} color="#fff" />
-                    <Text style={styles.btnText}>Income</Text>
-                  </>
-                )}
-              </Pressable>
+            {editId ? (
+              <View style={styles.buttonRow}>
+                <Pressable
+                  disabled={loading !== null}
+                  style={({ pressed }) => [
+                    styles.mainBtn,
+                    it === 'income' ? styles.incomeBtn : styles.expenseBtn,
+                    { flex: 1 },
+                    (pressed || loading !== null) && styles.btnPressed
+                  ]}
+                  onPress={() => submit(it)}
+                >
+                  {loading !== null ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                      <Text style={styles.btnText}>Update Entry</Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.buttonRow}>
+                <Pressable
+                  disabled={loading !== null}
+                  style={({ pressed }) => [
+                    styles.mainBtn,
+                    styles.incomeBtn,
+                    (pressed || loading === 'income') && styles.btnPressed
+                  ]}
+                  onPress={() => submit("income")}
+                >
+                  {loading === 'income' ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="trending-up" size={18} color="#fff" />
+                      <Text style={styles.btnText}>Income</Text>
+                    </>
+                  )}
+                </Pressable>
 
-              <Pressable
-                disabled={loading !== null}
-                style={({ pressed }) => [
-                  styles.mainBtn,
-                  styles.expenseBtn,
-                  (pressed || loading === 'expense') && styles.btnPressed
-                ]}
-                onPress={() => submit("expense")}
-              >
-                {loading === 'expense' ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <>
-                    <Ionicons name="trending-down" size={18} color="#fff" />
-                    <Text style={styles.btnText}>Expense</Text>
-                  </>
-                )}
-              </Pressable>
-            </View>
+                <Pressable
+                  disabled={loading !== null}
+                  style={({ pressed }) => [
+                    styles.mainBtn,
+                    styles.expenseBtn,
+                    (pressed || loading === 'expense') && styles.btnPressed
+                  ]}
+                  onPress={() => submit("expense")}
+                >
+                  {loading === 'expense' ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="trending-down" size={18} color="#fff" />
+                      <Text style={styles.btnText}>Expense</Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+            )}
           </View>
 
           {/* SECONDARY ACTION */}
@@ -774,7 +824,6 @@ const AddData = () => {
   );
 };
 
-export default AddData;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -1216,3 +1265,5 @@ const styles = StyleSheet.create({
     color: '#0a63bc',
   },
 });
+
+export default AddData;

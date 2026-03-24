@@ -1,10 +1,13 @@
-import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
-import React from "react";
+import { ScrollView, StyleSheet, Text, View, Pressable, Alert } from "react-native";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import axios from "axios";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
-const Items = ({ datas }) => {
-  const date = new Date();
+const Items = ({ datas, onDelete }) => {
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState(null);
 
   return (
     <ScrollView
@@ -13,12 +16,13 @@ const Items = ({ datas }) => {
       showsVerticalScrollIndicator={false}
     >
       {datas.map((i, index) => {
-        const isIncome = i.it === "income";
+        const isIncome = i.type === "income";
 
         // Extract emoji if present, or use first letter
-        const emojiMatch = i.cat.match(/[\p{Emoji}\u200d]+/u);
-        const iconSign = emojiMatch ? emojiMatch[0] : i.cat.charAt(0);
-        const cleanCat = i.cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
+        const cat = i.category || "Other";
+        const emojiMatch = cat.match(/[\p{Emoji}\u200d]+/u);
+        const iconSign = emojiMatch ? emojiMatch[0] : cat.charAt(0);
+        const cleanCat = cat.replace(/[\p{Emoji}\u200d]+/u, '').trim();
 
         return (
           <View
@@ -34,14 +38,14 @@ const Items = ({ datas }) => {
               <View style={styles.iconColumn}>
                 <Text style={styles.categoryIcon}>{iconSign}</Text>
                 <Text style={styles.categoryName} numberOfLines={1}>
-                  {cleanCat || i.cat}
+                  {cleanCat || i.category}
                 </Text>
               </View>
 
               {/* ── CENTER: main info ── */}
               <View style={styles.centerSection}>
                 <Text style={styles.description} numberOfLines={1}>
-                  {i.des}
+                  {i.desc}
                 </Text>
                 <Text style={styles.subDetail} numberOfLines={1}>
                   {i.bankName || 'Cash'}
@@ -52,25 +56,30 @@ const Items = ({ datas }) => {
                   </Text>
                 ) : null}
                 <Text style={styles.dateText}>
-                  {`${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear().toString().slice(-2)}`}
+                  {(() => { const d = new Date(i.date); return `${d.getDate().toString().padStart(2,'0')}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getFullYear().toString().slice(-2)}`; })()}
                 </Text>
               </View>
 
-              {/* ── RIGHT: amount + actions (untouched) ── */}
+              {/* ── RIGHT: amount + actions ── */}
               <View style={styles.rightSection}>
                 <Text style={[styles.amount, { color: isIncome ? "#2ecc71" : "#ff4757" }]}>
-                  {isIncome ? "+" : "-"}₹ {i.amm}
+                  {isIncome ? "+" : "-"}₹ {i.amount}
                 </Text>
                 <View style={styles.actions}>
                   <Pressable
                     onPress={() => router.push({
                       pathname: '../desbord/adddata',
-                      params: { cat: i.cat, amm: i.amm, des: i.des, it: i.it }
+                      params: { cat: i.category, amm: i.amount, des: i.desc, it: i.type, editId: i._id, bankN: i.bankName, upi: i.upiId, dat: i.date }
                     })}
                   >
                     <Ionicons name="create-outline" size={18} color="#95a5a6" />
                   </Pressable>
-                  <Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setSelectedEntry(i);
+                      setDeleteVisible(true);
+                    }}
+                  >
                     <Ionicons name="trash-outline" size={18} color="#ff4757" />
                   </Pressable>
                 </View>
@@ -80,6 +89,25 @@ const Items = ({ datas }) => {
           </View>
         );
       })}
+
+      <DeleteConfirmModal 
+        visible={deleteVisible}
+        onClose={() => setDeleteVisible(false)}
+        itemName={selectedEntry?.desc}
+        onConfirm={() => {
+          if (selectedEntry) {
+            axios.delete(`http://192.168.43.242:3000/user/deletedashboardentry/${selectedEntry._id}`)
+              .then(() => {
+                setDeleteVisible(false);
+                onDelete && onDelete();
+              })
+              .catch(err => {
+                console.log(err);
+                setDeleteVisible(false);
+              });
+          }
+        }}
+      />
     </ScrollView>
   );
 };
