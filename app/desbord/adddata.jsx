@@ -19,6 +19,8 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
+import { BASE_URL } from "../../constants/Config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ── Constants outside component (stable references) ──────────────────
 const DEFAULT_CATEGORIES = [
@@ -147,7 +149,7 @@ const AddData = () => {
     }, 2500);
   };
 
-  const submit = (type) => {
+  const submit =async (type) => {
     const newErrors = {};
     if (!amount) newErrors.amount = "Please enter amount";
     if (!category) newErrors.category = "Please select a category";
@@ -162,8 +164,9 @@ const AddData = () => {
     setLoading(type);
 
     // Use patch if editId exists, else use post
+    const userId = await AsyncStorage.getItem('userId');
     const apiCall = editId 
-      ? axios.patch(`http://192.168.43.242:3000/user/updatedashboardentry/${editId}`, {
+      ? axios.patch(`${BASE_URL}/updatedashboardentry/${editId}`, {
           type,
           date: date.toISOString(),
           amount,
@@ -172,7 +175,7 @@ const AddData = () => {
           upiId,
           desc,
         })
-      : axios.post('http://192.168.43.242:3000/user/adddashboardentry',{
+      : axios.post(`${BASE_URL}/adddashboardentry`,{
           type,
           date: date.toISOString(),
           amount,
@@ -180,6 +183,7 @@ const AddData = () => {
           bankName: bankName || 'Cash',
           upiId,
           desc,
+          user: userId,
         });
 
     apiCall

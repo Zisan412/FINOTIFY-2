@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import Danger from "../Modules/danger";
 import { useLocalSearchParams } from "expo-router";
 import axios from 'axios'
+import { BASE_URL } from "../../constants/Config";
 const Newpass = () => {
   const [press, setpress] = useState(0);
   const [chnage, setchnage] = useState(false);
@@ -53,7 +54,7 @@ const Newpass = () => {
     
   }
   else{
-    axios.post(`http://192.168.43.242:3000/user/newpass/${email}`,
+    axios.post(`${BASE_URL}/newpass/${email}`,
       {
         password:pass2
       }

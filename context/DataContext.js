@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const DataContext = createContext(null);
 
-const API_URL = 'http://192.168.43.242:3000/user';
+import { BASE_URL } from '../constants/Config';
 
 export const DataProvider = ({ children }) => {
   const [dashboardData, setDashboardData] = useState([]);
@@ -12,7 +12,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchDashboard = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/getdashboardentry`);
+      const res = await axios.get(`${BASE_URL}/getdashboardentry`);
       if (res.data && res.data.dashboard) {
         setDashboardData(res.data.dashboard);
       }
@@ -23,7 +23,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchDue = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/getdue`);
+      const res = await axios.get(`${BASE_URL}/getdue`);
       if (res.data && res.data.due) {
         setDueData(res.data.due);
       }

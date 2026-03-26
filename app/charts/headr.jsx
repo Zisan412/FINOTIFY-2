@@ -5,6 +5,10 @@ import { router } from 'expo-router'
 import Bottom from '../desbord/bottom'
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { useEffect, useCallback } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import axios from 'axios'
+import { BASE_URL } from '../../constants/Config'
 
 const Header = () => {
   const [selectedFilter, setSelectedFilter] = useState('This Month');
@@ -12,6 +16,29 @@ const Header = () => {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [entries, setEntries] = useState([]);
+
+const fetchEntries = useCallback(() => {
+  const load = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      const token = await AsyncStorage.getItem('token');
+      const res = await axios.get(`${BASE_URL}/getdashboardentry`, {
+        params: { user: userId },
+        headers: { Authorization: `Bearer ${token}` },
+      });console.log('res.data:', res.data); // structure dekh
+const data = res.data.data || res.data;
+setEntries(res.data.dashboard || []);
+    } catch (err) {
+      console.log('Stats fetch error:', err.message);
+    }
+  };
+  load();
+}, []);
+
+useEffect(() => {
+  fetchEntries();
+}, [fetchEntries]);
 
   const filters = ['This Week', 'This Month', 'Custom'];
 
@@ -44,25 +71,53 @@ const Header = () => {
 
   // Mock data that changes based on filter
   const pieData = useMemo(() => {
-    const isWeek = selectedFilter === 'This Week';
-    const isCustom = selectedFilter === 'Custom';
+  const now = new Date();
 
-    return [
-      {
-        value: isWeek ? 1500 : isCustom ? 2800 : 4500,
-        color: '#00e676',
-        label: 'Income',
-        onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 2 } })
-      },
-      {
-        value: isWeek ? 1200 : isCustom ? 2100 : 3800,
-        color: '#ff5252',
-        label: 'Expense',
-        onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 3 } })
-      },
-    ];
-  }, [selectedFilter, startDate, endDate]);
+  const filtered = entries.filter((e) => {
+    const entryDate = new Date(e.date);
 
+    if (selectedFilter === 'This Week') {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return entryDate >= weekAgo && entryDate <= now;
+    }
+    if (selectedFilter === 'This Month') {
+      return (
+        entryDate.getMonth() === now.getMonth() &&
+        entryDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (selectedFilter === 'Custom') {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59);
+      return entryDate >= startDate && entryDate <= end;
+    }
+    return true;
+  });
+
+  const income = filtered
+    .filter((e) => e.type === 'income')
+    .reduce((sum, e) => sum + Number(e.amount), 0);
+
+  const expense = filtered
+    .filter((e) => e.type === 'expense')
+    .reduce((sum, e) => sum + Number(e.amount), 0);
+
+  return [
+    {
+      value: income,
+      color: '#00e676',
+      label: 'Income',
+      onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 2 } }),
+    },
+    {
+      value: expense,
+      color: '#ff5252',
+      label: 'Expense',
+      onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 3 } }),
+    },
+  ];
+}, [entries, selectedFilter, startDate, endDate]);
   const total = pieData.reduce((acc, curr) => acc + curr.value, 0);
 
   // Clean, minimal data for PieChart with external labels

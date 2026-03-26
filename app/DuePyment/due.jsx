@@ -4,22 +4,29 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import Bottom from "../desbord/bottom";
 import axios from 'axios';
+import { BASE_URL } from "../../constants/Config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = 'http://192.168.43.242:3000/user';
+const API_URL = BASE_URL;
 
 const DueDashboard = () => {
-  const [dueData, setDueData] = useState([]);
+   const [dueData, setDueData] = useState([]);
 
   const fetchDue = useCallback(() => {
-    axios.get(`${API_URL}/getdue`)
-      .then(res => {
-        if (res.data && res.data.due) {
-          setDueData(res.data.due);
-        }
-      })
-      .catch(err => console.log(err));
+    const getDue = async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      
+      axios.get(`${BASE_URL}/getdue?user=${userId}`)
+        .then(res => {
+          if (res.data && res.data.due) {
+            const sorted = res.data.due.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setDueData(sorted);
+          }
+        })
+        .catch(err => console.log(err));
+    };
+    getDue();
   }, []);
-
   useFocusEffect(
     useCallback(() => {
       fetchDue();
@@ -33,7 +40,7 @@ const DueDashboard = () => {
   }, [dueData]);
 
   const handleDelete = (id) => {
-    axios.delete(`http://192.168.43.242:3000/user/deletedue/${id}`)
+    axios.delete(`${BASE_URL}/deletedue/${id}`)
       .then(() => {
         setDueData(prev => prev.filter(item => item._id !== id));
       })

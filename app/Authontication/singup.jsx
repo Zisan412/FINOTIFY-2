@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import Danger from "../Modules/danger";
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { BASE_URL } from "../../constants/Config";
 
 const Singup = () => {
   const [press, setpress] = useState(0);
@@ -47,7 +48,7 @@ const Singup = () => {
     seterror('')
     
     // Temporarily disabled for testing
-     axios.post('http://192.168.43.242:3000/user/register', {
+     axios.post(`${BASE_URL}/register`, {
       name: username,
       phonenumber: mobile,
       email: email,

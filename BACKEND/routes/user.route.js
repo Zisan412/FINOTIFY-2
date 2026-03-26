@@ -39,7 +39,7 @@ router.post('/login',async (req,res)=>{
     }
    
      let token = jwt.sign({ id: finddata._id },"MYSECRETKEY");
-    res.status(200).json({ message: "User login successfully", token: token ,name: finddata.name, email: finddata.email}); 
+    res.status(200).json({ message: "User login successfully", token: token ,name: finddata.name, email: finddata.email,_id: finddata._id}); 
     console.log(token);
 
 
@@ -146,8 +146,11 @@ router.delete('/deletedue/:id',async(req,res)=>{
   }
 })  
 router.get('/getdue',async(req,res)=>{
-    const due=await Due.find()
-    res.status(200).json({message:'due fetched successfully',due})
+   const { user } = req.query;
+  const filter = user ? { user } : {};
+  
+  const due = await Due.find(filter);
+  res.status(200).json({ message: 'due fetched successfully', due });
 })
 
 //main dashboard logic
@@ -177,7 +180,10 @@ router.post('/adddashboardentry',async(req,res)=>{
 })
 router.get('/getdashboardentry', async (req, res) => {
   try {
-    const dashboard = await Dashboard.find().sort({ date: -1 });
+    const { user } = req.query;
+    const filter = user ? { user } : {};
+    
+    const dashboard = await Dashboard.find(filter).sort({ date: -1 });
     res.status(200).json({ message: 'Entry fetched successfully', dashboard });
   } catch (err) {
     res.status(500).json({ message: err.message });

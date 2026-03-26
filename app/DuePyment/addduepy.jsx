@@ -16,8 +16,10 @@ import React, { useState, useRef } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import axios from 'axios';
+import { BASE_URL } from "../../constants/Config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = 'http://192.168.43.242:3000/user/adddue';
+const API_URL = `${BASE_URL}/adddue`;
 
 
 const AddDuePayment = () => {
@@ -76,13 +78,14 @@ const AddDuePayment = () => {
 
   setErrors({});
   setLoading(true);
-
+  const userId = await AsyncStorage.getItem('userId');
   try {
-    await axios.post(`http://192.168.43.242:3000/user/adddue`, {
+    await axios.post(`${BASE_URL}/adddue`, {
       type,
       name,
       amount: parseFloat(amount),
       note,
+      user: userId
     });
     triggerToast('success', 'Due added successfully');
     setTimeout(() => {

@@ -13,6 +13,8 @@ import Danger from "../Modules/danger";
 import axios from 'axios'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { BASE_URL } from "../../constants/Config";
+
 
 const Login = () => {
   const [activeInput, setActiveInput] = useState(0);
@@ -23,49 +25,37 @@ const Login = () => {
   const [error, setError] = useState("");
 
 
-  const submit =  () => {
-    // Temporarily disabled for testing
-    if (mobile == "" || password == "") {
-      setError("Please enter both mobile number and password.");
-      clearError();
-      return;
-    }
-    else if (mobile.length < 10) {
-      setError("Please enter a valid 10-digit mobile number.");
-      clearError();
-      return;
-    }
-    else{
-    
-     axios.post('http://192.168.43.242:3000/user/login',
-      {
-        phonenumber: mobile,
-        password: password
-      }).then(async(res) => {
+ const submit = async () => {
+  if (mobile == "" || password == "") {
+    setError("Please enter both mobile number and password.");
+    clearError();
+    return;
+  } else if (mobile.length < 10) {
+    setError("Please enter a valid 10-digit mobile number.");
+    clearError();
+    return;
+  }
 
+  try {
+    const res = await axios.post(`${BASE_URL}/login`, {
+      phonenumber: mobile,
+      password: password
+    });
 
-        console.log(JSON.stringify(res.data.massage));
-        await AsyncStorage.setItem('token', res.data.token);
+    await AsyncStorage.setItem('token', res.data.token);
+    await AsyncStorage.setItem('userName', res.data.name);
+    await AsyncStorage.setItem('userEmail', res.data.email);
+    await AsyncStorage.setItem('userId', res.data._id ?? '');
 
-        console.log(res.data)
-        await AsyncStorage.setItem('userName', res.data.name);
-        await AsyncStorage.setItem('userEmail', res.data.email);
+    console.log('Login success:', res.data);
+    router.replace('/desbord/desbord');
 
-        router.replace('../desbord/desbord')
-         await AsyncStorage.getItem('token').then((token) => {
-          console.log('Token stored in AsyncStorage:', token);
-        }).catch((error) => {
-          console.error('Error retrieving token from AsyncStorage:', error);
-        });
-      }).catch((error) => {
-        setError('Login failed. Please check your credentials and try again.');
-        setTimeout(() => {
-          setError('');
-        }, 2000);
-      })
-    }
-  };
-
+  } catch (error) {
+    console.log('Exact error:', error.message);
+    setError('Login failed. Please check your credentials and try again.');
+    clearError();
+  }
+};
   const clearError = () => {
     setTimeout(() => setError(""), 2000);
   };

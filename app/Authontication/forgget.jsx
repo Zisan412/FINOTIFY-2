@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/danger";
 import axios from 'axios'
+import { BASE_URL } from "../../constants/Config";
 
 
 const Forgget = () => {
@@ -17,7 +18,7 @@ const Forgget = () => {
 
   const sub= async ()=>{
     console.log(email)
-        await axios.post('http://192.168.43.242:3000/user/email',
+        await axios.post(`${BASE_URL}/email`,
           {email:email}
         )
         .then(async (res)=>{

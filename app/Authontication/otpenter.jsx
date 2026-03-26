@@ -8,6 +8,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/danger";
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer'
 import axios from 'axios'
+import { BASE_URL } from "../../constants/Config";
 import { jsx } from "react/jsx-runtime";
 const Otpenter = () => {
     const [otp,setotp]=useState('')
@@ -19,7 +20,7 @@ const Otpenter = () => {
 
 
   const sub=async()=>{
-    await axios.post('http://192.168.43.242:3000/user/otp',
+    await axios.post(`${BASE_URL}/otp`,
       {otp:otp}
     ).then((res)=>{
       console.log(JSON.stringify(res.data.message))

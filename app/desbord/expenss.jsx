@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { styles } from "./all";
 import axios from "axios";
+import { BASE_URL } from "../../constants/Config";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 
 const Expenss = ({ go, onDelete }) => {
@@ -93,7 +94,7 @@ const Expenss = ({ go, onDelete }) => {
         itemName={selectedEntry?.desc}
         onConfirm={() => {
           if (selectedEntry) {
-            axios.delete(`http://192.168.43.242:3000/user/deletedashboardentry/${selectedEntry._id}`)
+            axios.delete(`${BASE_URL}/deletedashboardentry/${selectedEntry._id}`)
               .then(() => {
                 setDeleteVisible(false);
                 onDelete && onDelete();

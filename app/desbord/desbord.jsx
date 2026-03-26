@@ -6,6 +6,8 @@ import Upper from "./upper";
 import Bottom from "./bottom";
 import Middel from "./middel";
 import FilterBottomSheet from "./FilterBottomSheet";
+import { BASE_URL } from "../../constants/Config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "axios";
 
@@ -28,22 +30,23 @@ const desbord = () => {
     }
   }, [params.tab]);
 
-  const fetchData = useCallback(() => {
-    axios.get('http://192.168.43.242:3000/user/getdashboardentry')
-      .then(res => {
-        if (res.data && res.data.dashboard) {
-          setDatas(res.data.dashboard);
-        }
-      })
-      .catch(err => console.log(err));
-  }, []);
+  const fetchData = useCallback(async () => {
+  const userId = await AsyncStorage.getItem('userId');
+    console.log('userId:', userId); 
+  axios.get(`${BASE_URL}/getdashboardentry?user=${userId}`)
+    .then(res => {
+      if (res.data && res.data.dashboard) {
+        setDatas(res.data.dashboard);
+      }
+    })
+    .catch(err => console.log(err));
+}, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [fetchData])
-  );
-
+useFocusEffect(
+  useCallback(() => {
+    fetchData();
+  }, [fetchData])
+);
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
     let result = [...datas];
