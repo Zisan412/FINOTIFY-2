@@ -7,11 +7,12 @@ const nodemailer = require("nodemailer");
 const Dashboard = require("../model/dashboard.model");
 const UpiEntry = require("../model/upi-entry.model");
 
-
+console.log("USER ROUTE LOADED");
 const jwt = require("jsonwebtoken");
 
 
 router.post("/register", async (req, res) => {
+  console.log("REGISTER HIT");
   try {
     const { name, phonenumber, email, password } = req.body;
 

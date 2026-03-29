@@ -10,9 +10,16 @@ const app = express();
 app.use(cors())
 
 
+
 app.use(express.json());
 
+
+
 app.use("/user",register)
+
+app.get("/", (req, res) => {
+  res.send("OK");
+});
 
 
 
