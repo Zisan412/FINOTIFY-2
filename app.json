@@ -20,8 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/ic.png",
         "backgroundColor": "#000"
-        
-      }, "permissions": [
+      },
+      "permissions": [
         "READ_SMS",
         "RECEIVE_SMS"
       ],
@@ -30,7 +30,6 @@
     },
     "web": {
       "favicon": "./assets/ic.png"
-      
     },
     "plugins": [
       "expo-router",
@@ -39,8 +38,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "d35d5278-aea8-4470-8ffc-04b79031526a"
+        "projectId": "00354f31-2d73-4fb7-9808-838f56002217"
       }
-    }
+    },
+    "owner": "zisan412"
   }
 }
