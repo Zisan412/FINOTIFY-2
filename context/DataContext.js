@@ -12,7 +12,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchDashboard = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/getdashboardentry`);
+      const res = await axios.get(`${BASE_URL}/user/getdashboardentry`);
       if (res.data && res.data.dashboard) {
         setDashboardData(res.data.dashboard);
       }
@@ -23,7 +23,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchDue = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/getdue`);
+      const res = await axios.get(`${BASE_URL}/user/getdue`);
       if (res.data && res.data.due) {
         setDueData(res.data.due);
       }

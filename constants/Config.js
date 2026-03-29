@@ -2,7 +2,7 @@
 // Update this IP once to change it everywhere in the app
 
 const LOCAL_IP = "10.38.208.242"; // <-- Bas yahan change karna hai!
-export const BASE_URL = `https://finotify-2-production.up.railway.app`;
+export const BASE_URL = `https://finotify-2-production.up.railway.app/user`;
 
 export default {
     BASE_URL,

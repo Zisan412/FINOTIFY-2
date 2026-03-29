@@ -23,7 +23,7 @@ const fetchEntries = useCallback(() => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       const token = await AsyncStorage.getItem('token');
-      const res = await axios.get(`${BASE_URL}/getdashboardentry`, {
+      const res = await axios.get(`${BASE_URL}/user/getdashboardentry`, {
         params: { user: userId },
         headers: { Authorization: `Bearer ${token}` },
       });console.log('res.data:', res.data); // structure dekh
