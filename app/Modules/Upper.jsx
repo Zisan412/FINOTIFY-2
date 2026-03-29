@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const Upper = ({singup}) => {
+const Upper = ({signup}) => {
   return (
     <View>
          <View style={styles.container2}>
-             <Text style={styles.text}>{"\n"}{singup}</Text>
+             <Text style={styles.text}>{"\n"}{signup}</Text>
         </View>
     </View>
   )

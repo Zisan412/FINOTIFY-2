@@ -44,17 +44,17 @@ const Bottom = () => {
           style={styles.foot}
           onPress={() => {
             animatePress(scaleHome);
-            router.replace('/desbord/desbord');
+            router.replace('/dashboard/dashboard');
           }}
         >
           <Animated.View style={{ transform: [{ scale: scaleHome }] }}>
             <MaterialIcons 
               name="home-filled" 
-              size={isActive('desbord') ? 28 : 24} 
-              color={isActive('desbord') ? "white" : "rgba(255,255,255,0.6)"} 
+              size={isActive('dashboard') ? 28 : 24} 
+              color={isActive('dashboard') ? "white" : "rgba(255,255,255,0.6)"} 
             />
           </Animated.View>
-          <Text style={[styles.fonts, { color: isActive('desbord') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('desbord') ? 'bold' : 'normal' }]}>Home</Text>
+          <Text style={[styles.fonts, { color: isActive('dashboard') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('dashboard') ? 'bold' : 'normal' }]}>Home</Text>
         </Pressable>
 
         {/* STATS */}
@@ -62,7 +62,7 @@ const Bottom = () => {
           style={styles.foot} 
           onPress={() => {
             animatePress(scaleStats);
-            router.replace('/charts/headr');
+            router.replace('../charts/chart');
           }}
         >
           <Animated.View style={{ transform: [{ scale: scaleStats }] }}>
@@ -79,7 +79,7 @@ const Bottom = () => {
         <View style={styles.addBtnContainer}>
           <Pressable 
             style={({ pressed }) => [styles.addbtn, pressed && { transform: [{ scale: 0.9 }] }]} 
-            onPress={() => router.push('/desbord/adddata')}
+            onPress={() => router.push('/dashboard/adddata')}
           >
             <Ionicons name="add" size={48} color="white" />
           </Pressable>
@@ -90,17 +90,17 @@ const Bottom = () => {
           style={styles.foot} 
           onPress={() => {
             animatePress(scaleDue);
-            router.replace('/DuePyment/due');
+            router.replace('/due-payment/due');
           }}
         >
           <Animated.View style={{ transform: [{ scale: scaleDue }] }}>
             <Ionicons 
               name="time" 
-              size={isActive('DuePyment') ? 28 : 24} 
-              color={isActive('DuePyment') ? "white" : "rgba(255,255,255,0.6)"} 
+              size={isActive('due-payment') ? 28 : 24} 
+              color={isActive('due-payment') ? "white" : "rgba(255,255,255,0.6)"} 
             />
           </Animated.View>
-          <Text style={[styles.fonts, { color: isActive('DuePyment') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('DuePyment') ? 'bold' : 'normal' }]}>Due</Text>
+          <Text style={[styles.fonts, { color: isActive('due-payment') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('due-payment') ? 'bold' : 'normal' }]}>Due</Text>
         </Pressable>
 
         {/* SETTINGS */}
@@ -108,17 +108,17 @@ const Bottom = () => {
           style={styles.foot} 
           onPress={() => {
             animatePress(scaleSettings);
-            router.replace('/Usersetting/setting');
+            router.replace('/user-settings/setting');
           }}
         >
           <Animated.View style={{ transform: [{ scale: scaleSettings }] }}>
             <Ionicons 
               name="settings-sharp" 
-              size={isActive('Usersetting') ? 28 : 24} 
-              color={isActive('Usersetting') ? "white" : "rgba(255,255,255,0.6)"} 
+              size={isActive('user-settings') ? 28 : 24} 
+              color={isActive('user-settings') ? "white" : "rgba(255,255,255,0.6)"} 
             />
           </Animated.View>
-          <Text style={[styles.fonts, { color: isActive('Usersetting') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('Usersetting') ? 'bold' : 'normal' }]}>Setting</Text>
+          <Text style={[styles.fonts, { color: isActive('user-settings') ? "white" : "rgba(255,255,255,0.6)", fontWeight: isActive('user-settings') ? 'bold' : 'normal' }]}>Setting</Text>
         </Pressable>
       </View>
     </View>

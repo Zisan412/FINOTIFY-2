@@ -89,7 +89,7 @@ const AddDuePayment = () => {
     });
     triggerToast('success', 'Due added successfully');
     setTimeout(() => {
-      router.push('/DuePyment/due');
+      router.push('/due-payment/due');
     }, 1500);
   } catch (err) {
     triggerToast('error', 'Failed to save');

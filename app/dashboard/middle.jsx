@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View, Animated, Dimensions } from "react-n
 import React, { useState, useEffect, useRef } from "react";
 import All from './all'
 import Income from './income'
-import Expenss from './expenss'
+import Expenses from './expenses'
 import Total from './total'
 
 const { width } = Dimensions.get('window');
@@ -12,7 +12,7 @@ const TAB_BAR_PADDING = 6;
 const TAB_BAR_WIDTH = width - (TAB_BAR_MARGIN * 2);
 const TAB_WIDTH = (TAB_BAR_WIDTH - (TAB_BAR_PADDING * 2)) / 4;
 
-const Middel = ({ activeTab, onTabChange, datas, onDelete }) => {
+const Middle = ({ activeTab, onTabChange, datas, onDelete }) => {
   // Animation for the tab selector slider
   const slideAnim = useRef(new Animated.Value(0)).current;
   // Animation for the content fade
@@ -72,14 +72,14 @@ const Middel = ({ activeTab, onTabChange, datas, onDelete }) => {
       <Animated.View style={[styles.contentContainer, { opacity: fadeAnim }]}>
         {activeTab == 1 && <All datas={datas} onDelete={onDelete} />}
         {activeTab == 2 && <Income go={datas} onDelete={onDelete} />}
-        {activeTab == 3 && <Expenss go={datas} onDelete={onDelete} />}
+        {activeTab == 3 && <Expenses go={datas} onDelete={onDelete} />}
         {activeTab == 4 && <Total go={datas} />}
       </Animated.View>
     </View>
   );
 };
 
-export default Middel;
+export default Middle;
 
 const styles = StyleSheet.create({
   allbtn: {

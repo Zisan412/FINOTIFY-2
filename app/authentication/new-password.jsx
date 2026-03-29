@@ -12,11 +12,11 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import Danger from "../Modules/danger";
+import Danger from "../Modules/Danger";
 import { useLocalSearchParams } from "expo-router";
 import axios from 'axios'
 import { BASE_URL } from "../../constants/Config";
-const Newpass = () => {
+const NewPassword = () => {
   const [press, setpress] = useState(0);
   const [chnage, setchnage] = useState(false);
   const [hide, sethide] = useState(10);
@@ -77,7 +77,7 @@ const Newpass = () => {
         source={require("../../assets/Forgget.png")}
         style={styles.container2}
       /> */}
-              {error ? <Danger errror={error} /> : ''}
+              {error ? <Danger error={error} /> : ''}
 
       <View style={{ paddingTop: 0,marginTop: 150 }}>
         <Text
@@ -88,7 +88,7 @@ const Newpass = () => {
             fontFamily: "",
           }}
         >
-          update password
+          Update Password
         </Text>
       </View>
       <View style={styles.input}>
@@ -118,7 +118,7 @@ const Newpass = () => {
             style={[styles.inp, press == 1 && { opacity: 1 }]}
             onFocus={() => setpress(1)}
             onBlur={() => setpress(0)}
-            placeholder="new password"
+            placeholder="New Password"
             secureTextEntry={chnage}
             value={pass2}
             onChangeText={setpass2}
@@ -198,7 +198,7 @@ const Newpass = () => {
             style={[styles.inp, { marginTop: 2 }, press == 1 && { opacity: 1 }]}
             onFocus={() => setpress(1)}
             onBlur={() => setpress(0)}
-            placeholder="confirm new password"
+            placeholder="Confirm New Password"
             secureTextEntry={chnage2}
             value={pass}
             onChangeText={setpass}
@@ -272,7 +272,7 @@ const Newpass = () => {
               textAlign: "center",
             }}
           >
-            update password
+            Update Password
           </Text>
         </Pressable>
       </View>
@@ -280,7 +280,7 @@ const Newpass = () => {
   );
 };
 
-export default Newpass;
+export default NewPassword;
 
 const styles = StyleSheet.create({
   container2: {

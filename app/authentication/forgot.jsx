@@ -4,12 +4,12 @@ import { Pressable, StyleSheet, Text, TextInput, View,Image } from "react-native
 import Upper from "../Modules/Upper";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import Danger from "../Modules/danger";
+import Danger from "../Modules/Danger";
 import axios from 'axios'
 import { BASE_URL } from "../../constants/Config";
 
 
-const Forgget = () => {
+const Forgot = () => {
   const [press, setpress] = useState(0);
   const [email,setemail]=useState('')
     const [error,seterror]=useState('')
@@ -22,8 +22,8 @@ const Forgget = () => {
           {email:email}
         )
         .then(async (res)=>{
-          console.log(JSON.stringify(res.data.massage))
-          router.push({ pathname: './otpenter', params: { email: email } })
+          console.log(JSON.stringify(res.data.message))
+          router.push({ pathname: './otp-enter', params: { email: email } })
         })
         .catch((error)=>{
           seterror('Failed to send OTP. Please check your email and try again.');
@@ -37,15 +37,10 @@ const Forgget = () => {
   }
   return (
     <View style={{backgroundColor: "#ffffff", height:'100%' }}>
-          {/* TOP IMAGE */}
-          {/* <Image
-            source={require("../../assets/Forgget.png")}
-            style={styles.container2}
-          /> */}
-              {error ? <Danger errror={error} /> : null}
+              {error ? <Danger error={error} /> : null}
       <View style={{paddingTop:0,marginTop:150}}><Text style={{textAlign:'center',fontSize:20,textTransform:'capitalize',fontFamily:''}}>
-        enter email id to send a code {'\n'}
-        for recover password</Text></View>
+        Enter email ID to send a code {'\n'}
+        for recovering password</Text></View>
       <View style={styles.input}>
                  <View style={{display:'flex',flexDirection:'row',width:'80%',justifyContent:'center',alignItems:'center',borderRadius:14,marginTop:10,elevation:3,backgroundColor:'white'}}>
           <MaterialIcons name={'email'} size={24} color={'#0a63bcd5'} style={{}}></MaterialIcons>
@@ -76,7 +71,7 @@ const Forgget = () => {
               textAlign: "center",
             }}
           >
-            send otp on email
+            Send OTP to Email
           </Text>
         </Pressable>
       </View>
@@ -84,7 +79,7 @@ const Forgget = () => {
   );
 };
 
-export default Forgget;
+export default Forgot;
 
 const styles = StyleSheet.create({
   container2: {

@@ -4,16 +4,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import Upper from "./upper";
 import Bottom from "./bottom";
-import Middel from "./middel";
+import Middle from "./middle";
 import FilterBottomSheet from "./FilterBottomSheet";
 import { BASE_URL } from "../../constants/Config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "axios";
 
-const desbord = () => {
+const Dashboard = () => {
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(1);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [datas, setDatas] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -23,17 +24,34 @@ const desbord = () => {
     dateRange: "All",
     sortBy: "Latest",
   });
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     if (params.tab) {
       setActiveTab(parseInt(params.tab));
     }
+    // Session check: If no token, kick out to welcome page
+    const checkSession = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          router.replace("/");
+        } else {
+          setIsAuthLoading(false);
+        }
+      } catch (e) {
+        router.replace("/");
+      }
+    };
+    checkSession();
   }, [params.tab]);
 
   const fetchData = useCallback(async () => {
-  const userId = await AsyncStorage.getItem('userId');
+    const userId = await AsyncStorage.getItem('userId');
+    if (!userId) return;
+    
     console.log('userId:', userId); 
-  axios.get(`${BASE_URL}/getdashboardentry?user=${userId}`)
+    axios.get(`${BASE_URL}/getdashboardentry?user=${userId}`)
     .then(res => {
       if (res.data && res.data.dashboard) {
         setDatas(res.data.dashboard);
@@ -47,9 +65,19 @@ useFocusEffect(
     fetchData();
   }, [fetchData])
 );
+  const monthlyData = useMemo(() => {
+    return datas.filter((item) => {
+      const itemDate = new Date(item.date);
+      return (
+        itemDate.getMonth() === selectedDate.getMonth() &&
+        itemDate.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+  }, [datas, selectedDate]);
+
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
-    let result = [...datas];
+    let result = [...monthlyData];
 
     // 1. Search Query Filter
     if (searchQuery.trim()) {
@@ -106,13 +134,13 @@ useFocusEffect(
     }
 
     return result;
-  }, [datas, searchQuery, filters, activeTab]);
+  }, [monthlyData, searchQuery, filters, activeTab]);
 
   const totals = useMemo(() => {
-    const income = datas
+    const income = monthlyData
       .filter((i) => i.type === "income")
       .reduce((s, j) => s + j.amount, 0);
-    const expense = datas
+    const expense = monthlyData
       .filter((i) => i.type === "expense")
       .reduce((s, k) => s + k.amount, 0);
     return {
@@ -120,7 +148,7 @@ useFocusEffect(
       income: income,
       expense: expense,
     };
-  }, [datas]);
+  }, [monthlyData]);
 
   const handleRefresh = () => {
     setSearchQuery("");
@@ -131,8 +159,13 @@ useFocusEffect(
       sortBy: "Latest",
     });
     setActiveTab(1);
+    setSelectedDate(new Date());
     fetchData();
   };
+
+  if (isAuthLoading) {
+    return null; // Jab tak auth ho raha hai, tab tak blank dikhega taaki dashboard blink na kare
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -145,11 +178,13 @@ useFocusEffect(
           onSearchChange={setSearchQuery}
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
+          selectedDate={selectedDate}
+          onMonthChange={setSelectedDate}
         />
       </View>
 
       <View style={styles.content}>
-        <Middel
+        <Middle
           activeTab={activeTab}
           onTabChange={setActiveTab}
           datas={filteredDatas}
@@ -170,7 +205,7 @@ useFocusEffect(
   );
 };
 
-export default desbord;
+export default Dashboard;
 
 const styles = StyleSheet.create({
   container: {

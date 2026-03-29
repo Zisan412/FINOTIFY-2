@@ -454,7 +454,7 @@ const AddData = () => {
               styles.dueAction,
               pressed && styles.btnPressed
             ]}
-            onPress={() => router.push('/DuePyment/addduepy')}
+            onPress={() => router.push('/due-payment/add-due')}
           >
             <View style={styles.dueIconBox}>
               <Ionicons name="time" size={20} color="#0a63bc" />

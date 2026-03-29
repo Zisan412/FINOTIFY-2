@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ScrollView, Pressable, SafeAreaView, Platform, 
 import React, { useState, useMemo } from 'react'
 import { PieChart } from 'react-native-gifted-charts'
 import { router } from 'expo-router'
-import Bottom from '../desbord/bottom'
+import Bottom from '../dashboard/bottom'
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useEffect, useCallback } from 'react'
@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import { BASE_URL } from '../../constants/Config'
 
-const Header = () => {
+const Charts = () => {
   const [selectedFilter, setSelectedFilter] = useState('This Month');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -108,13 +108,13 @@ useEffect(() => {
       value: income,
       color: '#00e676',
       label: 'Income',
-      onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 2 } }),
+      onPress: () => router.replace({ pathname: '/dashboard/dashboard', params: { tab: 2 } }),
     },
     {
       value: expense,
       color: '#ff5252',
       label: 'Expense',
-      onPress: () => router.replace({ pathname: '/desbord/desbord', params: { tab: 3 } }),
+      onPress: () => router.replace({ pathname: '/dashboard/dashboard', params: { tab: 3 } }),
     },
   ];
 }, [entries, selectedFilter, startDate, endDate]);
@@ -209,7 +209,7 @@ useEffect(() => {
           <View style={styles.chartCard}>
             <View style={styles.chartWrapper}>
               <Pressable
-                onPress={() => router.replace({ pathname: '/desbord/desbord', params: { tab: 1 } })}
+                onPress={() => router.replace({ pathname: '/dashboard/dashboard', params: { tab: 1 } })}
                 style={styles.chartInteractiveArea}
               >
                 <PieChart
@@ -270,7 +270,7 @@ useEffect(() => {
   )
 }
 
-export default Header
+export default Charts
 
 const styles = StyleSheet.create({
   safeArea: {

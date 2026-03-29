@@ -28,19 +28,19 @@ export default function Layout() {
         to make it feel like a smooth tab-bar experience.
       */}
       <Stack.Screen 
-        name="desbord/desbord" 
+        name="dashboard/dashboard" 
         options={{ animation: 'none' }} 
       />
       <Stack.Screen 
-        name="charts/headr" 
+        name="charts/chart" 
         options={{ animation: 'none' }} 
       />
       <Stack.Screen 
-        name="DuePyment/due" 
+        name="due-payment/due" 
         options={{ animation: 'none' }} 
       />
       <Stack.Screen 
-        name="Usersetting/setting" 
+        name="user-settings/setting" 
         options={{ animation: 'none' }} 
       />
 
@@ -48,7 +48,7 @@ export default function Layout() {
         OTHER SCREENS: Keep standard push/pull animations for adding data
       */}
       <Stack.Screen 
-        name="desbord/adddata" 
+        name="dashboard/adddata" 
         options={{ 
           animation: 'slide_from_bottom',
           presentation: 'modal'

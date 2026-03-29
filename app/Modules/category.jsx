@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 
-const category = ({catt}) => {
+const Category = ({catt}) => {
 
   const [closed,setclosed]=useState(0)
 
@@ -19,7 +19,7 @@ const cat=()=>{
     </View>
      <ScrollView style={{display:'flex',flexDirection:'column',height:150}}>
       <Text style={styles.cat}>food 🍴</Text>
-      <Text style={styles.cat}>shooping 🛍️</Text>
+      <Text style={styles.cat}>shopping 🛍️</Text>
       <Text style={styles.cat}>traveling 🧳</Text>
       <Text style={styles.cat}>household 🏠</Text>
       <Text style={styles.cat}>sports 🥎</Text>
@@ -31,7 +31,7 @@ const cat=()=>{
   )
 }
 
-export default category
+export default Category
 
 const styles = StyleSheet.create({
     main:{

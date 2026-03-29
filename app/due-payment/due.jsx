@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, FlatList, Pressable, SafeAreaView, Platform, St
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import Bottom from "../desbord/bottom";
+import Bottom from "../dashboard/bottom";
 import axios from 'axios';
 import { BASE_URL } from "../../constants/Config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -110,7 +110,7 @@ const DueDashboard = () => {
               <Text style={styles.title}>Due Management</Text>
               <Text style={styles.sub}>Track your pending transactions</Text>
             </View>
-            <Pressable style={styles.addBtn} onPress={() => router.push('/DuePyment/addduepy')}>
+            <Pressable style={styles.addBtn} onPress={() => router.push('/due-payment/add-due')}>
               <Ionicons name="add" size={24} color="#FFF" />
             </Pressable>
           </View>

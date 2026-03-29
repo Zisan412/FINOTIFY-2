@@ -25,7 +25,7 @@ const Mainpage = () => {
         const token = await AsyncStorage.getItem('token');
         console.log('Token:', token);
         if (token) {
-          router.replace('./desbord/desbord'); // ✅ replace use karo push nahi
+          router.replace('./dashboard/dashboard'); // ✅ replace use karo push nahi
         }
       } catch (error) {
         console.error('Error:', error);
@@ -45,7 +45,7 @@ const Mainpage = () => {
 
       <Pressable
         style={[styles.button, styles.primaryBtn]}
-        onPress={() => router.push("./Authontication/singup")}
+        onPress={() => router.push("./authentication/signup")}
       >
         <Text style={styles.primaryBtnText}>WELCOME TO FINOTIFY</Text>
         <View style={styles.arrowBox}>
@@ -55,7 +55,7 @@ const Mainpage = () => {
 
       <Pressable
         style={[styles.button, styles.secondaryBtn]}
-        onPress={() => router.push("./Authontication/login")}
+        onPress={() => router.push("./authentication/login")}
       >
         <Text style={styles.secondaryBtnText}>Already have an account? Login</Text>
       </Pressable>

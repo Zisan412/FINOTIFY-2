@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Animated, Easing } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 
-const Danger = ({ errror, visible = true }) => {
+const Danger = ({ error, visible = true }) => {
  
 
   
@@ -15,7 +15,7 @@ const Danger = ({ errror, visible = true }) => {
       ]}
     >
       <View style={styles.dot} />
-      <Text style={styles.text}>{errror}</Text>
+      <Text style={styles.text}>{error}</Text>
     </View>
   )
 }

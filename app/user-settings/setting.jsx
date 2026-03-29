@@ -11,8 +11,8 @@ import {
 import React, { useState,useEffect } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import Bottom from "../desbord/bottom";
-import Confermation from "../Modules/confermation";
+import Bottom from "../dashboard/bottom";
+import Confirmation from "../Modules/Confirmation";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -99,7 +99,7 @@ useEffect(() => {
                 icon="chatbubble-ellipses-outline"
                 title="Send Feedback"
                 color="#00897b"
-                onPress={() => router.push("../Usersetting/feedback")}
+                onPress={() => router.push("../user-settings/feedback")}
               />
               <SettingItem
                 icon="help-circle-outline"
@@ -141,7 +141,7 @@ useEffect(() => {
 
       {/* MODALS */}
       {showLogoutConfirm && (
-        <Confermation
+        <Confirmation
           isPressed={showLogoutConfirm}
           setIsPressed={setShowLogoutConfirm}
         />

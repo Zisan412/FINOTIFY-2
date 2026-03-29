@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import Danger from "../Modules/danger";
+import Danger from "../Modules/Danger";
 import axios from 'axios'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -48,7 +48,7 @@ const Login = () => {
     await AsyncStorage.setItem('userId', res.data._id ?? '');
 
     console.log('Login success:', res.data);
-    router.replace('/desbord/desbord');
+    router.replace('/dashboard/dashboard');
 
   } catch (error) {
     console.log('Exact error:', error.message);
@@ -72,7 +72,7 @@ const Login = () => {
           style={styles.container2}
         />
 
-        {error ? <Danger errror={error} /> : null}
+        {error ? <Danger error={error} /> : null}
 
         <Text style={styles.heading}>Login Here</Text>
 
@@ -125,14 +125,14 @@ const Login = () => {
           </Pressable>
 
           {/* FORGOT */}
-          <Pressable onPress={() => router.push("./forgget")}>
+          <Pressable onPress={() => router.push("./forgot")}>
             <Text style={styles.forgot}>Forgot Password?</Text>
           </Pressable>
         </View>
       </View>
 
       {/* FOOTER */}
-      <Pressable onPress={() => router.push("./singup")}>
+      <Pressable onPress={() => router.push("./signup")}>
         <View style={styles.footer}>
           <Text style={styles.ftext}>No account? Register</Text>
         </View>
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 50,
     resizeMode: "cover",
-    Radius: 20,
+    borderRadius: 20,
 
   },
 

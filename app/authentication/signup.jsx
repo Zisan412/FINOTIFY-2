@@ -12,12 +12,12 @@ import Upper from "../Modules/Upper";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import Danger from "../Modules/danger";
+import Danger from "../Modules/Danger";
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { BASE_URL } from "../../constants/Config";
 
-const Singup = () => {
+const Signup = () => {
   const [press, setpress] = useState(0);
   const [chnage, setchnage] = useState(false);
   const [hide, sethide] = useState(10);
@@ -54,14 +54,13 @@ const Singup = () => {
       email: email,
       password: pass
     }).then(async(res) => {
-  console.log(JSON.stringify(res.data.massage));
-        // await AsyncStorage.setItem('token', res.data.token);
-
-        console.log(res.data)
+  console.log(JSON.stringify(res.data.message));
+        await AsyncStorage.setItem('token', res.data.token);
         await AsyncStorage.setItem('userName', res.data.name);
         await AsyncStorage.setItem('userEmail', res.data.email);
+        await AsyncStorage.setItem('userId', res.data._id);
 
-        router.replace('../desbord/desbord')
+        router.replace('../dashboard/dashboard')
         //  await AsyncStorage.getItem('token').then((token) => {
         //   console.log('Token stored in AsyncStorage:', token);
         // }).catch((error) => {
@@ -115,7 +114,7 @@ const Singup = () => {
       }, 2000)
     }
     else {
-      router.replace('/desbord/desbord')
+      router.replace('/dashboard/dashboard')
     }
   }
 
@@ -125,10 +124,10 @@ const Singup = () => {
       <View>
         {/* {/*  */}
         <View>
-          <Image style={styles.logo} source={require("../../assets/singup.png")} />
+          <Image style={styles.logo} source={require("../../assets/signup.png")} />
         </View>
 
-        {error ? <Danger errror={error} /> : ''}
+        {error ? <Danger error={error} /> : ''}
         <View style={{ paddingTop: 20 }}>
           <Text
             style={{
@@ -139,7 +138,7 @@ const Singup = () => {
               marginTop: -20
             }}
           >
-            register here
+            Register Here
           </Text>
         </View>
         <View style={styles.input}>
@@ -251,7 +250,7 @@ const Singup = () => {
               ]}
               onFocus={() => setpress(5)}
               onBlur={() => setpress(0)}
-              placeholder=" Confirom Password"
+              placeholder=" Confirm Password"
               secureTextEntry={chnage2}
               value={pass}
               onChangeText={setpass}
@@ -328,7 +327,7 @@ const Singup = () => {
                 textTransform: "capitalize",
               }}
             >
-              singup here
+              Signup Here
             </Text>
           </Pressable>
         </View>
@@ -354,7 +353,7 @@ const Singup = () => {
   );
 };
 
-export default Singup;
+export default Signup;
 
 const styles = StyleSheet.create({
   logo: {

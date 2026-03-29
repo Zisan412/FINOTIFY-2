@@ -4,10 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { styles } from "./all";
 import axios from "axios";
-import DeleteConfirmModal from "./DeleteConfirmModal";
 import { BASE_URL } from "../../constants/Config";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
-const Income = ({ go, onDelete }) => {
+const Expenses = ({ go, onDelete }) => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
 
@@ -18,7 +18,7 @@ const Income = ({ go, onDelete }) => {
       showsVerticalScrollIndicator={false}
     >
       {go.map((i, index) => {
-        if (i.type !== "income") return null;
+        if (i.type !== "expense") return null;
 
         const cat = i.category || "Other";
         const emojiMatch = cat.match(/[\p{Emoji}\u200d]+/u);
@@ -28,7 +28,7 @@ const Income = ({ go, onDelete }) => {
         return (
           <View
             key={index}
-            style={[styles.card, { borderLeftColor: "#2ecc71" }]}
+            style={[styles.card, { borderLeftColor: "#ff4757" }]}
           >
             <View style={styles.row}>
 
@@ -60,13 +60,13 @@ const Income = ({ go, onDelete }) => {
 
               {/* ── RIGHT: amount + actions ── */}
               <View style={styles.rightSection}>
-                <Text style={[styles.amount, { color: "#2ecc71" }]}>
-                  +₹ {i.amount}
+                <Text style={[styles.amount, { color: "#ff4757" }]}>
+                  -₹ {i.amount}
                 </Text>
                 <View style={styles.actions}>
                   <Pressable
                     onPress={() => router.push({
-                      pathname: '../desbord/adddata',
+                      pathname: '../dashboard/adddata',
                       params: { cat: i.category, amm: i.amount, des: i.desc, it: i.type, editId: i._id, bankN: i.bankName, upi: i.upiId, dat: i.date }
                     })}
                   >
@@ -110,4 +110,4 @@ const Income = ({ go, onDelete }) => {
   );
 };
 
-export default Income;
+export default Expenses;
