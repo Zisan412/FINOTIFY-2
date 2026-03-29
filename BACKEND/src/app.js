@@ -15,11 +15,11 @@ app.use(express.json());
 
 
 
-app.use("/user",register)
+// app.use("/user",register)
 
-app.get("/", (req, res) => {
-  res.send("OK");
-});
+// app.get("/", (req, res) => {
+//   res.send("OK");
+// });
 
 
 
