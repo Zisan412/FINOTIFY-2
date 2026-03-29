@@ -26,7 +26,7 @@ router.post("/register", async (req, res) => {
     email,
     password: hashpassword,
   });
-  let token = jwt.sign({ id: user._id }, "mysecretkey");
+  let token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN);
   res
     .status(200)
     .json({
@@ -55,7 +55,7 @@ router.post("/login", async (req, res) => {
       .json({ message: "Mobile number or password is not correct" });
   }
 
-  let token = jwt.sign({ id: finddata._id }, "mysecretkey");
+  let token = jwt.sign({ id: finddata._id }, process.env.JWT_TOKEN);
   res
     .status(200)
     .json({
@@ -257,7 +257,7 @@ const verifyToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token' });
     
-    jwt.verify(token, "mysecretkey", (err, decoded) => {
+    jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
         req.user = decoded;
         next();
