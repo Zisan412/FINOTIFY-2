@@ -12,33 +12,41 @@ const jwt = require("jsonwebtoken");
 
 
 router.post("/register", async (req, res) => {
-  const { name, phonenumber, email, password } = req.body;
+  try {
+    const { name, phonenumber, email, password } = req.body;
 
-  const finduser = await Register.findOne({ phonenumber });
+    const finduser = await Register.findOne({ phonenumber });
 
-  if (finduser) {
-    return res.status(400).json({ message: "User already exists" });
-  }
-  const hashpassword = await bcrypt.hash(password, 10);
-  const user = await Register.create({
-    name,
-    phonenumber,
-    email,
-    password: hashpassword,
-  });
-  let token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN);
-  res
-    .status(200)
-    .json({
+    if (finduser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashpassword = await bcrypt.hash(password, 10);
+
+    const user = await Register.create({
+      name,
+      phonenumber,
+      email,
+      password: hashpassword,
+    });
+
+    let token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN);
+
+    console.log("TOKEN:", token);
+
+    res.status(200).json({
       message: "User registered successfully",
       token: token,
       _id: user._id,
       email: user.email,
       name: user.name,
     });
-  console.log(token);
-});
 
+  } catch (err) {
+    console.log("REGISTER ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 router.post("/login", async (req, res) => {
   const { phonenumber, password } = req.body;
   const finddata = await Register.findOne({ phonenumber: phonenumber });
