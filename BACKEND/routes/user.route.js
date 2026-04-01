@@ -323,7 +323,8 @@ router.post('/parse-sms', verifyToken, async (req, res) => {
             return res.status(400).json({ error: 'Not a UPI SMS' });
         }
 
-        const existing = await UpiEntry.findOne({
+        // Duplicate check
+        const existing = await Dashboard.findOne({
             user: req.user.id,
             amount: parsed.amount,
             upiId: parsed.upiId,
@@ -334,8 +335,14 @@ router.post('/parse-sms', verifyToken, async (req, res) => {
             return res.status(200).json({ message: 'Already saved', data: existing });
         }
 
-        const entry = new UpiEntry({
-            ...parsed,
+        const entry = new Dashboard({
+            type: parsed.type === 'credit' ? 'income' : 'expense',
+            date: parsed.date,
+            amount: parsed.amount,
+            category: parsed.category,
+            bankName: parsed.bankName,
+            upiId: parsed.upiId,
+            desc: `Auto UPI • ${parsed.upiId || ''}`,
             user: req.user.id,
         });
 
@@ -345,9 +352,7 @@ router.post('/parse-sms', verifyToken, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
-
-// GET /upi/entries — user ki saari UPI entries
+});// GET /upi/entries — user ki saari UPI entries
 router.get('/entries', verifyToken, async (req, res) => {
     try {
         const entries = await UpiEntry.find({ user: req.user.id }).sort({ createdAt: -1 });

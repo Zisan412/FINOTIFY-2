@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView } from "react-native";
+import { StyleSheet, View, SafeAreaView ,Platform} from "react-native";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
@@ -8,6 +8,10 @@ import Middle from "./middle";
 import FilterBottomSheet from "./FilterBottomSheet";
 import { BASE_URL } from "../../constants/Config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+// Dashboard.jsx — TOP pe yeh imports add kar
+// import { View, SafeAreaView, PermissionsAndroid, Alert, Platform } from "react-native";
+import SmsAndroid from 'react-native-get-sms-android';
+import SmsListener from 'react-native-android-sms-listener';
 
 import axios from "axios";
 
@@ -65,6 +69,117 @@ useFocusEffect(
     fetchData();
   }, [fetchData])
 );
+ // ─── SMS PERMISSION + SCAN ───────────────────────────────
+
+const sendSmsToBackend = useCallback((body) => {
+  const inner = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const userId = await AsyncStorage.getItem('userId');
+      if (!token || !userId) return;
+
+      await axios.post(
+        `${BASE_URL}/parse-sms`,
+        { body, userId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchData(); // entry add hone ke baad refresh
+    } catch (e) {
+      console.log('SMS backend error:', e);
+    }
+  };
+  inner();
+}, [fetchData]);
+
+const scanOldSms = useCallback(() => {
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+  SmsAndroid.list(
+    JSON.stringify({
+      box: 'inbox',
+      minDate: thirtyDaysAgo,
+      maxCount: 200,
+    }),
+    (fail) => console.log('SMS read failed:', fail),
+    (count, smsList) => {
+      const messages = JSON.parse(smsList);
+      messages.forEach((msg) => {
+        const body = msg.body || '';
+        const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+        if (isUpi) sendSmsToBackend(body);
+      });
+    }
+  );
+}, [sendSmsToBackend]);
+
+const requestSmsPermission = useCallback(() => {
+  const inner = async () => {
+    try {
+      const alreadyAsked = await AsyncStorage.getItem('smsPermissionAsked');
+      if (alreadyAsked) {
+        // Already asked before — seedha scan kar
+        const granted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.READ_SMS
+        );
+        if (granted) scanOldSms();
+        return;
+      }
+
+      // Pehli baar — popup dikhao
+      Alert.alert(
+        'UPI Transactions Auto-Detect 🔔',
+        'Finotify aapke SMS read karke last 30 days ki UPI transactions automatically add kar sakta hai. Allow karein?',
+        [
+          {
+            text: 'Allow',
+            onPress: async () => {
+              await AsyncStorage.setItem('smsPermissionAsked', 'true');
+              const result = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_SMS,
+                {
+                  title: 'SMS Permission',
+                  message: 'UPI transactions auto-detect ke liye SMS access chahiye.',
+                  buttonPositive: 'Allow',
+                  buttonNegative: 'Deny',
+                }
+              );
+              if (result === PermissionsAndroid.RESULTS.GRANTED) {
+                scanOldSms();
+              }
+            },
+          },
+          {
+            text: 'Baad Mein',
+            onPress: async () => {
+              await AsyncStorage.setItem('smsPermissionAsked', 'true');
+            },
+            style: 'cancel',
+          },
+        ]
+      );
+    } catch (e) {
+      console.log('Permission error:', e);
+    }
+  };
+  inner();
+}, [scanOldSms]);
+
+// ─── SMS useEffect ────────────────────────────────────────
+useEffect(() => {
+  if (Platform.OS !== 'android' || isAuthLoading) return;
+
+  requestSmsPermission();
+
+  // Live listener — naya SMS aate hi detect karo
+  const subscription = SmsListener.addListener((message) => {
+    const body = message.body || '';
+    const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+    if (isUpi) sendSmsToBackend(body);
+  });
+
+  return () => subscription.remove();
+}, [isAuthLoading]); // eslint-disable-line
+
   const monthlyData = useMemo(() => {
     return datas.filter((item) => {
       const itemDate = new Date(item.date);
