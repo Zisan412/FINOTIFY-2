@@ -291,6 +291,17 @@ function parseSms(body) {
     if (!isUPI) return null;
 
     const dateMatch = body.match(/(\d{2}[-\/]\d{2}[-\/]\d{2,4})/i);
+    let parsedDate = new Date();
+    if (dateMatch) {
+      const parts = dateMatch[1].split(/[-/]/);
+      if (parts.length === 3) {
+          let day = parseInt(parts[0], 10);
+          let month = parseInt(parts[1], 10) - 1;
+          let year = parseInt(parts[2], 10);
+          if (year < 100) year += 2000;
+          parsedDate = new Date(year, month, day);     
+      }
+    }
     const bankMatch = body.match(/(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Yes|Paytm|IndusInd|Canara|Union|Federal)/i);
     const upiMatch = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
 
@@ -308,7 +319,7 @@ function parseSms(body) {
         type,
         bankName: bankMatch ? bankMatch[1] + ' Bank' : 'Unknown Bank',
         category,
-        date: dateMatch ? new Date(dateMatch[1].replace(/-/g, '/')) : new Date(),
+        date: parsedDate,
         upiId: upiMatch ? upiMatch[1] : '',
     };
 }
