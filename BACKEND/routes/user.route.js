@@ -273,97 +273,106 @@ const verifyToken = (req, res, next) => {
     });
 };
 
+function parseSms(body, smsDate) {
+  if (!body) return null;
 
-function parseSms(body) {
-    if (!body) return null;
+  const sentMatch     = body.match(/Sent\s+Rs\.?([\d.]+)/i);
+  const receivedMatch = body.match(/Received\s+Rs\.?([\d.]+)/i);
+  const debitMatch    = body.match(/Rs\.?([\d.]+)\s+debited/i);
+  const creditMatch   = body.match(/Rs\.?([\d.]+)\s+credited/i);
+  const inrMatch      = body.match(/INR\s+([\d.]+)/i);
+  const sbiMatch      = body.match(/debited\s+with\s+Rs\.?([\d.]+)/i);
 
-    const sentMatch = body.match(/Sent\s+Rs\.?([\d.]+)/i);
-    const receivedMatch = body.match(/Received\s+Rs\.?([\d.]+)/i);
-    const debitMatch = body.match(/Rs\.?([\d.]+)\s+debited/i);
-    const creditMatch = body.match(/Rs\.?([\d.]+)\s+credited/i);
-    const inrMatch = body.match(/INR\s+([\d.]+)/i);
-    const sbiMatch = body.match(/debited\s+with\s+Rs\.?([\d.]+)/i);
+  const amountMatch = sentMatch || receivedMatch || debitMatch || creditMatch || inrMatch || sbiMatch;
+  if (!amountMatch) return null;
 
-    const amountMatch = sentMatch || receivedMatch || debitMatch || creditMatch || inrMatch || sbiMatch;
-    if (!amountMatch) return null;
+  const isUPI = body.match(/UPI|upi|IMPS|debited|credited|Sent|Received/i);
+  if (!isUPI) return null;
 
-    const isUPI = body.match(/UPI|upi|IMPS|debited|credited|Sent|Received/i);
-    if (!isUPI) return null;
+  // ✅ Fix 1: smsDate use karo (frontend se aata hai — actual SMS timestamp)
+  let parsedDate = smsDate ? new Date(Number(smsDate)) : new Date();
 
-    const dateMatch = body.match(/(\d{2}[-\/]\d{2}[-\/]\d{2,4})/i);
-    let parsedDate = new Date();
-    if (dateMatch) {
-      const parts = dateMatch[1].split(/[-/]/);
-      if (parts.length === 3) {
-          let day = parseInt(parts[0], 10);
-          let month = parseInt(parts[1], 10) - 1;
-          let year = parseInt(parts[2], 10);
-          if (year < 100) year += 2000;
-          parsedDate = new Date(year, month, day);     
-      }
-    }
-    const bankMatch = body.match(/(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Yes|Paytm|IndusInd|Canara|Union|Federal)/i);
-    const upiMatch = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
+  const bankMatch = body.match(/(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Yes|Paytm|IndusInd|Canara|Union|Federal)/i);
+  const upiMatch  = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
 
-    let type = 'debit';
-    if ((creditMatch || receivedMatch) && !sentMatch && !debitMatch) type = 'credit';
+  let type = 'debit';
+  if ((creditMatch || receivedMatch) && !sentMatch && !debitMatch) type = 'credit';
 
-    let category = 'Other';
-    if (body.match(/zomato|swiggy|food|restaurant/i)) category = 'Food';
-    else if (body.match(/uber|ola|rapido|petrol|fuel/i)) category = 'Transport';
-    else if (body.match(/amazon|flipkart|myntra|shopping/i)) category = 'Shopping';
-    else if (body.match(/salary|credit|received/i) && type === 'credit') category = 'Income';
+  // ✅ Fix 2: Category — same format as manual entries (emoji wali)
+  let category = '📦 Other';
+  if (body.match(/zomato|swiggy|food|restaurant|cafe|blinkit/i))        category = '🍔 Food';
+  else if (body.match(/uber|ola|rapido|petrol|fuel|irctc|train|bus/i))  category = '✈️ Travel';
+  else if (body.match(/amazon|flipkart|myntra|meesho|shopping/i))       category = '🛍️ Shopping';
+  else if (body.match(/rent|electricity|water|maintenance|house/i))     category = '🏠 House';
+  else if (body.match(/salary|stipend/i) && type === 'credit')          category = '💰 Salary';
 
-    return {
-        amount: parseFloat(amountMatch[1]),
-        type,
-        bankName: bankMatch ? bankMatch[1] + ' Bank' : 'Unknown Bank',
-        category,
-        date: parsedDate,
-        upiId: upiMatch ? upiMatch[1] : '',
-    };
+  // ✅ Fix 3: Better description — UPI ID se readable name
+  let desc = 'UPI Transaction';
+  if (upiMatch) {
+    const handle = upiMatch[1].split('@')[0];         // "kotak.food" from "kotak.food@kotak"
+    const readable = handle
+      .replace(/[.\-_]/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())         // "Kotak Food"
+      .trim();
+    desc = `UPI • ${readable}`;
+  } else if (bankMatch) {
+    desc = `UPI • ${bankMatch[1]} Bank`;
+  }
+
+  return {
+    amount:   parseFloat(amountMatch[1]),
+    type,
+    bankName: bankMatch ? bankMatch[1] + ' Bank' : 'Unknown Bank',
+    category,
+    date:     parsedDate,
+    upiId:    upiMatch ? upiMatch[1] : '',
+    desc,
+  };
 }
-
 // POST /upi/parse-sms
 router.post('/parse-sms', verifyToken, async (req, res) => {
-    try {
-        const { body } = req.body;
-        const parsed = parseSms(body);
+  try {
+    const { body, smsDate } = req.body;           // ✅ smsDate bhi lo
+    const parsed = parseSms(body, smsDate);
 
-        if (!parsed) {
-            return res.status(400).json({ error: 'Not a UPI SMS' });
-        }
-
-        // Duplicate check
-        const existing = await Dashboard.findOne({
-            user: req.user.id,
-            amount: parsed.amount,
-            upiId: parsed.upiId,
-            date: parsed.date,
-        });
-
-        if (existing) {
-            return res.status(200).json({ message: 'Already saved', data: existing });
-        }
-
-        const entry = new Dashboard({
-            type: parsed.type === 'credit' ? 'income' : 'expense',
-            date: parsed.date,
-            amount: parsed.amount,
-            category: parsed.category,
-            bankName: parsed.bankName,
-            upiId: parsed.upiId,
-            desc: `Auto UPI • ${parsed.upiId || ''}`,
-            user: req.user.id,
-        });
-
-        await entry.save();
-        res.status(201).json({ message: 'Saved', data: entry });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    if (!parsed) {
+      return res.status(400).json({ error: 'Not a UPI SMS' });
     }
-});// GET /upi/entries — user ki saari UPI entries
+
+    // ✅ Fix 4: Duplicate check — exact date match kaam nahi karta, same-day + amount + upiId use karo
+    const startOfDay = new Date(parsed.date); startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay   = new Date(parsed.date); endOfDay.setHours(23, 59, 59, 999);
+
+    const existing = await Dashboard.findOne({
+      user:   req.user.id,
+      amount: parsed.amount,
+      upiId:  parsed.upiId,
+      date:   { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    if (existing) {
+      return res.status(200).json({ message: 'Already saved', data: existing });
+    }
+
+    const entry = new Dashboard({
+      type:     parsed.type === 'credit' ? 'income' : 'expense',
+      date:     parsed.date,
+      amount:   parsed.amount,
+      category: parsed.category,
+      bankName: parsed.bankName,
+      upiId:    parsed.upiId,
+      desc:     parsed.desc,           // ✅ Better desc
+      user:     req.user.id,
+    });
+
+    await entry.save();
+    res.status(201).json({ message: 'Saved', data: entry });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// GET /upi/entries — user ki saari UPI entries
 router.get('/entries', verifyToken, async (req, res) => {
     try {
         const entries = await UpiEntry.find({ user: req.user.id }).sort({ createdAt: -1 });

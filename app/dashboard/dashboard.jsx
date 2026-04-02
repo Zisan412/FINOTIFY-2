@@ -70,8 +70,8 @@ useFocusEffect(
   }, [fetchData])
 );
  // ─── SMS PERMISSION + SCAN ───────────────────────────────
-
-const sendSmsToBackend = useCallback((body) => {
+// smsDate bhi pass karo
+const sendSmsToBackend = useCallback((body, smsDate) => {
   const inner = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -80,10 +80,10 @@ const sendSmsToBackend = useCallback((body) => {
 
       await axios.post(
         `${BASE_URL}/parse-sms`,
-        { body, userId },
+        { body, userId, smsDate },   // ✅ smsDate add kiya
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchData(); // entry add hone ke baad refresh
+      fetchData();
     } catch (e) {
       console.log('SMS backend error:', e);
     }
@@ -95,18 +95,14 @@ const scanOldSms = useCallback(() => {
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
   SmsAndroid.list(
-    JSON.stringify({
-      box: 'inbox',
-      minDate: thirtyDaysAgo,
-      maxCount: 200,
-    }),
+    JSON.stringify({ box: 'inbox', minDate: thirtyDaysAgo, maxCount: 200 }),
     (fail) => console.log('SMS read failed:', fail),
     (count, smsList) => {
       const messages = JSON.parse(smsList);
       messages.forEach((msg) => {
         const body = msg.body || '';
         const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
-        if (isUpi) sendSmsToBackend(body);
+        if (isUpi) sendSmsToBackend(body, msg.date); // ✅ msg.date pass karo
       });
     }
   );
