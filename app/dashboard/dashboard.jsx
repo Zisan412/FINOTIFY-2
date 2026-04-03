@@ -95,7 +95,7 @@ const scanOldSms = useCallback(() => {
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
   SmsAndroid.list(
-    JSON.stringify({ box: 'inbox', minDate: thirtyDaysAgo, maxCount: 200 }),
+    JSON.stringify({ box: 'inbox', minDate: thirtyDaysAgo, maxCount: 500 }),
     (fail) => console.log('SMS read failed:', fail),
     (count, smsList) => {
       const messages = JSON.parse(smsList);

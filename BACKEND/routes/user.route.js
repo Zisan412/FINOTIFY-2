@@ -229,7 +229,7 @@ router.get("/getdashboardentry", async (req, res) => {
       return res.status(200).json({ message: "No user ID provided", dashboard: [] });
     }
 
-    const dashboard = await Dashboard.find({ user }).sort({ date: -1 });
+    const dashboard = await Dashboard.find({ user,deletedByUser: { $ne: true } }).sort({ date: -1 });
     res.status(200).json({ message: "Entry fetched successfully", dashboard });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -240,7 +240,7 @@ router.patch("/updatedashboardentry/:id", async (req, res) => {
   try {
     const updated = await Dashboard.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: { deletedByUser: true } },
       { new: true },
     );
     res.status(200).json({ message: "Entry updated successfully", updated });
@@ -251,13 +251,16 @@ router.patch("/updatedashboardentry/:id", async (req, res) => {
 
 router.delete("/deletedashboardentry/:id", async (req, res) => {
   try {
-    const dashboard = await Dashboard.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: " Entry deleted successfully", dashboard });
+    const dashboard = await Dashboard.findByIdAndUpdate(
+      req.params.id,
+      { $set: { deletedByUser: true } },
+      { new: true }
+    );
+    res.status(200).json({ message: "Entry deleted successfully", dashboard });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 //upi logic
 
@@ -275,16 +278,17 @@ const verifyToken = (req, res, next) => {
 
 function parseSms(body, smsDate) {
   if (!body) return null;
+const sentMatch     = body.match(/Sent\s+Rs\.?([\d,]+\.?\d*)/i);
+const receivedMatch = body.match(/Received\s+Rs\.?([\d,]+\.?\d*)/i);
+const debitMatch    = body.match(/Rs\.?([\d,]+\.?\d*)\s+debited/i);
+const creditMatch   = body.match(/Rs\.?([\d,]+\.?\d*)\s+credited/i);
+const inrMatch      = body.match(/INR\s+([\d,]+\.?\d*)/i);
+const sbiMatch      = body.match(/debited\s+(?:by|with)\s+Rs\.?([\d,]+\.?\d*)/i);
+const hdfcMatch     = body.match(/(?:debited|credited)\s+for\s+Rs\.?([\d,]+\.?\d*)/i);
+const bobMatch      = body.match(/Rs\.?([\d,]+\.?\d*)\s+(?:has been\s+)?debited/i);
 
-  const sentMatch     = body.match(/Sent\s+Rs\.?([\d.]+)/i);
-  const receivedMatch = body.match(/Received\s+Rs\.?([\d.]+)/i);
-  const debitMatch    = body.match(/Rs\.?([\d.]+)\s+debited/i);
-  const creditMatch   = body.match(/Rs\.?([\d.]+)\s+credited/i);
-  const inrMatch      = body.match(/INR\s+([\d.]+)/i);
-  const sbiMatch      = body.match(/debited\s+with\s+Rs\.?([\d.]+)/i);
-
-  const amountMatch = sentMatch || receivedMatch || debitMatch || creditMatch || inrMatch || sbiMatch;
-  if (!amountMatch) return null;
+const amountMatch = sentMatch || receivedMatch || debitMatch || creditMatch 
+                  || inrMatch || sbiMatch || hdfcMatch || bobMatch;  if (!amountMatch) return null;
 
   const isUPI = body.match(/UPI|upi|IMPS|debited|credited|Sent|Received/i);
   if (!isUPI) return null;
@@ -292,8 +296,9 @@ function parseSms(body, smsDate) {
   // ✅ Fix 1: smsDate use karo (frontend se aata hai — actual SMS timestamp)
   let parsedDate = smsDate ? new Date(Number(smsDate)) : new Date();
 
-  const bankMatch = body.match(/(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Yes|Paytm|IndusInd|Canara|Union|Federal)/i);
-  const upiMatch  = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
+  const bankMatch = body.match(
+    /(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Baroda|Yes\s?Bank|Paytm|IndusInd|Canara|Union|Federal|IDBI|UCO|Karnataka|Equitas)/i
+);const upiMatch  = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
 
   let type = 'debit';
   if ((creditMatch || receivedMatch) && !sentMatch && !debitMatch) type = 'credit';
@@ -350,9 +355,12 @@ router.post('/parse-sms', verifyToken, async (req, res) => {
       date:   { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (existing) {
-      return res.status(200).json({ message: 'Already saved', data: existing });
+    if (existing) {// ✅ User ne delete ki thi — dobara insert mat karo
+    if (existing.deletedByUser) {
+        return res.status(200).json({ message: 'Skipped (user deleted)', data: null });
     }
+    return res.status(200).json({ message: 'Already saved', data: existing });
+}
 
     const entry = new Dashboard({
       type:     parsed.type === 'credit' ? 'income' : 'expense',

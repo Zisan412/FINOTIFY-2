@@ -12,6 +12,10 @@ const DashboardSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    deletedByUser: {        // ✅ NEW — soft delete flag
+        type: Boolean,
+        default: false
+    },
     createdAt:{
         type:Date,
         default:Date.now
