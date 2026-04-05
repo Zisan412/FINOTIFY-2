@@ -79,9 +79,6 @@ router.post("/login", async (req, res) => {
   console.log(token);
 });
 
-const brevoClient = Brevo.ApiClient.instance;
-brevoClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
-const emailApi = new Brevo.TransactionalEmailsApi();
 
 let createotp = () => {
   return Math.floor(100000 + Math.random() * 900000);
@@ -90,29 +87,30 @@ let createotp = () => {
 let otphere = null;
 router.post("/email", async (req, res) => {
   let { email } = req.body;
-  console.log(email);
 
   const foundEmail = await Register.findOne({ email });
   if (!foundEmail) {
-    console.log("Email not found");
     return res.status(404).json({ message: "Email not found" });
   }
 
   otphere = createotp();
-  console.log("OTP:", otphere);
 
   try {
-    await resend.emails.send({
-      from: 'Finotify <onboarding@resend.dev>',
-      to: email,
-      subject: 'Reset Password OTP by Finotify',
-      text: `Hey ${foundEmail.name},\n\nYour OTP for password reset is: ${otphere}\n\nThank you for using Finotify`,
+    await axios.post('https://api.brevo.com/v3/smtp/email', {
+      sender: { email: "finotify.in@gmail.com", name: "Finotify" },
+      to: [{ email: email }],
+      subject: "Reset Password OTP by Finotify",
+      textContent: `Hey ${foundEmail.name},\n\nYour OTP is: ${otphere}\n\nThank you for using Finotify`,
+    }, {
+      headers: {
+        'api-key': process.env.BREVO_API_KEY,
+        'Content-Type': 'application/json',
+      }
     });
 
-    console.log("Email sent successfully");
     res.status(200).json({ message: "Email sent successfully", data: foundEmail });
   } catch (error) {
-    console.log(error);
+    console.log(error.response?.data || error.message);
     res.status(500).json({ message: "Failed to send email" });
   }
 });
