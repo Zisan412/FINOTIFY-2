@@ -3,7 +3,7 @@ const router = express.Router();
 const Register = require("../model/register.model");
 const Due = require("../model/due.model");
 const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 const Dashboard = require("../model/dashboard.model");
 const UpiEntry = require("../model/upi-entry.model");
 
@@ -76,12 +76,14 @@ router.post("/login", async (req, res) => {
     });
   console.log(token);
 });
+
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 let createotp = () => {
   return Math.floor(100000 + Math.random() * 900000);
 };
 
 let otphere = null;
-
 router.post("/email", async (req, res) => {
   let { email } = req.body;
   console.log(email);
@@ -91,42 +93,25 @@ router.post("/email", async (req, res) => {
     console.log("Email not found");
     return res.status(404).json({ message: "Email not found" });
   }
+
   otphere = createotp();
+  console.log("OTP:", otphere);
 
-  console.log("Email found, sending...");
+  try {
+    await resend.emails.send({
+      from: 'Finotify <onboarding@resend.dev>',
+      to: email,
+      subject: 'Reset Password OTP by Finotify',
+      text: `Hey ${foundEmail.name},\n\nYour OTP for password reset is: ${otphere}\n\nThank you for using Finotify`,
+    });
 
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "finotify.in@gmail.com",
-      pass: "vdvz fmmj nxci vhcm",
-    },
-  });
-
-  let mailOptions = {
-    from: "finotify.in@gmail.com",
-    to: email, // ✅ plain string, not {email}
-    subject: "Reset Password OTP by Finotify",
-    text: `Hey ${foundEmail.name},
-    
-    Your OTP for password reset is: ${otphere}
-    
-    Thank you for using Finotify`,
-  };
-
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-      return res.status(500).send("Failed to send email");
-    } else {
-      console.log("Email sent: " + info.response);
-      res
-        .status(200)
-        .json({ message: "Email sent successfully", data: foundEmail });
-    }
-  });
+    console.log("Email sent successfully");
+    res.status(200).json({ message: "Email sent successfully", data: foundEmail });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to send email" });
+  }
 });
-
 router.post("/otp", async (req, res) => {
   let { otp } = req.body;
   console.log(otp, otphere);

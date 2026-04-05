@@ -18,7 +18,7 @@ const Forgot = () => {
 
   const sub= async ()=>{
     console.log(email)
-        await axios.post(`${BASE_URL}/user/email`,
+        await axios.post(`${BASE_URL}/email`,
           {email:email}
         )
         .then(async (res)=>{
