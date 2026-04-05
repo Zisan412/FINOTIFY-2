@@ -3,8 +3,8 @@ const router = express.Router();
 const Register = require("../model/register.model");
 const Due = require("../model/due.model");
 const bcrypt = require("bcrypt");
-const { Resend } = require('resend');
-
+// const { Resend } = require('resend');
+const Brevo = require('@getbrevo/brevo');
 // const nodemailer = require("nodemailer");
 const Dashboard = require("../model/dashboard.model");
 const UpiEntry = require("../model/upi-entry.model");
@@ -79,7 +79,10 @@ router.post("/login", async (req, res) => {
   console.log(token);
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const brevoClient = Brevo.ApiClient.instance;
+brevoClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+const emailApi = new Brevo.TransactionalEmailsApi();
+
 let createotp = () => {
   return Math.floor(100000 + Math.random() * 900000);
 };
