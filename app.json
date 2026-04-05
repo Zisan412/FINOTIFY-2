@@ -4,22 +4,23 @@
     "slug": "finotify",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/ic.png",
-    "image": "./assets/ic.png",
+    "icon": "./assets/finotifylogo-transparent.png",
+    "image": "./assets/finotifylogo-transparent.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/ic.png",
+        "splash": {
+      "image": "./assets/finotifylogo-transparent.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a63bcd5"
+      "backgroundColor": "#ffffff"
     },
+
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/ic.png",
-        "backgroundColor": "#000"
+        "foregroundImage": "./assets/finotifylogo-transparent.png",
+        "backgroundColor": "#FFFFFF"
       },
       "permissions": [
         "READ_SMS",
@@ -29,7 +30,7 @@
       "package": "com.anonymous.myapp"
     },
     "web": {
-      "favicon": "./assets/ic.png"
+      "favicon": "./assets/finotifylogo-transparent.png"
     },
     "plugins": [
       "expo-router",

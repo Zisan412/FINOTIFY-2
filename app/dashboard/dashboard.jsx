@@ -1,5 +1,5 @@
 import { StyleSheet, View, SafeAreaView, Platform, PermissionsAndroid, Alert } from "react-native";
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import Upper from "./upper";
@@ -64,9 +64,14 @@ const Dashboard = () => {
     .catch(err => console.log(err));
 }, []);
 
+const hasFetched = useRef(false);
+
 useFocusEffect(
   useCallback(() => {
-    fetchData();
+    if (!hasFetched.current) {
+      fetchData();
+      hasFetched.current = true;
+    }
   }, [fetchData])
 );
  // ─── SMS PERMISSION + SCAN ───────────────────────────────
@@ -124,7 +129,7 @@ const requestSmsPermission = useCallback(() => {
       // Pehli baar — popup dikhao
       Alert.alert(
         'UPI Transactions Auto-Detect 🔔',
-        'Finotify aapke SMS read karke last 30 days ki UPI transactions automatically add kar sakta hai. Allow karein?',
+        'Please allow SMS permission to auto-detect UPI transactions',
         [
           {
             text: 'Allow',
@@ -134,7 +139,7 @@ const requestSmsPermission = useCallback(() => {
                 PermissionsAndroid.PERMISSIONS.READ_SMS,
                 {
                   title: 'SMS Permission',
-                  message: 'UPI transactions auto-detect ke liye SMS access chahiye.',
+                  message: 'Please allow SMS permission to auto-detect some UPI transactions',
                   buttonPositive: 'Allow',
                   buttonNegative: 'Deny',
                 }
@@ -145,11 +150,11 @@ const requestSmsPermission = useCallback(() => {
             },
           },
           {
-            text: 'Baad Mein',
+            text: 'Later',
             onPress: async () => {
               await AsyncStorage.setItem('smsPermissionAsked', 'true');
             },
-            style: 'cancel',
+            style: 'later',
           },
         ]
       );
@@ -159,6 +164,26 @@ const requestSmsPermission = useCallback(() => {
   };
   inner();
 }, [scanOldSms]);
+// Last entry ka timestamp se ab tak SMS scan karo
+const scanSmsSince = useCallback((fromTimestamp) => {
+   if (!SmsAndroid) {
+    console.log('SmsAndroid not available (Expo Go)');
+    fetchData(); // sirf data refresh karo
+    return;
+  }
+  SmsAndroid.list(
+    JSON.stringify({ box: 'inbox', minDate: fromTimestamp, maxCount: 200 }),
+    (fail) => console.log('SMS scan failed:', fail),
+    (count, smsList) => {
+      const messages = JSON.parse(smsList);
+      messages.forEach((msg) => {
+        const body = msg.body || '';
+        const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+        if (isUpi) sendSmsToBackend(body, msg.date);
+      });
+    }
+  );
+}, [sendSmsToBackend]);
 
 // ─── SMS useEffect ────────────────────────────────────────
 useEffect(() => {
@@ -185,6 +210,7 @@ useEffect(() => {
       );
     });
   }, [datas, selectedDate]);
+
 
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
@@ -260,20 +286,23 @@ useEffect(() => {
       expense: expense,
     };
   }, [monthlyData]);
+const handleRefresh = () => {
+  setSearchQuery("");
+  setFilters({ type: "All", category: "All", dateRange: "All", sortBy: "Latest" });
+  setActiveTab(1);
+  setSelectedDate(new Date());
 
-  const handleRefresh = () => {
-    setSearchQuery("");
-    setFilters({
-      type: "All",
-      category: "All",
-      dateRange: "All",
-      sortBy: "Latest",
-    });
-    setActiveTab(1);
-    setSelectedDate(new Date());
-    fetchData();
-  };
+  // Last entry ka time lo, usके baad ke SMS scan karo
+  if (datas.length > 0) {
+    const lastEntryTime = Math.max(...datas.map(d => new Date(d.date).getTime()));
+    scanSmsSince(lastEntryTime);
+  } else {
+    // Koi entry nahi hai toh last 24 hrs scan karo
+    scanSmsSince(Date.now() - 24 * 60 * 60 * 1000);
+  }
 
+  fetchData();
+};
   if (isAuthLoading) {
     return null; // Jab tak auth ho raha hai, tab tak blank dikhega taaki dashboard blink na kare
   }

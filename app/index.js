@@ -40,8 +40,12 @@ const Mainpage = () => {
 
   return (
     <ImageBackground style={styles.container}>
-      <Image source={require("../assets/ic.png")} style={styles.logo} />
-      <Text style={styles.title}>FINOTIFY</Text>
+      <Image 
+        source={require("../assets/finotifylogo-transparent.png")} 
+        style={styles.logo}
+        resizeMode="contain" 
+      />
+      <Text style={styles.title}></Text>
 
       <Pressable
         style={[styles.button, styles.primaryBtn]}
@@ -72,9 +76,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#0a63bcb4",
   },
+
   logo: {
-    height: 100,
-    width: 100,
+    height: 180,
+    width: 180,
     marginBottom: 10,
   },
   title: {

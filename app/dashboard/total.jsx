@@ -9,7 +9,7 @@ const Total = ({ go }) => {
     { key: "✈️ Travel", label: "Travel" },
     { key: "🏀 Sports", label: "Sports" },
     { key: "🏠 House", label: "House" },
-    { key: "📦 Other", label: "Others" },
+    { key: "₹🇮🇳 Other", label: "Others" },
   ];
 
   const summary = {};

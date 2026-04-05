@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import Bottom from "../dashboard/bottom";
 import Confirmation from "../Modules/Confirmation";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {  Linking } from "react-native";
 
 
 const SettingItem = ({ icon, title, value, onPress, color = "#0a63bc", trailing = true }) => (
@@ -28,6 +29,8 @@ const SettingItem = ({ icon, title, value, onPress, color = "#0a63bc", trailing 
     {trailing && <Ionicons name="chevron-forward" size={18} color="#94a3b8" />}
   </Pressable>
 );
+
+
 
 const Settings = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -44,6 +47,9 @@ useEffect(() => {
     // Logic for currency change can be added here
     alert("Currency selection coming soon!");
   };
+const openNotificationSettings = () => {
+  Linking.sendIntent('android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS');
+};
 
   const logout=()=>{
      setShowLogoutConfirm(true)
@@ -89,6 +95,13 @@ useEffect(() => {
                 value={currency}
                 onPress={handleCurrencyChange}
               />
+              <SettingItem
+  icon="notifications-outline"
+  title="Notification Access"
+  value="Required for SMS read"
+  onPress={openNotificationSettings}
+  color="#7c3aed"
+/>
             </View>
           </View>
 

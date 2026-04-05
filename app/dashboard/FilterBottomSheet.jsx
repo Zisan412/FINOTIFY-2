@@ -91,7 +91,7 @@ const FilterBottomSheet = ({
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Category</Text>
                             <View style={styles.chipRow}>
-                                {["All", "Food", "Salary", "Shopping", "Others"].map((cat) => (
+                                {["All", "Food", "Salary", "Shopping", "Other"].map((cat) => (
                                     <Chip
                                         key={cat}
                                         label={cat}

@@ -26,13 +26,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const DEFAULT_CATEGORIES = [
   { icon: '🍔', label: 'Food' },
   { icon: '💰', label: 'Salary' },
-  { icon: '✈️', label: 'Travel' },
+  { icon: '🧳', label: 'Travel' },
   { icon: '🏠', label: 'House' },
-  { icon: '🏀', label: 'Sports' },
+  { icon: '⛽', label: 'Petrol' },
   { icon: '🛍️', label: 'Shopping' },
   { icon: '💊', label: 'Health' },
   { icon: '🚗', label: 'Transport' },
-  { icon: '📦', label: 'Other' },
+  { icon: '💵', label: 'Other' },
 ];
 
 const MAX_CATS = 15; // 9 default + up to 6 custom
