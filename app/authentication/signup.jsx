@@ -5,16 +5,17 @@ import {
   TextInput,
   View,
   Image,
+  ScrollView,
 } from "react-native";
 import React, { useEffect } from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Upper from "../Modules/Upper";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Danger from "../Modules/Danger";
 import axios from "axios";
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from "../../constants/Config";
 
 const Signup = () => {
@@ -24,59 +25,45 @@ const Signup = () => {
   const [hide2, sethide2] = useState(11);
   const [chnage2, setchnage2] = useState(false);
 
-  const [username, setusername] = useState('')
-  const [mobile, setmobile] = useState('')
-  const [email, setemail] = useState('')
-  const [paas2, setpass2] = useState('')
-  const [pass, setpass] = useState('')
+  const [username, setusername] = useState('');
+  const [mobile, setmobile] = useState('');
+  const [email, setemail] = useState('');
+  const [paas2, setpass2] = useState('');
+  const [pass, setpass] = useState('');
 
-  const [error, seterror] = useState('')
+  const [error, seterror] = useState('');
+
+  const confirmPasswordRef = useRef(null);
 
   const senddata = () => {
-    if(username == '' || mobile == '' || email == '' || paas2 == '' || pass == ''){  
-    
-      return
-    }
-      
-     
-    else if(pass != paas2){
-      return
-    }
-    else{
-    
-    console.log('yess')
-    seterror('')
-    
-    // Temporarily disabled for testing
-     axios.post(`${BASE_URL}/register`, {
-      name: username,
-      phonenumber: mobile,
-      email: email,
-      password: pass
-    }).then(async(res) => {
-  console.log(JSON.stringify(res.data.message));
+    if (username == '' || mobile == '' || email == '' || paas2 == '' || pass == '') {
+      return;
+    } else if (pass != paas2) {
+      return;
+    } else {
+      console.log('yess');
+      seterror('');
+      axios.post(`${BASE_URL}/register`, {
+        name: username,
+        phonenumber: mobile,
+        email: email,
+        password: pass
+      }).then(async (res) => {
+        console.log(JSON.stringify(res.data.message));
         await AsyncStorage.setItem('token', res.data.token);
         await AsyncStorage.setItem('userName', res.data.name);
         await AsyncStorage.setItem('userEmail', res.data.email);
         await AsyncStorage.setItem('userId', res.data._id);
-
-        router.replace('../dashboard/dashboard')
-        //  await AsyncStorage.getItem('token').then((token) => {
-        //   console.log('Token stored in AsyncStorage:', token);
-        // }).catch((error) => {
-        //   console.error('Error retrieving token from AsyncStorage:', error);
-        // });
+        router.replace('../dashboard/dashboard');
       }).catch((error) => {
         seterror('Registration failed. Please try again.');
         setTimeout(() => {
           seterror('');
         }, 2000);
-      })
+      });
     }
-  }
-    ;
+  };
 
-  
   const hideing = () => {
     setchnage(true);
     sethide(9);
@@ -85,77 +72,61 @@ const Signup = () => {
     setchnage(false);
     sethide(10);
   };
-
   const hideing2 = () => {
     setchnage2(true);
-
     sethide2(11);
   };
   const show2 = () => {
     setchnage2(false);
-
     sethide2(12);
   };
 
   const sub = () => {
     if (username == '' || mobile == '' || email == '' || paas2 == '' || pass == '') {
-
-      seterror('please enter a valid detail')
-
-      setTimeout(() => {
-        seterror('')
-      }, 2000)
+      seterror('please enter a valid detail');
+      setTimeout(() => { seterror(''); }, 2000);
+    } else if (pass != paas2) {
+      seterror('no match password');
+      setTimeout(() => { seterror(''); }, 2000);
+    } else {
+      router.replace('/dashboard/dashboard');
     }
-
-    else if (pass != paas2) {
-      seterror('no match password')
-      setTimeout(() => {''
-        seterror('')
-      }, 2000)
-    }
-    else {
-      router.replace('/dashboard/dashboard')
-    }
-  }
-
+  };
 
   return (
-    <View style={{ backgroundColor: 'white', flex: 1, justifyContent: 'space-between' }}>
-      <View>
-        {/* {/*  */}
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View>
           <Image style={styles.logo} source={require("../../assets/signup.png")} />
         </View>
 
         {error ? <Danger error={error} /> : ''}
+
         <View style={{ paddingTop: 20 }}>
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 20,
-              textTransform: "capitalize",
-              fontFamily: "",
-              marginTop: -20
-            }}
-          >
+          <Text style={{ textAlign: "center", fontSize: 20, textTransform: "capitalize", marginTop: -20 }}>
             Register Here
           </Text>
         </View>
+
         <View style={styles.input}>
           <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, elevation: 3, backgroundColor: 'white' }}>
-            <Ionicons name={'person'} size={24} color={'#0a63bcd5'} style={{}}></Ionicons>
+            <Ionicons name={'person'} size={24} color={'#0a63bcd5'} />
             <TextInput
               style={[styles.inp, press == 1 && { opacity: 1 }]}
               onFocus={() => setpress(1)}
               onBlur={() => setpress(0)}
               placeholder=" Username"
-
               value={username}
               onChangeText={setusername}
-            ></TextInput>
+            />
           </View>
+
           <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <Ionicons name={'call'} size={24} color={'#0a63bcd5'} style={{}}></Ionicons>
+            <Ionicons name={'call'} size={24} color={'#0a63bcd5'} />
             <TextInput
               style={[styles.inp, press == 2 && { opacity: 1 }]}
               onFocus={() => setpress(2)}
@@ -163,10 +134,11 @@ const Signup = () => {
               placeholder=" Mobile No"
               value={mobile}
               onChangeText={setmobile}
-            ></TextInput>
+            />
           </View>
+
           <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <MaterialIcons name={'email'} size={24} color={'#0a63bcd5'} style={{}}></MaterialIcons>
+            <MaterialIcons name={'email'} size={24} color={'#0a63bcd5'} />
             <TextInput
               style={[styles.inp, press == 3 && { opacity: 1 }]}
               onFocus={() => setpress(3)}
@@ -174,179 +146,70 @@ const Signup = () => {
               placeholder="Email id"
               value={email}
               onChangeText={setemail}
-            ></TextInput>
+            />
           </View>
+
           <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} style={{}}></MaterialIcons>
+            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} />
             <TextInput
               style={[styles.inp, press == 4 && { opacity: 1 }]}
               onFocus={() => setpress(4)}
               onBlur={() => setpress(0)}
-              placeholder=" Password "
+              placeholder=" Password"
               secureTextEntry={chnage}
               value={paas2}
               onChangeText={setpass2}
-
-            ></TextInput>
+              returnKeyType="next"
+              onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+              blurOnSubmit={false}
+            />
           </View>
           <Pressable onPress={() => hideing()}>
-            {hide == 10 && (
-              <Ionicons
-                name="lock-open"
-                size={24}
-                color="gray"
-                style={[{ position: "relative", right: -100, top: -40 }]}
-              />
-            )}
-            {hide == 9 && (
-              <Ionicons
-                name="lock-closed"
-                size={24}
-                color="gray"
-                style={[
-                  {
-                    position: "relative",
-                    display: "none",
-                    right: -100,
-                    top: -40,
-                  },
-                ]}
-              />
-            )}
+            {hide == 10 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
+            {hide == 9 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
           </Pressable>
           <Pressable onPress={() => show()}>
-            {hide == 10 && (
-              <Ionicons
-                name="lock-open"
-                size={24}
-                color="gray"
-                style={[
-                  {
-                    position: "relative",
-                    display: "none",
-                    right: -100,
-                    top: -40,
-                  },
-                ]}
-              />
-            )}
-            {hide == 9 && (
-              <Ionicons
-                name="lock-closed"
-                size={24}
-                color="gray"
-                style={[{ position: "relative", right: -100, top: -40 }]}
-              />
-            )}
+            {hide == 10 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
+            {hide == 9 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
           </Pressable>
+
           <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: -10, elevation: 3, backgroundColor: 'white', height: '12%' }}>
-            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} style={{}}></MaterialIcons>
+            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} />
             <TextInput
-              style={[
-                styles.inp,
-                press == 5 && { opacity: 1 },
-                { paddingTop: 12 },
-                // { marginTop: -10 },
-              ]}
+              ref={confirmPasswordRef}
+              style={[styles.inp, press == 5 && { opacity: 1 }, { paddingTop: 12 }]}
               onFocus={() => setpress(5)}
               onBlur={() => setpress(0)}
               placeholder=" Confirm Password"
               secureTextEntry={chnage2}
               value={pass}
               onChangeText={setpass}
-            ></TextInput>
+              returnKeyType="done"
+            />
           </View>
           <Pressable onPress={() => hideing2()}>
-            {hide2 == 12 && (
-              <Ionicons
-                name="lock-open"
-                size={24}
-                color="gray"
-                style={[{ position: "relative", right: -100, top: -40 }]}
-              />
-            )}
-            {hide2 == 11 && (
-              <Ionicons
-                name="lock-closed"
-                size={24}
-                color="gray"
-                style={[
-                  {
-                    position: "relative",
-                    display: "none",
-                    right: -100,
-                    top: -40,
-                  },
-                ]}
-              />
-            )}
+            {hide2 == 12 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
+            {hide2 == 11 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
           </Pressable>
           <Pressable onPress={() => show2()}>
-            {hide2 == 12 && (
-              <Ionicons
-                name="lock-open"
-                size={24}
-                color="gray"
-                style={[
-                  {
-                    position: "relative",
-                    display: "none",
-                    right: -100,
-                    top: -40,
-                  },
-                ]}
-              />
-            )}
-            {hide2 == 11 && (
-              <Ionicons
-                name="lock-closed"
-                size={24}
-                color="gray"
-                style={[{ position: "relative", right: -100, top: -40 }]}
-              />
-            )}
+            {hide2 == 12 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
+            {hide2 == 11 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
           </Pressable>
 
           <Pressable
-            style={[
-              styles.btn,
-              press === 6 && {
-                backgroundColor: "rgba(2, 91, 151, 0.49)",
-                opacity: 1,
-              },
-            ]}
+            style={[styles.btn, press === 6 && { backgroundColor: "rgba(2, 91, 151, 0.49)", opacity: 1 }]}
             onPressIn={() => setpress(6)}
             onPressOut={() => setpress(0)}
             onPress={() => senddata()}
           >
-            <Text
-              style={{
-                color: "white",
-                alignItems: "center",
-                justifyContent: "center",
-                textTransform: "capitalize",
-              }}
-            >
-              Signup Here
-            </Text>
+            <Text style={{ color: "white", textTransform: "capitalize" }}>Signup Here</Text>
           </Pressable>
         </View>
-      </View>
+      </ScrollView>
+
       <Pressable onPress={() => router.push("./login")}>
         <View style={styles.footer}>
-          <Text
-            style={[
-              styles.ftext,
-              press == 7 && {
-                opacity: 0.5,
-                textTransform: "capitalize",
-              },
-            ]}
-            onPress={() => setpress(7)}
-            onPressOut={() => setpress(0)}
-          >
-            Already have an account?Login
-          </Text>
+          <Text style={styles.ftext}>Already have an account? Login</Text>
         </View>
       </Pressable>
     </View>
@@ -363,11 +226,8 @@ const styles = StyleSheet.create({
     width: 250,
     height: 50,
     marginTop: 0,
-    // borderRadius: 10,
     position: "relative",
     opacity: 1,
-    // elevation:2,
-
   },
   input: {
     marginTop: 25,
@@ -401,11 +261,9 @@ const styles = StyleSheet.create({
   footer: {
     backgroundColor: "#0a63bcd5",
     height: 68,
-
     alignItems: "center",
     justifyContent: "center",
     color: "white",
-    // textAlign:'center',
   },
   ftext: {
     color: "white",

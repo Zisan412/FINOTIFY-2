@@ -1,38 +1,30 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React from "react";
-
 const Total = ({ go }) => {
-  const categories = [
-    { key: "🍔 Food", label: "Food" },
-    { key: "💰 Salary", label: "Salary" },
-    { key: "🛍️ Shopping", label: "Shopping" },
-    { key: "✈️ Travel", label: "Travel" },
-    { key: "🏀 Sports", label: "Sports" },
-    { key: "🏠 House", label: "House" },
-    { key: "₹🇮🇳 Other", label: "Others" },
-  ];
-
+  // Dynamic categories — jo bhi DB mein hai
   const summary = {};
-  categories.forEach(c => {
-    summary[c.key] = { income: 0, expense: 0 };
-  });
 
   go.forEach(item => {
-    // Exact match with DB category name (e.g. "🍔 Food")
-    if (summary[item.category]) {
-      if (item.type === "income") summary[item.category].income += item.amount;
-      else summary[item.category].expense += item.amount;
+    if (!summary[item.category]) {
+      summary[item.category] = { income: 0, expense: 0 };
     }
+    if (item.type === "income") summary[item.category].income += item.amount;
+    else summary[item.category].expense += item.amount;
   });
 
-  const totalIncome = Object.values(summary).reduce(
-    (s, c) => s + c.income,
-    0
-  );
-  const totalExpense = Object.values(summary).reduce(
-    (s, c) => s + c.expense,
-    0
-  );
+  const categories = Object.keys(summary); // DB se jo aaya
+
+  const totalIncome = Object.values(summary).reduce((s, c) => s + c.income, 0);
+  const totalExpense = Object.values(summary).reduce((s, c) => s + c.expense, 0);
+
+  // Agar koi data nahi
+  if (categories.length === 0) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: '#aaa', fontSize: 15 }}>No transactions found</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -58,13 +50,11 @@ const Total = ({ go }) => {
         </View>
 
         {categories.map(cat => {
-          const data = summary[cat.key];
-          const balance = data.income - data.expense;
-
-          return (
-            <View key={cat.key} style={styles.tableRow}>
-              <Text style={styles.tdCat}>{cat.label}</Text>
-
+  const data = summary[cat];
+  const balance = data.income - data.expense;
+  return (
+    <View key={cat} style={styles.tableRow}>
+      <Text style={styles.tdCat}>{cat}</Text>
               <Text style={[styles.td, styles.income]}>
                 ₹{data.income}
               </Text>

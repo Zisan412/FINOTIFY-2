@@ -29,11 +29,22 @@ const Dashboard = () => {
     sortBy: "Latest",
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [statsFilter, setStatsFilter] = useState(null);
 
   useEffect(() => {
-    if (params.tab) {
-      setActiveTab(parseInt(params.tab));
-    }
+  if (params.tab) {
+    setActiveTab(parseInt(params.tab));
+  }
+  if (params.filter) {
+    setStatsFilter({
+      filter: params.filter,
+      startDate: params.startDate ? new Date(params.startDate) : new Date(),
+      endDate: params.endDate ? new Date(params.endDate) : new Date(),
+    });
+    // Stats se aaye toh force refetch karo
+    hasFetched.current = false;
+    fetchData();
+  }
     // Session check: If no token, kick out to welcome page
     const checkSession = async () => {
       try {
@@ -48,7 +59,7 @@ const Dashboard = () => {
       }
     };
     checkSession();
-  }, [params.tab]);
+  }, [params.tab, params.filter, params.startDate, params.endDate]);
 
   const fetchData = useCallback(async () => {
     const userId = await AsyncStorage.getItem('userId');
@@ -68,12 +79,13 @@ const hasFetched = useRef(false);
 
 useFocusEffect(
   useCallback(() => {
-    if (!hasFetched.current) {
-      fetchData();
-      hasFetched.current = true;
-    }
+    fetchData();
   }, [fetchData])
 );
+const handleTabChange = useCallback((tab) => {
+  setActiveTab(tab);
+  setStatsFilter(null); // stats filter hat jaye
+}, []);
  // ─── SMS PERMISSION + SCAN ───────────────────────────────
 // smsDate bhi pass karo
 const sendSmsToBackend = useCallback((body, smsDate) => {
@@ -200,17 +212,41 @@ useEffect(() => {
 
   return () => subscription.remove();
 }, [isAuthLoading]); // eslint-disable-line
-
   const monthlyData = useMemo(() => {
+  // Agar stats se aaya filter hai toh woh use karo
+  if (statsFilter) {
+    const now = new Date();
     return datas.filter((item) => {
-      const itemDate = new Date(item.date);
-      return (
-        itemDate.getMonth() === selectedDate.getMonth() &&
-        itemDate.getFullYear() === selectedDate.getFullYear()
-      );
+      const entryDate = new Date(item.date);
+      if (statsFilter.filter === 'This Week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        return entryDate >= weekAgo && entryDate <= now;
+      }
+      if (statsFilter.filter === 'This Month') {
+        return (
+          entryDate.getMonth() === now.getMonth() &&
+          entryDate.getFullYear() === now.getFullYear()
+        );
+      }
+      if (statsFilter.filter === 'Custom') {
+        const end = new Date(statsFilter.endDate);
+        end.setHours(23, 59, 59);
+        return entryDate >= statsFilter.startDate && entryDate <= end;
+      }
+      return true;
     });
-  }, [datas, selectedDate]);
+  }
 
+  // Normal dashboard filter — selected month
+  return datas.filter((item) => {
+    const itemDate = new Date(item.date);
+    return (
+      itemDate.getMonth() === selectedDate.getMonth() &&
+      itemDate.getFullYear() === selectedDate.getFullYear()
+    );
+  });
+}, [datas, selectedDate, statsFilter]);
 
   // Filtered and Sorted data
   const filteredDatas = useMemo(() => {
@@ -267,9 +303,14 @@ useEffect(() => {
         result.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
     } else {
-      result.sort((a, b) => new Date(b.date) - new Date(a.date));
-    }
-
+  if (activeTab === 2) {
+    result = result.filter((item) => item.type === 'income');
+  } else if (activeTab === 3) {
+    result = result.filter((item) => item.type === 'expense');
+  }
+  // activeTab === 4 (Total) — koi filter nahi, sab dikhao
+  result.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
     return result;
   }, [monthlyData, searchQuery, filters, activeTab]);
 
@@ -287,6 +328,7 @@ useEffect(() => {
     };
   }, [monthlyData]);
 const handleRefresh = () => {
+  setStatsFilter(null);
   setSearchQuery("");
   setFilters({ type: "All", category: "All", dateRange: "All", sortBy: "Latest" });
   setActiveTab(1);
@@ -319,14 +361,17 @@ const handleRefresh = () => {
           onFilterPress={() => setIsFilterVisible(true)}
           onRefresh={handleRefresh}
           selectedDate={selectedDate}
-          onMonthChange={setSelectedDate}
+          onMonthChange={(date) => {
+  setSelectedDate(date);
+  setStatsFilter(null); // stats filter hat jaye
+}}
         />
       </View>
 
       <View style={styles.content}>
         <Middle
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           datas={filteredDatas}
           onDelete={fetchData}
         />

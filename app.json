@@ -16,19 +16,19 @@
 
     "ios": {
       "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/finotifylogo-transparent.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "permissions": [
-        "READ_SMS",
-        "RECEIVE_SMS"
-      ],
-      "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.myapp"
-    },
+    },"android": {
+  "adaptiveIcon": {
+    "foregroundImage": "./assets/finotifylogo-transparent.png",
+    "backgroundColor": "#FFFFFF"
+  },
+  "softwareKeyboardLayoutMode": "pan",
+  "permissions": [
+    "READ_SMS",
+    "RECEIVE_SMS"
+  ],
+  "edgeToEdgeEnabled": true,
+  "package": "com.anonymous.myapp"
+},
     "web": {
       "favicon": "./assets/finotifylogo-transparent.png"
     },

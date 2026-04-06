@@ -4,14 +4,13 @@ const Register = require("../model/register.model");
 const Due = require("../model/due.model");
 const bcrypt = require("bcrypt");
 // const { Resend } = require('resend');
-const Brevo = require('@getbrevo/brevo');
+const Brevo = require("@getbrevo/brevo");
 // const nodemailer = require("nodemailer");
 const Dashboard = require("../model/dashboard.model");
 const UpiEntry = require("../model/upi-entry.model");
-const axios = require('axios');
+const axios = require("axios");
 console.log("USER ROUTE LOADED");
 const jwt = require("jsonwebtoken");
-
 
 router.post("/register", async (req, res) => {
   console.log("REGISTER HIT");
@@ -44,7 +43,6 @@ router.post("/register", async (req, res) => {
       email: user.email,
       name: user.name,
     });
-
   } catch (err) {
     console.log("REGISTER ERROR:", err);
     res.status(500).json({ error: err.message });
@@ -67,18 +65,15 @@ router.post("/login", async (req, res) => {
   }
 
   let token = jwt.sign({ id: finddata._id }, process.env.JWT_TOKEN);
-  res
-    .status(200)
-    .json({
-      message: "User login successfully",
-      token: token,
-      name: finddata.name,
-      email: finddata.email,
-      _id: finddata._id,
-    });
+  res.status(200).json({
+    message: "User login successfully",
+    token: token,
+    name: finddata.name,
+    email: finddata.email,
+    _id: finddata._id,
+  });
   console.log(token);
 });
-
 
 let createotp = () => {
   return Math.floor(100000 + Math.random() * 900000);
@@ -96,19 +91,25 @@ router.post("/email", async (req, res) => {
   otphere = createotp();
 
   try {
-    await axios.post('https://api.brevo.com/v3/smtp/email', {
-      sender: { email: "finotify.in@gmail.com", name: "Finotify" },
-      to: [{ email: email }],
-      subject: "Reset Password OTP by Finotify",
-      textContent: `Hey ${foundEmail.name},\n\nYour OTP is: ${otphere}\n\nThank you for using Finotify`,
-    }, {
-      headers: {
-        'api-key': process.env.BREVO_API_KEY,
-        'Content-Type': 'application/json',
-      }
-    });
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: { email: "finotify.in@gmail.com", name: "Finotify" },
+        to: [{ email: email }],
+        subject: "Reset Password OTP by Finotify",
+        textContent: `Hey ${foundEmail.name},\n\nYour OTP is: ${otphere}\n\nThank you for using Finotify`,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-    res.status(200).json({ message: "Email sent successfully", data: foundEmail });
+    res
+      .status(200)
+      .json({ message: "Email sent successfully", data: foundEmail });
   } catch (error) {
     console.log(error.response?.data || error.message);
     res.status(500).json({ message: "Failed to send email" });
@@ -169,7 +170,7 @@ router.delete("/deletedue/:id", async (req, res) => {
 });
 router.get("/getdue", async (req, res) => {
   const { user } = req.query;
-  if (!user || user === 'null' || user === 'undefined') {
+  if (!user || user === "null" || user === "undefined") {
     return res.status(200).json({ message: "No user ID provided", due: [] });
   }
 
@@ -212,11 +213,16 @@ router.post("/adddashboardentry", async (req, res) => {
 router.get("/getdashboardentry", async (req, res) => {
   try {
     const { user } = req.query;
-    if (!user || user === 'null' || user === 'undefined') {
-      return res.status(200).json({ message: "No user ID provided", dashboard: [] });
+    if (!user || user === "null" || user === "undefined") {
+      return res
+        .status(200)
+        .json({ message: "No user ID provided", dashboard: [] });
     }
 
-    const dashboard = await Dashboard.find({ user,deletedByUser: { $ne: true } }).sort({ date: -1 });
+    const dashboard = await Dashboard.find({
+      user,
+      deletedByUser: { $ne: true },
+    }).sort({ date: -1 });
     res.status(200).json({ message: "Entry fetched successfully", dashboard });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -225,11 +231,25 @@ router.get("/getdashboardentry", async (req, res) => {
 
 router.patch("/updatedashboardentry/:id", async (req, res) => {
   try {
+    const { amount, bankName, category, type, date, desc, upiId } = req.body;
     const updated = await Dashboard.findByIdAndUpdate(
       req.params.id,
-      { $set: { deletedByUser: true } },
+      {
+        $set: {
+          amount: Number(amount),
+          bankName,
+          category,
+          type,
+          date,
+          desc,
+          upiId,
+        },
+      },
       { new: true },
     );
+    if (!updated) {
+      return res.status(404).json({ message: "Entry not found" }); // ✅ yeh bhi
+    }
     res.status(200).json({ message: "Entry updated successfully", updated });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -241,7 +261,7 @@ router.delete("/deletedashboardentry/:id", async (req, res) => {
     const dashboard = await Dashboard.findByIdAndUpdate(
       req.params.id,
       { $set: { deletedByUser: true } },
-      { new: true }
+      { new: true },
     );
     res.status(200).json({ message: "Entry deleted successfully", dashboard });
   } catch (err) {
@@ -251,42 +271,56 @@ router.delete("/deletedashboardentry/:id", async (req, res) => {
 
 //upi logic
 
-
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    
-    jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
-        if (err) return res.status(403).json({ error: 'Invalid token' });
-        req.user = decoded;
-        next();
-    });
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "No token" });
+
+  jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    req.user = decoded;
+    next();
+  });
 };
 function parseSms(body, smsDate) {
   if (!body) return null;
 
-  const sentMatch      = body.match(/Sent\s+Rs\.?([\d,]+\.?\d*)/i);
-  const receivedMatch  = body.match(/Received\s+Rs\.?([\d,]+\.?\d*)/i);
-  const debitMatch     = body.match(/Rs\.?([\d,]+\.?\d*)\s+debited/i);
-  const creditMatch    = body.match(/Rs\.?([\d,]+\.?\d*)\s+credited/i);
-  const inrMatch       = body.match(/INR\s+([\d,]+\.?\d*)/i);
+  const sentMatch = body.match(/Sent\s+Rs\.?([\d,]+\.?\d*)/i);
+  const receivedMatch = body.match(/Received\s+Rs\.?([\d,]+\.?\d*)/i);
+  const debitMatch = body.match(/Rs\.?([\d,]+\.?\d*)\s+debited/i);
+  const creditMatch = body.match(/Rs\.?([\d,]+\.?\d*)\s+credited/i);
+  const inrMatch = body.match(/INR\s+([\d,]+\.?\d*)/i);
 
   // SBI — "debited by 5.00" (no Rs), "credited by Rs.265"
-  const sbiDebitMatch  = body.match(/debited\s+(?:by|with)\s+(?:Rs\.?)?([\d,]+\.?\d*)/i);
-  const sbiCreditMatch = body.match(/credited\s+(?:by|with)\s+(?:Rs\.?)?([\d,]+\.?\d*)/i);
+  const sbiDebitMatch = body.match(
+    /debited\s+(?:by|with)\s+(?:Rs\.?)?([\d,]+\.?\d*)/i,
+  );
+  const sbiCreditMatch = body.match(
+    /credited\s+(?:by|with)\s+(?:Rs\.?)?([\d,]+\.?\d*)/i,
+  );
 
   // YES Bank — "debited for INR 250.00"
-  const hdfcMatch      = body.match(/(?:debited|credited)\s+for\s+(?:Rs\.?|INR\s?)([\d,]+\.?\d*)/i);
+  const hdfcMatch = body.match(
+    /(?:debited|credited)\s+for\s+(?:Rs\.?|INR\s?)([\d,]+\.?\d*)/i,
+  );
 
   // YES Bank credit — "INR 1.00 credited"
   const inrCreditMatch = body.match(/INR\s+([\d,]+\.?\d*)\s+credited/i);
-  const inrDebitMatch  = body.match(/INR\s+([\d,]+\.?\d*)\s+debited/i);
+  const inrDebitMatch = body.match(/INR\s+([\d,]+\.?\d*)\s+debited/i);
 
-  const bobMatch       = body.match(/Rs\.?([\d,]+\.?\d*)\s+(?:has been\s+)?debited/i);
+  const bobMatch = body.match(/Rs\.?([\d,]+\.?\d*)\s+(?:has been\s+)?debited/i);
 
-  const amountMatch = sentMatch || receivedMatch || debitMatch || creditMatch
-                    || inrCreditMatch || inrDebitMatch || sbiDebitMatch || sbiCreditMatch
-                    || hdfcMatch || inrMatch || bobMatch;
+  const amountMatch =
+    sentMatch ||
+    receivedMatch ||
+    debitMatch ||
+    creditMatch ||
+    inrCreditMatch ||
+    inrDebitMatch ||
+    sbiDebitMatch ||
+    sbiCreditMatch ||
+    hdfcMatch ||
+    inrMatch ||
+    bobMatch;
 
   if (!amountMatch) return null;
 
@@ -296,31 +330,41 @@ function parseSms(body, smsDate) {
   let parsedDate = smsDate ? new Date(Number(smsDate)) : new Date();
 
   const bankMatch = body.match(
-    /(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Baroda|Yes\s?Bank|Paytm|IndusInd|Canara|Union|Federal|IDBI|UCO|Karnataka|Equitas)/i
+    /(Kotak|HDFC|SBI|ICICI|Axis|PNB|BOB|Baroda|Yes\s?Bank|Paytm|IndusInd|Canara|Union|Federal|IDBI|UCO|Karnataka|Equitas)/i,
   );
   const upiMatch = body.match(/([a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+)/);
 
   // type detection — sbi/yes bank credit patterns bhi check karo
-  let type = 'debit';
-  if ((creditMatch || receivedMatch || inrCreditMatch || sbiCreditMatch) 
-      && !sentMatch && !debitMatch && !inrDebitMatch && !sbiDebitMatch) {
-    type = 'credit';
+  let type = "debit";
+  if (
+    (creditMatch || receivedMatch || inrCreditMatch || sbiCreditMatch) &&
+    !sentMatch &&
+    !debitMatch &&
+    !inrDebitMatch &&
+    !sbiDebitMatch
+  ) {
+    type = "credit";
   }
   // ✅ Fix 2: Category — same format as manual entries (emoji wali)
-  let category = '💵 Other';
-  if (body.match(/zomato|swiggy|food|restaurant|cafe|blinkit/i))        category = '🍔 Food';
-  else if (body.match(/uber|ola|rapido|petrol|fuel|irctc|train|bus/i))  category = '🧳 Travel';
-  else if (body.match(/amazon|flipkart|myntra|meesho|shopping/i))       category = '🛍️ Shopping';
-  else if (body.match(/rent|electricity|water|maintenance|house/i))     category = '🏠 House';
-  else if (body.match(/salary|stipend/i) && type === 'credit')          category = '💰 Salary';
+  let category = "💵 Other";
+  if (body.match(/zomato|swiggy|food|restaurant|cafe|blinkit/i))
+    category = "🍔 Food";
+  else if (body.match(/uber|ola|rapido|petrol|fuel|irctc|train|bus/i))
+    category = "🧳 Travel";
+  else if (body.match(/amazon|flipkart|myntra|meesho|shopping/i))
+    category = "🛍️ Shopping";
+  else if (body.match(/rent|electricity|water|maintenance|house/i))
+    category = "🏠 House";
+  else if (body.match(/salary|stipend/i) && type === "credit")
+    category = "💰 Salary";
 
   // ✅ Fix 3: Better description — UPI ID se readable name
-  let desc = 'UPI Transaction';
+  let desc = "UPI Transaction";
   if (upiMatch) {
-    const handle = upiMatch[1].split('@')[0];         // "kotak.food" from "kotak.food@kotak"
+    const handle = upiMatch[1].split("@")[0]; // "kotak.food" from "kotak.food@kotak"
     const readable = handle
-      .replace(/[.\-_]/g, ' ')
-      .replace(/\b\w/g, c => c.toUpperCase())         // "Kotak Food"
+      .replace(/[.\-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()) // "Kotak Food"
       .trim();
     desc = `UPI • ${readable}`;
   } else if (bankMatch) {
@@ -328,72 +372,75 @@ function parseSms(body, smsDate) {
   }
 
   return {
-    amount:   parseFloat(amountMatch[1]),
+    amount: parseFloat(amountMatch[1]),
     type,
-    bankName: bankMatch ? bankMatch[1] + ' Bank' : 'Unknown Bank',
+    bankName: bankMatch ? bankMatch[1] + " Bank" : "Unknown Bank",
     category,
-    date:     parsedDate,
-    upiId:    upiMatch ? upiMatch[1] : '',
+    date: parsedDate,
+    upiId: upiMatch ? upiMatch[1] : "",
     desc,
   };
 }
 // POST /upi/parse-sms
-router.post('/parse-sms', verifyToken, async (req, res) => {
+router.post("/parse-sms", verifyToken, async (req, res) => {
   try {
-    const { body, smsDate } = req.body;           // ✅ smsDate bhi lo
+    const { body, smsDate } = req.body; // ✅ smsDate bhi lo
     const parsed = parseSms(body, smsDate);
 
     if (!parsed) {
-      return res.status(400).json({ error: 'Not a UPI SMS' });
+      return res.status(400).json({ error: "Not a UPI SMS" });
     }
 
     // ✅ Fix 4: Duplicate check — exact date match kaam nahi karta, same-day + amount + upiId use karo
-    const startOfDay = new Date(parsed.date); startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay   = new Date(parsed.date); endOfDay.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(parsed.date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(parsed.date);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const existing = await Dashboard.findOne({
-      user:   req.user.id,
+      user: req.user.id,
       amount: parsed.amount,
-      upiId:  parsed.upiId,
-      date:   { $gte: startOfDay, $lte: endOfDay },
+      upiId: parsed.upiId,
+      date: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (existing) {// ✅ User ne delete ki thi — dobara insert mat karo
-    if (existing.deletedByUser) {
-        return res.status(200).json({ message: 'Skipped (user deleted)', data: null });
+    if (existing) {
+      // ✅ User ne delete ki thi — dobara insert mat karo
+      if (existing.deletedByUser) {
+        return res
+          .status(200)
+          .json({ message: "Skipped (user deleted)", data: null });
+      }
+      return res.status(200).json({ message: "Already saved", data: existing });
     }
-    return res.status(200).json({ message: 'Already saved', data: existing });
-}
 
     const entry = new Dashboard({
-      type:     parsed.type === 'credit' ? 'income' : 'expense',
-      date:     parsed.date,
-      amount:   parsed.amount,
+      type: parsed.type === "credit" ? "income" : "expense",
+      date: parsed.date,
+      amount: parsed.amount,
       category: parsed.category,
       bankName: parsed.bankName,
-      upiId:    parsed.upiId,
-      desc:     parsed.desc,           // ✅ Better desc
-      user:     req.user.id,
+      upiId: parsed.upiId,
+      desc: parsed.desc, // ✅ Better desc
+      user: req.user.id,
     });
 
     await entry.save();
-    res.status(201).json({ message: 'Saved', data: entry });
-
+    res.status(201).json({ message: "Saved", data: entry });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 // GET /upi/entries — user ki saari UPI entries
-router.get('/entries', verifyToken, async (req, res) => {
-    try {
-        const entries = await UpiEntry.find({ user: req.user.id }).sort({ createdAt: -1 });
-        res.json({ data: entries });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+router.get("/entries", verifyToken, async (req, res) => {
+  try {
+    const entries = await UpiEntry.find({ user: req.user.id }).sort({
+      createdAt: -1,
+    });
+    res.json({ data: entries });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-
-
-
 
 module.exports = router;

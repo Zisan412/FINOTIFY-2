@@ -26,7 +26,8 @@ const fetchEntries = useCallback(() => {
       const res = await axios.get(`${BASE_URL}/getdashboardentry`, {
         params: { user: userId },
         headers: { Authorization: `Bearer ${token}` },
-      });console.log('res.data:', res.data); // structure dekh
+      });
+      // console.log('res.data:', res.data); // structure dekh
 const data = res.data.data || res.data;
 setEntries(res.data.dashboard || []);
     } catch (err) {
@@ -108,16 +109,33 @@ useEffect(() => {
       value: income,
       color: '#00e676',
       label: 'Income',
-      onPress: () => router.replace({ pathname: '/dashboard/dashboard', params: { tab: 2 } }),
+      onPress: () => router.replace({
+  pathname: '/dashboard/dashboard',
+  params: {
+    tab: 2,
+    filter: selectedFilter,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  }
+}),
     },
     {
       value: expense,
       color: '#ff5252',
       label: 'Expense',
-      onPress: () => router.replace({ pathname: '/dashboard/dashboard', params: { tab: 3 } }),
+      onPress: () => router.replace({
+  pathname: '/dashboard/dashboard',
+  params: {
+    tab: 3,
+    filter: selectedFilter,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+  }
+}),
     },
   ];
-}, [entries, selectedFilter, startDate, endDate]);
+},
+[entries, selectedFilter, startDate, endDate]);
   const total = pieData.reduce((acc, curr) => acc + curr.value, 0);
 
   // Clean, minimal data for PieChart with external labels

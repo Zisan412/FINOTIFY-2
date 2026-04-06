@@ -70,7 +70,7 @@ const Items = ({ datas, onDelete }) => {
                   <Pressable
                     onPress={() => router.push({
                       pathname: '../dashboard/adddata',
-                      params: { cat: i.category, amm: i.amount, des: i.desc, it: i.type, editId: i._id, bankN: i.bankName, upi: i.upiId, dat: i.date }
+                      params: { cat: i.category, amm: String(i.amount), des: i.desc, it: i.type, editId: String(i._id), bankN: i.bankName, upi: i.upiId,  dat: String(i.date) }
                     })}
                   >
                     <Ionicons name="create-outline" size={18} color="#95a5a6" />

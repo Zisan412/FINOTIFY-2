@@ -54,23 +54,29 @@ const AddData = () => {
   const [showAddBank, setShowAddBank] = useState(false);
   const [newBankName, setNewBankName] = useState("");
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(() => {
+  if (dat && dat !== 'undefined' && dat !== 'null') {
+    const parsed = new Date(dat);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return new Date();
+});
   const [amount, setAmount] = useState(amm || "");
   const [category, setCategory] = useState(cat || "");
   const [desc, setDesc] = useState(des || "");
   const [bankName, setBankName] = useState(bankN || "");
   const [upiId, setUpiId] = useState(upi || "");
 
-  useEffect(() => {
-    if (editId) {
-      if (dat) setDate(new Date(dat));
-      if (amm) setAmount(amm);
-      if (cat) setCategory(cat);
-      if (des) setDesc(des);
-      if (bankN) setBankName(bankN === 'Cash' ? '' : bankN);
-      if (upi) setUpiId(upi);
-    }
-  }, [editId]);
+ useEffect(() => {
+  if (editId && editId !== 'undefined') {
+    // if (dat) setDate(new Date(dat));
+    if (amm) setAmount(String(amm));
+    if (cat) setCategory(cat);
+    if (des) setDesc(des);
+    if (bankN && bankN !== 'undefined') setBankName(bankN === 'Cash' ? '' : bankN);
+    if (upi && upi !== 'undefined') setUpiId(upi);
+  }
+}, [editId]);
 
   const DEFAULT_BANKS = ['SBI', 'HDFC', 'Bank of Baroda'];
   const [customBanks, setCustomBanks] = useState([]);
@@ -99,6 +105,7 @@ const AddData = () => {
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
   const openCategory = () => {
+     Keyboard.dismiss();
     slideAnim.setValue(SCREEN_HEIGHT);
     setShowCategory(true);
     Animated.spring(slideAnim, {
@@ -165,27 +172,28 @@ const AddData = () => {
 
     // Use patch if editId exists, else use post
     const userId = await AsyncStorage.getItem('userId');
-    const apiCall = editId 
-      ? axios.patch(`${BASE_URL}/updatedashboardentry/${editId}`, {
-          type,
-          date: date.toISOString(),
-          amount,
-          category,
-          bankName: bankName || 'Cash',
-          upiId,
-          desc,
-        })
-      : axios.post(`${BASE_URL}/adddashboardentry`,{
-          type,
-          date: date.toISOString(),
-          amount,
-          category,
-          bankName: bankName || 'Cash',
-          upiId,
-          desc,
-          user: userId,
-        });
-
+    const localDate = new Date(date);
+  localDate.setHours(12, 0, 0, 0);
+    const apiCall = editId && editId !== 'undefined'
+  ? axios.patch(`${BASE_URL}/updatedashboardentry/${editId}`, {
+      type,
+      date: localDate.toISOString(),
+      amount: Number(amount),
+      category,
+      bankName: bankName || 'Cash',
+      upiId: upiId || '',
+      desc,
+    })
+  : axios.post(`${BASE_URL}/adddashboardentry`, {
+      type,
+      date: localDate.toISOString(),
+      amount: Number(amount),
+      category,
+      bankName: bankName || 'Cash',
+      upiId: upiId || '',
+      desc,
+      user: userId,
+    });
     apiCall
       .then(() => {
         setLoading(null);
@@ -322,7 +330,7 @@ const AddData = () => {
               <Text style={styles.label}>Bank Account</Text>
               <Pressable
                 style={[styles.inputBox, activeInput === 'bank' && styles.activeBox]}
-                onPress={() => setShowBank(true)}
+                onPress={() => { Keyboard.dismiss(); setShowBank(true); }}
               >
                 <Ionicons name="business" size={20} color="#0a63bc" />
                 <Text style={[styles.inputText, !bankName && { color: '#94a3b8' }]}>
