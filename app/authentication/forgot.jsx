@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import Danger from "../Modules/Danger";
 import axios from 'axios';
 import { BASE_URL } from "../../constants/Config";
 
