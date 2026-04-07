@@ -1,29 +1,38 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React from "react";
+
+const STANDARD_CATEGORIES = [
+  '🍔 Food',
+  '💰 Salary',
+  '🧳 Travel',
+  '🏠 House',
+  '⛽ Petrol',
+  '🛍️ Shopping',
+  '💊 Health',
+  '🚗 Transport',
+  '💵 Other',
+];
+
 const Total = ({ go }) => {
-  // Dynamic categories — jo bhi DB mein hai
   const summary = {};
 
   go.forEach(item => {
-    if (!summary[item.category]) {
-      summary[item.category] = { income: 0, expense: 0 };
+    const cat = item.category || '💵 Other';
+    if (!summary[cat]) {
+      summary[cat] = { income: 0, expense: 0 };
     }
-    if (item.type === "income") summary[item.category].income += item.amount;
-    else summary[item.category].expense += item.amount;
+    if (item.type === "income") summary[cat].income += item.amount;
+    else summary[cat].expense += item.amount;
   });
 
-  const categories = Object.keys(summary);
+  const extraCategories = Object.keys(summary).filter(
+    cat => !STANDARD_CATEGORIES.includes(cat)
+  );
+  const allCategories = [...STANDARD_CATEGORIES, ...extraCategories];
 
   const totalIncome = Object.values(summary).reduce((s, c) => s + c.income, 0);
   const totalExpense = Object.values(summary).reduce((s, c) => s + c.expense, 0);
-
-  if (categories.length === 0) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: '#aaa', fontSize: 15 }}>No transactions found</Text>
-      </View>
-    );
-  }
+  const totalBalance = totalIncome - totalExpense;
 
   return (
     <ScrollView
@@ -31,60 +40,55 @@ const Total = ({ go }) => {
       contentContainerStyle={{ paddingBottom: 120 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* TITLE CARD */}
+      {/* HEADER CARD */}
       <View style={styles.headerCard}>
         <Text style={styles.headerTitle}>Transaction Summary</Text>
-        <Text style={styles.headerSub}>
-          Income • Expense • Balance
-        </Text>
+        <Text style={styles.headerSub}>Income • Expense • Balance</Text>
       </View>
 
       {/* TABLE CARD */}
       <View style={styles.card}>
+        {/* Table Header */}
         <View style={styles.tableHeader}>
-          <Text style={styles.th}>Category</Text>
+          <Text style={[styles.th, styles.colCat]}>Category</Text>
           <Text style={styles.th}>Income</Text>
           <Text style={styles.th}>Expense</Text>
           <Text style={styles.th}>Balance</Text>
         </View>
 
-        {categories.map(cat => {
-  const data = summary[cat];
-  const balance = data.income - data.expense;
-  return (
-    <View key={cat} style={styles.tableRow}>
-      <Text style={styles.tdCat}>{cat}</Text>
-              <Text style={[styles.td, styles.income]}>
-                ₹{data.income}
+        {/* Rows */}
+        {allCategories.map((cat, index) => {
+          const data = summary[cat] || { income: 0, expense: 0 };
+          const balance = data.income - data.expense;
+          const isLast = index === allCategories.length - 1;
+          return (
+            <View
+              key={cat}
+              style={[styles.tableRow, isLast && { borderBottomWidth: 0 }]}
+            >
+              <Text style={[styles.tdCat, styles.colCat]} numberOfLines={1}>
+                {cat}
               </Text>
-
-              <Text style={[styles.td, styles.expense]}>
-                ₹{data.expense}
+              <Text style={[styles.td, data.income > 0 && styles.green]}>
+                ₹ {data.income}
               </Text>
-
-              <Text
-                style={[
-                  styles.td,
-                  { color: balance >= 0 ? "#2ecc71" : "#e74c3c" },
-                ]}
-              >
-                ₹{balance}
+              <Text style={[styles.td, data.expense > 0 && styles.red]}>
+                ₹ {data.expense}
+              </Text>
+              <Text style={[styles.td, balance > 0 ? styles.green : balance < 0 ? styles.red : null]}>
+                ₹ {balance}
               </Text>
             </View>
           );
         })}
 
-        {/* TOTAL FOOTER */}
+        {/* Total Footer Row */}
         <View style={styles.footerRow}>
-          <Text style={styles.totalText}>Total</Text>
-          <Text style={[styles.totalText, { color: "#2ecc71" }]}>
-            ₹{totalIncome}
-          </Text>
-          <Text style={[styles.totalText, { color: "#e74c3c" }]}>
-            ₹{totalExpense}
-          </Text>
-          <Text style={styles.totalText}>
-            ₹{totalIncome - totalExpense}
+          <Text style={[styles.totalLabel, styles.colCat]}>Total</Text>
+          <Text style={[styles.totalValue, styles.green]}>₹ {totalIncome}</Text>
+          <Text style={[styles.totalValue, styles.red]}>₹ {totalExpense}</Text>
+          <Text style={[styles.totalValue, totalBalance >= 0 ? styles.green : styles.red]}>
+            ₹ {totalBalance}
           </Text>
         </View>
       </View>
@@ -99,7 +103,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
-
   headerCard: {
     margin: 14,
     padding: 16,
@@ -107,88 +110,96 @@ const styles = StyleSheet.create({
     backgroundColor: "#0a63bc",
     elevation: 4,
   },
-
   headerTitle: {
     color: "white",
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
   },
-
   headerSub: {
-    color: "#e6e6e6",
-    fontSize: 13,
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 15,
     textAlign: "center",
     marginTop: 4,
   },
-
   card: {
     backgroundColor: "#fff",
     marginHorizontal: 14,
     marginBottom: 20,
     borderRadius: 16,
-    padding: 12,
+    paddingHorizontal: 10,
+    paddingTop: 10,
     elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+  },
+
+  // Column widths
+  colCat: {
+    flex: 1.4,
+    textAlign: "left",
   },
 
   tableHeader: {
     flexDirection: "row",
-    borderBottomWidth: 1,
+    borderBottomWidth: 1.5,
     borderColor: "#eee",
     paddingBottom: 8,
-    marginBottom: 6,
+    marginBottom: 2,
   },
-
   th: {
-    width: "25%",
-    textAlign: "center",
-    fontWeight: "600",
-    fontSize: 13,
-    color: "#555",
-  },
-
-  tableRow: {
-    flexDirection: "row",
-    paddingVertical: 8,
-    borderBottomWidth: 0.5,
-    borderColor: "#f0f0f0",
-  },
-
-  tdCat: {
-    width: "25%",
-    fontSize: 13,
-    color: "#2f3640",
-    fontWeight: "500",
-  },
-
-  td: {
-    width: "25%",
-    textAlign: "center",
-    fontSize: 13,
-  },
-
-  income: {
-    color: "#2ecc71",
-    fontWeight: "600",
-  },
-
-  expense: {
-    color: "#ff4757",
-    fontWeight: "600",
-  },
-
-  footerRow: {
-    flexDirection: "row",
-    paddingTop: 10,
-    marginTop: 6,
-    borderTopWidth: 1,
-    borderColor: "#ddd",
-  },
-
-  totalText: {
-    width: "25%",
+    flex: 1,
     textAlign: "center",
     fontWeight: "700",
     fontSize: 14,
+    color: "#888",
+  },
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 13,
+    borderBottomWidth: 0.5,
+    borderColor: "#f0f0f0",
+    alignItems: "center",
+  },
+  tdCat: {
+    fontSize: 15,
+    color: "#2f3640",
+    fontWeight: "500",
+  },
+  td: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 15,
+    color: "#aaa",
+    fontWeight: "500",
+  },
+  green: {
+    color: "#2ecc71",
+    fontWeight: "700",
+  },
+  red: {
+    color: "#ff4757",
+    fontWeight: "700",
+  },
+  footerRow: {
+    flexDirection: "row",
+    paddingVertical: 12,
+    borderTopWidth: 1.5,
+    borderColor: "#ddd",
+    alignItems: "center",
+    marginTop: 2,
+  },
+  totalLabel: {
+    fontWeight: "800",
+    fontSize: 16,
+    color: "#1e2a35",
+  },
+  totalValue: {
+    flex: 1,
+    textAlign: "center",
+    fontWeight: "800",
+    fontSize: 15,
   },
 });

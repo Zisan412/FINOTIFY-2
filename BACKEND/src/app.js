@@ -2,14 +2,23 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const connectDB = require("../db/db");
-const register = require("../routes/user.route");
+
+const authRoutes      = require("../routes/auth.route");
+const passwordRoutes  = require("../routes/password.route");
+const dueRoutes       = require("../routes/due.route");
+const dashboardRoutes = require("../routes/dashboard.route");
+const smsRoutes       = require("../routes/sms.route");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-connectDB(); // ✅ DB connect
+connectDB();
 
-app.use("/user", register); // ✅ Routes mount
+app.use("/user", authRoutes);
+app.use("/user", passwordRoutes);
+app.use("/user", dueRoutes);
+app.use("/user", dashboardRoutes);
+app.use("/user", smsRoutes);
 
 module.exports = app;

@@ -4,12 +4,12 @@
     "slug": "finotify",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "image": "./assets/icon.png",
+    "icon": "./assets/flogo.png",
+    "image": "./assets/flogo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
         "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/finotifylogo.png",
       "resizeMode": "contain",
       "backgroundColor": "#0d1117"
     },
@@ -18,7 +18,7 @@
       "supportsTablet": true
     },"android": {
   "adaptiveIcon": {
-    "foregroundImage": "./assets/adaptive-icon.png",
+    "foregroundImage": "./assets/flogo.png",
     "backgroundColor": "#0d1117"
   },
   "softwareKeyboardLayoutMode": "pan",
