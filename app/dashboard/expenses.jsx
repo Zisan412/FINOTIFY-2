@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, Pressable, Alert } from "react-native";
+import { ScrollView, Text, View, Pressable } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -99,8 +99,7 @@ const Expenses = ({ go, onDelete }) => {
                 setDeleteVisible(false);
                 onDelete && onDelete();
               })
-              .catch(err => {
-                console.log(err);
+              .catch(() => {
                 setDeleteVisible(false);
               });
           }

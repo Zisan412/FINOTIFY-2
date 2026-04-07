@@ -1,6 +1,5 @@
 import { StyleSheet, View, SafeAreaView, Platform, PermissionsAndroid, Alert } from "react-native";
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import Upper from "./upper";
 import Bottom from "./bottom";
@@ -8,11 +7,8 @@ import Middle from "./middle";
 import FilterBottomSheet from "./FilterBottomSheet";
 import { BASE_URL } from "../../constants/Config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// Dashboard.jsx — TOP pe yeh imports add kar
-// import { View, SafeAreaView, PermissionsAndroid, Alert, Platform } from "react-native";
 import SmsAndroid from 'react-native-get-sms-android';
 import SmsListener from 'react-native-android-sms-listener';
-
 import axios from "axios";
 
 const Dashboard = () => {
@@ -32,20 +28,17 @@ const Dashboard = () => {
   const [statsFilter, setStatsFilter] = useState(null);
 
   useEffect(() => {
-  if (params.tab) {
-    setActiveTab(parseInt(params.tab));
-  }
-  if (params.filter) {
-    setStatsFilter({
-      filter: params.filter,
-      startDate: params.startDate ? new Date(params.startDate) : new Date(),
-      endDate: params.endDate ? new Date(params.endDate) : new Date(),
-    });
-    // Stats se aaye toh force refetch karo
-    hasFetched.current = false;
-    fetchData();
-  }
-    // Session check: If no token, kick out to welcome page
+    if (params.tab) {
+      setActiveTab(parseInt(params.tab));
+    }
+    if (params.filter) {
+      setStatsFilter({
+        filter: params.filter,
+        startDate: params.startDate ? new Date(params.startDate) : new Date(),
+        endDate: params.endDate ? new Date(params.endDate) : new Date(),
+      });
+      fetchData();
+    }
     const checkSession = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
@@ -64,195 +57,172 @@ const Dashboard = () => {
   const fetchData = useCallback(async () => {
     const userId = await AsyncStorage.getItem('userId');
     if (!userId) return;
-    
-    console.log('userId:', userId); 
     axios.get(`${BASE_URL}/getdashboardentry?user=${userId}`)
-    .then(res => {
-      if (res.data && res.data.dashboard) {
-        setDatas(res.data.dashboard);
-      }
-    })
-    .catch(err => console.log(err));
-}, []);
+      .then(res => {
+        if (res.data && res.data.dashboard) {
+          setDatas(res.data.dashboard);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
-const hasFetched = useRef(false);
-
-useFocusEffect(
-  useCallback(() => {
-    fetchData();
-  }, [fetchData])
-);
-const handleTabChange = useCallback((tab) => {
-  setActiveTab(tab);
-  setStatsFilter(null); // stats filter hat jaye
-}, []);
- // ─── SMS PERMISSION + SCAN ───────────────────────────────
-// smsDate bhi pass karo
-const sendSmsToBackend = useCallback((body, smsDate) => {
-  const inner = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const userId = await AsyncStorage.getItem('userId');
-      if (!token || !userId) return;
-
-      await axios.post(
-        `${BASE_URL}/parse-sms`,
-        { body, userId, smsDate },   // ✅ smsDate add kiya
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  useFocusEffect(
+    useCallback(() => {
       fetchData();
-    } catch (e) {
-      console.log('SMS backend error:', e);
-    }
-  };
-  inner();
-}, [fetchData]);
-
-const scanOldSms = useCallback(() => {
-  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-
-  SmsAndroid.list(
-    JSON.stringify({ box: 'inbox', minDate: thirtyDaysAgo, maxCount: 500 }),
-    (fail) => console.log('SMS read failed:', fail),
-    (count, smsList) => {
-      const messages = JSON.parse(smsList);
-      messages.forEach((msg) => {
-        const body = msg.body || '';
-        const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
-        if (isUpi) sendSmsToBackend(body, msg.date); // ✅ msg.date pass karo
-      });
-    }
+    }, [fetchData])
   );
-}, [sendSmsToBackend]);
 
-const requestSmsPermission = useCallback(() => {
-  const inner = async () => {
-    try {
-      const alreadyAsked = await AsyncStorage.getItem('smsPermissionAsked');
-      if (alreadyAsked) {
-        // Already asked before — seedha scan kar
-        const granted = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_SMS
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    setStatsFilter(null);
+  }, []);
+
+  const sendSmsToBackend = useCallback((body, smsDate) => {
+    const inner = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const userId = await AsyncStorage.getItem('userId');
+        if (!token || !userId) return;
+        await axios.post(
+          `${BASE_URL}/parse-sms`,
+          { body, userId, smsDate },
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (granted) scanOldSms();
-        return;
+        fetchData();
+      } catch (e) {}
+    };
+    inner();
+  }, [fetchData]);
+
+  const scanOldSms = useCallback(() => {
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    SmsAndroid.list(
+      JSON.stringify({ box: 'inbox', minDate: thirtyDaysAgo, maxCount: 500 }),
+      () => {},
+      (count, smsList) => {
+        const messages = JSON.parse(smsList);
+        messages.forEach((msg) => {
+          const body = msg.body || '';
+          const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+          if (isUpi) sendSmsToBackend(body, msg.date);
+        });
       }
-
-      // Pehli baar — popup dikhao
-      Alert.alert(
-        'UPI Transactions Auto-Detect 🔔',
-        'Please allow SMS permission to auto-detect UPI transactions',
-        [
-          {
-            text: 'Allow',
-            onPress: async () => {
-              await AsyncStorage.setItem('smsPermissionAsked', 'true');
-              const result = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_SMS,
-                {
-                  title: 'SMS Permission',
-                  message: 'Please allow SMS permission to auto-detect some UPI transactions',
-                  buttonPositive: 'Allow',
-                  buttonNegative: 'Deny',
-                }
-              );
-              if (result === PermissionsAndroid.RESULTS.GRANTED) {
-                scanOldSms();
-              }
-            },
-          },
-          {
-            text: 'Later',
-            onPress: async () => {
-              await AsyncStorage.setItem('smsPermissionAsked', 'true');
-            },
-            style: 'later',
-          },
-        ]
-      );
-    } catch (e) {
-      console.log('Permission error:', e);
-    }
-  };
-  inner();
-}, [scanOldSms]);
-// Last entry ka timestamp se ab tak SMS scan karo
-const scanSmsSince = useCallback((fromTimestamp) => {
-   if (!SmsAndroid) {
-    console.log('SmsAndroid not available (Expo Go)');
-    fetchData(); // sirf data refresh karo
-    return;
-  }
-  SmsAndroid.list(
-    JSON.stringify({ box: 'inbox', minDate: fromTimestamp, maxCount: 200 }),
-    (fail) => console.log('SMS scan failed:', fail),
-    (count, smsList) => {
-      const messages = JSON.parse(smsList);
-      messages.forEach((msg) => {
-        const body = msg.body || '';
-        const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
-        if (isUpi) sendSmsToBackend(body, msg.date);
-      });
-    }
-  );
-}, [sendSmsToBackend]);
-
-// ─── SMS useEffect ────────────────────────────────────────
-useEffect(() => {
-  if (Platform.OS !== 'android' || isAuthLoading) return;
-
-  requestSmsPermission();
-
-  // Live listener — naya SMS aate hi detect karo
-  const subscription = SmsListener.addListener((message) => {
-    const body = message.body || '';
-    const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
-    if (isUpi) sendSmsToBackend(body);
-  });
-
-  return () => subscription.remove();
-}, [isAuthLoading]); // eslint-disable-line
-  const monthlyData = useMemo(() => {
-  // Agar stats se aaya filter hai toh woh use karo
-  if (statsFilter) {
-    const now = new Date();
-    return datas.filter((item) => {
-      const entryDate = new Date(item.date);
-      if (statsFilter.filter === 'This Week') {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return entryDate >= weekAgo && entryDate <= now;
-      }
-      if (statsFilter.filter === 'This Month') {
-        return (
-          entryDate.getMonth() === now.getMonth() &&
-          entryDate.getFullYear() === now.getFullYear()
-        );
-      }
-      if (statsFilter.filter === 'Custom') {
-        const end = new Date(statsFilter.endDate);
-        end.setHours(23, 59, 59);
-        return entryDate >= statsFilter.startDate && entryDate <= end;
-      }
-      return true;
-    });
-  }
-
-  // Normal dashboard filter — selected month
-  return datas.filter((item) => {
-    const itemDate = new Date(item.date);
-    return (
-      itemDate.getMonth() === selectedDate.getMonth() &&
-      itemDate.getFullYear() === selectedDate.getFullYear()
     );
-  });
-}, [datas, selectedDate, statsFilter]);
+  }, [sendSmsToBackend]);
 
-  // Filtered and Sorted data
+  const requestSmsPermission = useCallback(() => {
+    const inner = async () => {
+      try {
+        const alreadyAsked = await AsyncStorage.getItem('smsPermissionAsked');
+        if (alreadyAsked) {
+          const granted = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.READ_SMS
+          );
+          if (granted) scanOldSms();
+          return;
+        }
+        Alert.alert(
+          'UPI Transactions Auto-Detect 🔔',
+          'Please allow SMS permission to auto-detect UPI transactions',
+          [
+            {
+              text: 'Allow',
+              onPress: async () => {
+                await AsyncStorage.setItem('smsPermissionAsked', 'true');
+                const result = await PermissionsAndroid.request(
+                  PermissionsAndroid.PERMISSIONS.READ_SMS,
+                  {
+                    title: 'SMS Permission',
+                    message: 'Allow SMS permission to auto-detect UPI transactions',
+                    buttonPositive: 'Allow',
+                    buttonNegative: 'Deny',
+                  }
+                );
+                if (result === PermissionsAndroid.RESULTS.GRANTED) {
+                  scanOldSms();
+                }
+              },
+            },
+            {
+              text: 'Later',
+              onPress: async () => {
+                await AsyncStorage.setItem('smsPermissionAsked', 'true');
+              },
+              style: 'cancel',
+            },
+          ]
+        );
+      } catch (e) {}
+    };
+    inner();
+  }, [scanOldSms]);
+
+  const scanSmsSince = useCallback((fromTimestamp) => {
+    if (!SmsAndroid) {
+      fetchData();
+      return;
+    }
+    SmsAndroid.list(
+      JSON.stringify({ box: 'inbox', minDate: fromTimestamp, maxCount: 200 }),
+      () => {},
+      (count, smsList) => {
+        const messages = JSON.parse(smsList);
+        messages.forEach((msg) => {
+          const body = msg.body || '';
+          const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+          if (isUpi) sendSmsToBackend(body, msg.date);
+        });
+      }
+    );
+  }, [sendSmsToBackend]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android' || isAuthLoading) return;
+    requestSmsPermission();
+    const subscription = SmsListener.addListener((message) => {
+      const body = message.body || '';
+      const isUpi = /UPI|debited|credited|Sent|Received/i.test(body);
+      if (isUpi) sendSmsToBackend(body);
+    });
+    return () => subscription.remove();
+  }, [isAuthLoading]); // eslint-disable-line
+
+  const monthlyData = useMemo(() => {
+    if (statsFilter) {
+      const now = new Date();
+      return datas.filter((item) => {
+        const entryDate = new Date(item.date);
+        if (statsFilter.filter === 'This Week') {
+          const weekAgo = new Date();
+          weekAgo.setDate(now.getDate() - 7);
+          return entryDate >= weekAgo && entryDate <= now;
+        }
+        if (statsFilter.filter === 'This Month') {
+          return (
+            entryDate.getMonth() === now.getMonth() &&
+            entryDate.getFullYear() === now.getFullYear()
+          );
+        }
+        if (statsFilter.filter === 'Custom') {
+          const end = new Date(statsFilter.endDate);
+          end.setHours(23, 59, 59);
+          return entryDate >= statsFilter.startDate && entryDate <= end;
+        }
+        return true;
+      });
+    }
+    return datas.filter((item) => {
+      const itemDate = new Date(item.date);
+      return (
+        itemDate.getMonth() === selectedDate.getMonth() &&
+        itemDate.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+  }, [datas, selectedDate, statsFilter]);
+
   const filteredDatas = useMemo(() => {
     let result = [...monthlyData];
 
-    // 1. Search Query Filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -263,21 +233,16 @@ useEffect(() => {
       );
     }
 
-    // 2. Advanced Filters - ONLY apply when 'All' tab is active
     if (activeTab === 1) {
       if (filters.type !== "All") {
         const typeKey = filters.type.toLowerCase() === "income" ? "income" : "expense";
         result = result.filter((item) => item.type === typeKey);
       }
-
       if (filters.category !== "All") {
-        result = result.filter((item) => {
-          const itemCatLower = item.category.toLowerCase();
-          const filterCatLower = filters.category.toLowerCase();
-          return itemCatLower.includes(filterCatLower);
-        });
+        result = result.filter((item) =>
+          item.category.toLowerCase().includes(filters.category.toLowerCase())
+        );
       }
-
       if (filters.dateRange !== "All") {
         const now = new Date();
         if (filters.dateRange === "Last 7 Days") {
@@ -294,7 +259,6 @@ useEffect(() => {
           });
         }
       }
-
       if (filters.sortBy === "Amount: High to Low") {
         result.sort((a, b) => b.amount - a.amount);
       } else if (filters.sortBy === "Amount: Low to High") {
@@ -303,51 +267,38 @@ useEffect(() => {
         result.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
     } else {
-  if (activeTab === 2) {
-    result = result.filter((item) => item.type === 'income');
-  } else if (activeTab === 3) {
-    result = result.filter((item) => item.type === 'expense');
-  }
-  // activeTab === 4 (Total) — koi filter nahi, sab dikhao
-  result.sort((a, b) => new Date(b.date) - new Date(a.date));
-}
+      if (activeTab === 2) {
+        result = result.filter((item) => item.type === 'income');
+      } else if (activeTab === 3) {
+        result = result.filter((item) => item.type === 'expense');
+      }
+      result.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
     return result;
   }, [monthlyData, searchQuery, filters, activeTab]);
 
   const totals = useMemo(() => {
-    const income = monthlyData
-      .filter((i) => i.type === "income")
-      .reduce((s, j) => s + j.amount, 0);
-    const expense = monthlyData
-      .filter((i) => i.type === "expense")
-      .reduce((s, k) => s + k.amount, 0);
-    return {
-      balance: income - expense,
-      income: income,
-      expense: expense,
-    };
+    const income = monthlyData.filter((i) => i.type === "income").reduce((s, j) => s + j.amount, 0);
+    const expense = monthlyData.filter((i) => i.type === "expense").reduce((s, k) => s + k.amount, 0);
+    return { balance: income - expense, income, expense };
   }, [monthlyData]);
-const handleRefresh = () => {
-  setStatsFilter(null);
-  setSearchQuery("");
-  setFilters({ type: "All", category: "All", dateRange: "All", sortBy: "Latest" });
-  setActiveTab(1);
-  setSelectedDate(new Date());
 
-  // Last entry ka time lo, usके baad ke SMS scan karo
-  if (datas.length > 0) {
-    const lastEntryTime = Math.max(...datas.map(d => new Date(d.date).getTime()));
-    scanSmsSince(lastEntryTime);
-  } else {
-    // Koi entry nahi hai toh last 24 hrs scan karo
-    scanSmsSince(Date.now() - 24 * 60 * 60 * 1000);
-  }
+  const handleRefresh = () => {
+    setStatsFilter(null);
+    setSearchQuery("");
+    setFilters({ type: "All", category: "All", dateRange: "All", sortBy: "Latest" });
+    setActiveTab(1);
+    setSelectedDate(new Date());
+    if (datas.length > 0) {
+      const lastEntryTime = Math.max(...datas.map(d => new Date(d.date).getTime()));
+      scanSmsSince(lastEntryTime);
+    } else {
+      scanSmsSince(Date.now() - 24 * 60 * 60 * 1000);
+    }
+    fetchData();
+  };
 
-  fetchData();
-};
-  if (isAuthLoading) {
-    return null; // Jab tak auth ho raha hai, tab tak blank dikhega taaki dashboard blink na kare
-  }
+  if (isAuthLoading) return null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -362,9 +313,9 @@ const handleRefresh = () => {
           onRefresh={handleRefresh}
           selectedDate={selectedDate}
           onMonthChange={(date) => {
-  setSelectedDate(date);
-  setStatsFilter(null); // stats filter hat jaye
-}}
+            setSelectedDate(date);
+            setStatsFilter(null);
+          }}
         />
       </View>
 

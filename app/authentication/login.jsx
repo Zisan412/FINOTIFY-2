@@ -46,12 +46,8 @@ const Login = () => {
     await AsyncStorage.setItem('userName', res.data.name);
     await AsyncStorage.setItem('userEmail', res.data.email);
     await AsyncStorage.setItem('userId', res.data._id ?? '');
-
-    console.log('Login success:', res.data);
     router.replace('/dashboard/dashboard');
-
   } catch (error) {
-    console.log('Exact error:', error.message);
     setError('Login failed. Please check your credentials and try again.');
     clearError();
   }
@@ -142,9 +138,6 @@ const Login = () => {
 };
 
 export default Login;
-
-// /* ================= STYLES ================= */
-/* styesls */
 
 const styles = StyleSheet.create({
   container2: {

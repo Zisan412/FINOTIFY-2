@@ -12,12 +12,11 @@ const Total = ({ go }) => {
     else summary[item.category].expense += item.amount;
   });
 
-  const categories = Object.keys(summary); // DB se jo aaya
+  const categories = Object.keys(summary);
 
   const totalIncome = Object.values(summary).reduce((s, c) => s + c.income, 0);
   const totalExpense = Object.values(summary).reduce((s, c) => s + c.expense, 0);
 
-  // Agar koi data nahi
   if (categories.length === 0) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

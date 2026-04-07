@@ -1,11 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View,Image } from "react-native";
-import Upper from "../Modules/Upper";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import Danger from "../Modules/Danger";
-import axios from 'axios'
+import axios from 'axios';
 import { BASE_URL } from "../../constants/Config";
 
 
@@ -16,25 +15,16 @@ const Forgot = () => {
 
 
 
-  const sub= async ()=>{
-    console.log(email)
-        await axios.post(`${BASE_URL}/email`,
-          {email:email}
-        )
-        .then(async (res)=>{
-          console.log(JSON.stringify(res.data.message))
-          router.push({ pathname: './otp-enter', params: { email: email } })
-        })
-        .catch((error)=>{
-          seterror('Failed to send OTP. Please check your email and try again.');
-          setTimeout(() => {
-            seterror('');
-          }, 2000);
-
-        })
-          
-
-  }
+  const sub = async () => {
+    await axios.post(`${BASE_URL}/email`, { email })
+      .then(() => {
+        router.push({ pathname: './otp-enter', params: { email } });
+      })
+      .catch(() => {
+        seterror('Failed to send OTP. Please check your email and try again.');
+        setTimeout(() => seterror(''), 2000);
+      });
+  };
   return (
     <View style={{backgroundColor: "#ffffff", height:'100%' }}>
               {error ? <Danger error={error} /> : null}
@@ -82,19 +72,9 @@ const Forgot = () => {
 export default Forgot;
 
 const styles = StyleSheet.create({
-  container2: {
-    height:250,
-    width: 250,
-    alignSelf:'center',
-    justifyContent:'center',
-    marginTop: 50,
-    resizeMode: "cover",
-  },
   inp: {
     width: 250,
     height: 50,
-    marginTop: 0,
-    
   },
   input: {
     height: 150,
@@ -103,12 +83,6 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-  },
-  label: {
-    position: "absolute",
-    left: 45,
-    top: 20,
-    backgroundColor: "white",
   },
   btn: {
     backgroundColor: "#0a63bccb",
@@ -120,5 +94,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     opacity: 1,
   },
-  
 });

@@ -7,14 +7,15 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  Alert,
+  PermissionsAndroid,
 } from "react-native";
-import React, { useState,useEffect } from "react";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Bottom from "../dashboard/bottom";
 import Confirmation from "../Modules/Confirmation";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {  Linking } from "react-native";
 
 
 const SettingItem = ({ icon, title, value, onPress, color = "#0a63bc", trailing = true }) => (
@@ -44,12 +45,40 @@ useEffect(() => {
   AsyncStorage.getItem('userEmail').then(email => { if(email) setUserEmail(email); });
 }, []);
   const handleCurrencyChange = () => {
-    // Logic for currency change can be added here
-    alert("Currency selection coming soon!");
+    // Currency selection — coming soon, no action for now
   };
-const openNotificationSettings = () => {
-  Linking.sendIntent('android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS');
-};
+
+  const requestSmsPermission = () => {
+    if (Platform.OS !== 'android') return;
+    Alert.alert(
+      'UPI Transactions Auto-Detect 🔔',
+      'Please allow SMS permission to auto-detect UPI transactions',
+      [
+        {
+          text: 'Allow',
+          onPress: async () => {
+            await AsyncStorage.setItem('smsPermissionAsked', 'true');
+            const result = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.READ_SMS,
+              {
+                title: 'SMS Permission',
+                message: 'Please allow SMS permission to auto-detect some UPI transactions',
+                buttonPositive: 'Allow',
+                buttonNegative: 'Deny',
+              }
+            );
+            if (result === PermissionsAndroid.RESULTS.GRANTED) {
+              Alert.alert('Success', 'SMS permission granted! UPI transactions will now be auto-detected.');
+            }
+          },
+        },
+        {
+          text: 'Later',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
 
   const logout=()=>{
      setShowLogoutConfirm(true)
@@ -96,12 +125,12 @@ const openNotificationSettings = () => {
                 onPress={handleCurrencyChange}
               />
               <SettingItem
-  icon="notifications-outline"
-  title="Notification Access"
-  value="Required for SMS read"
-  onPress={openNotificationSettings}
-  color="#7c3aed"
-/>
+                icon="notifications-outline"
+                title="Notification Access"
+                value="Required for SMS read"
+                onPress={requestSmsPermission}
+                color="#7c3aed"
+              />
             </View>
           </View>
 

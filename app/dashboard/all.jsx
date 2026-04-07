@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View, Pressable, Alert } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -102,8 +102,7 @@ const Items = ({ datas, onDelete }) => {
                 setDeleteVisible(false);
                 onDelete && onDelete();
               })
-              .catch(err => {
-                console.log(err);
+              .catch(() => {
                 setDeleteVisible(false);
               });
           }

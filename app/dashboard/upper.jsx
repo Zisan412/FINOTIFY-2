@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Platform, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import asyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onFilterPress, onRefresh, selectedDate, onMonthChange }) => {
@@ -12,39 +12,33 @@ const Upper = ({ totalBalance, income, expense, searchQuery, onSearchChange, onF
     newDate.setMonth(newDate.getMonth() + increment);
     onMonthChange(newDate);
   };
-  const [displayName, setDisplayName] = useState(''); // Default to 'User' if name not found
-  console.log('Upper component received data:', displayName); // Debugging log
- // This could come from a user context
+  const [displayName, setDisplayName] = useState('');
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   const waveAnim = useRef(new Animated.Value(0)).current;
   const spinAnim = useRef(new Animated.Value(0)).current;
 
-  // Re-run if name changes
-useEffect(() => {
+  useEffect(() => {
   let startTyping;
   let timer;
 
-  asyncStorage.getItem('userName').then((storedName) => {
-    const targetName = storedName || 'User'; // fallback if null
-    
+  AsyncStorage.getItem('userName').then((storedName) => {
+    const targetName = storedName || 'User';
     startTyping = setTimeout(() => {
       let index = 0;
       timer = setInterval(() => {
-        setDisplayName(targetName.substring(0, index + 1)); // ✅ Now targetName is a real string
+        setDisplayName(targetName.substring(0, index + 1));
         index++;
         if (index >= targetName.length) clearInterval(timer);
       }, 70);
     }, 600);
   });
 
-  // ✅ Cleanup both timers on unmount
   return () => {
     clearTimeout(startTyping);
     clearInterval(timer);
   };
-
-}, []); // ✅ Runs once on mount only
+}, []);
 
 
   const waveStyle = {
@@ -64,18 +58,13 @@ useEffect(() => {
   });
 
   const handleSyncPress = () => {
-    // 1. Replay spin animation
     spinAnim.setValue(0);
     Animated.timing(spinAnim, {
       toValue: 1,
       duration: 600,
       useNativeDriver: true,
     }).start();
-
-    // 2. Call external refresh to reload state
-    if (onRefresh) {
-      onRefresh();
-    }
+    if (onRefresh) onRefresh();
   };
 
   return (
@@ -224,8 +213,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: "white",
   },
-
-  // Compact Balance Card
   balanceCard: {
     backgroundColor: "#0a63bc",
     borderRadius: 16,

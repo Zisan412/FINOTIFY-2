@@ -7,11 +7,8 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React, { useEffect } from "react";
-import { useState, useRef } from "react";
-import Upper from "../Modules/Upper";
-import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState, useRef } from "react";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import Danger from "../Modules/Danger";
 import axios from "axios";
@@ -19,78 +16,46 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from "../../constants/Config";
 
 const Signup = () => {
-  const [press, setpress] = useState(0);
-  const [chnage, setchnage] = useState(false);
-  const [hide, sethide] = useState(10);
-  const [hide2, sethide2] = useState(11);
-  const [chnage2, setchnage2] = useState(false);
+  const [focusedInput, setFocusedInput] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [username, setusername] = useState('');
-  const [mobile, setmobile] = useState('');
-  const [email, setemail] = useState('');
-  const [paas2, setpass2] = useState('');
-  const [pass, setpass] = useState('');
-
-  const [error, seterror] = useState('');
+  const [username, setUsername] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
   const confirmPasswordRef = useRef(null);
 
-  const senddata = () => {
-    if (username == '' || mobile == '' || email == '' || paas2 == '' || pass == '') {
+  const sendData = () => {
+    if (!username || !mobile || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      setTimeout(() => setError(''), 2000);
       return;
-    } else if (pass != paas2) {
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setTimeout(() => setError(''), 2000);
       return;
-    } else {
-      console.log('yess');
-      seterror('');
-      axios.post(`${BASE_URL}/register`, {
-        name: username,
-        phonenumber: mobile,
-        email: email,
-        password: pass
-      }).then(async (res) => {
-        console.log(JSON.stringify(res.data.message));
-        await AsyncStorage.setItem('token', res.data.token);
-        await AsyncStorage.setItem('userName', res.data.name);
-        await AsyncStorage.setItem('userEmail', res.data.email);
-        await AsyncStorage.setItem('userId', res.data._id);
-        router.replace('../dashboard/dashboard');
-      }).catch((error) => {
-        seterror('Registration failed. Please try again.');
-        setTimeout(() => {
-          seterror('');
-        }, 2000);
-      });
     }
-  };
-
-  const hideing = () => {
-    setchnage(true);
-    sethide(9);
-  };
-  const show = () => {
-    setchnage(false);
-    sethide(10);
-  };
-  const hideing2 = () => {
-    setchnage2(true);
-    sethide2(11);
-  };
-  const show2 = () => {
-    setchnage2(false);
-    sethide2(12);
-  };
-
-  const sub = () => {
-    if (username == '' || mobile == '' || email == '' || paas2 == '' || pass == '') {
-      seterror('please enter a valid detail');
-      setTimeout(() => { seterror(''); }, 2000);
-    } else if (pass != paas2) {
-      seterror('no match password');
-      setTimeout(() => { seterror(''); }, 2000);
-    } else {
-      router.replace('/dashboard/dashboard');
-    }
+    setError('');
+    axios.post(`${BASE_URL}/register`, {
+      name: username,
+      phonenumber: mobile,
+      email,
+      password,
+    }).then(async (res) => {
+      await AsyncStorage.setItem('token', res.data.token);
+      await AsyncStorage.setItem('userName', res.data.name);
+      await AsyncStorage.setItem('userEmail', res.data.email);
+      await AsyncStorage.setItem('userId', res.data._id);
+      router.replace('../dashboard/dashboard');
+    }).catch(() => {
+      setError('Registration failed. Please try again.');
+      setTimeout(() => setError(''), 2000);
+    });
   };
 
   return (
@@ -104,7 +69,7 @@ const Signup = () => {
           <Image style={styles.logo} source={require("../../assets/signup.png")} />
         </View>
 
-        {error ? <Danger error={error} /> : ''}
+        {error ? <Danger error={error} /> : null}
 
         <View style={{ paddingTop: 20 }}>
           <Text style={{ textAlign: "center", fontSize: 20, textTransform: "capitalize", marginTop: -20 }}>
@@ -112,104 +77,100 @@ const Signup = () => {
           </Text>
         </View>
 
-        <View style={styles.input}>
-          <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, elevation: 3, backgroundColor: 'white' }}>
-            <Ionicons name={'person'} size={24} color={'#0a63bcd5'} />
+        <View style={styles.inputContainer}>
+          {/* Username */}
+          <View style={styles.inputRow}>
+            <Ionicons name="person" size={24} color="#0a63bcd5" />
             <TextInput
-              style={[styles.inp, press == 1 && { opacity: 1 }]}
-              onFocus={() => setpress(1)}
-              onBlur={() => setpress(0)}
+              style={styles.inp}
+              onFocus={() => setFocusedInput('username')}
+              onBlur={() => setFocusedInput(null)}
               placeholder=" Username"
               value={username}
-              onChangeText={setusername}
+              onChangeText={setUsername}
             />
           </View>
 
-          <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <Ionicons name={'call'} size={24} color={'#0a63bcd5'} />
+          {/* Mobile */}
+          <View style={[styles.inputRow, { marginTop: 10 }]}>
+            <Ionicons name="call" size={24} color="#0a63bcd5" />
             <TextInput
-              style={[styles.inp, press == 2 && { opacity: 1 }]}
-              onFocus={() => setpress(2)}
-              onBlur={() => setpress(0)}
+              style={styles.inp}
+              onFocus={() => setFocusedInput('mobile')}
+              onBlur={() => setFocusedInput(null)}
               placeholder=" Mobile No"
               value={mobile}
-              onChangeText={setmobile}
+              onChangeText={setMobile}
+              keyboardType="phone-pad"
             />
           </View>
 
-          <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <MaterialIcons name={'email'} size={24} color={'#0a63bcd5'} />
+          {/* Email */}
+          <View style={[styles.inputRow, { marginTop: 10 }]}>
+            <MaterialIcons name="email" size={24} color="#0a63bcd5" />
             <TextInput
-              style={[styles.inp, press == 3 && { opacity: 1 }]}
-              onFocus={() => setpress(3)}
-              onBlur={() => setpress(0)}
+              style={styles.inp}
+              onFocus={() => setFocusedInput('email')}
+              onBlur={() => setFocusedInput(null)}
               placeholder="Email id"
               value={email}
-              onChangeText={setemail}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
 
-          <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: 10, elevation: 3, backgroundColor: 'white' }}>
-            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} />
+          {/* Password */}
+          <View style={[styles.inputRow, { marginTop: 10 }]}>
+            <MaterialIcons name="security" size={24} color="#0a63bcd5" />
             <TextInput
-              style={[styles.inp, press == 4 && { opacity: 1 }]}
-              onFocus={() => setpress(4)}
-              onBlur={() => setpress(0)}
+              style={styles.inp}
+              onFocus={() => setFocusedInput('password')}
+              onBlur={() => setFocusedInput(null)}
               placeholder=" Password"
-              secureTextEntry={chnage}
-              value={paas2}
-              onChangeText={setpass2}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
               returnKeyType="next"
               onSubmitEditing={() => confirmPasswordRef.current?.focus()}
               blurOnSubmit={false}
             />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons name={showPassword ? "lock-open" : "lock-closed"} size={22} color="gray" />
+            </Pressable>
           </View>
-          <Pressable onPress={() => hideing()}>
-            {hide == 10 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
-            {hide == 9 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
-          </Pressable>
-          <Pressable onPress={() => show()}>
-            {hide == 10 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
-            {hide == 9 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
-          </Pressable>
 
-          <View style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, marginTop: -10, elevation: 3, backgroundColor: 'white', height: '12%' }}>
-            <MaterialIcons name={'security'} size={24} color={'#0a63bcd5'} />
+          {/* Confirm Password */}
+          <View style={[styles.inputRow, { marginTop: 10 }]}>
+            <MaterialIcons name="security" size={24} color="#0a63bcd5" />
             <TextInput
               ref={confirmPasswordRef}
-              style={[styles.inp, press == 5 && { opacity: 1 }, { paddingTop: 12 }]}
-              onFocus={() => setpress(5)}
-              onBlur={() => setpress(0)}
+              style={styles.inp}
+              onFocus={() => setFocusedInput('confirm')}
+              onBlur={() => setFocusedInput(null)}
               placeholder=" Confirm Password"
-              secureTextEntry={chnage2}
-              value={pass}
-              onChangeText={setpass}
+              secureTextEntry={!showConfirmPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
               returnKeyType="done"
             />
+            <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Ionicons name={showConfirmPassword ? "lock-open" : "lock-closed"} size={22} color="gray" />
+            </Pressable>
           </View>
-          <Pressable onPress={() => hideing2()}>
-            {hide2 == 12 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
-            {hide2 == 11 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
-          </Pressable>
-          <Pressable onPress={() => show2()}>
-            {hide2 == 12 && <Ionicons name="lock-open" size={24} color="gray" style={{ position: "relative", display: "none", right: -100, top: -40 }} />}
-            {hide2 == 11 && <Ionicons name="lock-closed" size={24} color="gray" style={{ position: "relative", right: -100, top: -40 }} />}
-          </Pressable>
 
           <Pressable
-            style={[styles.btn, press === 6 && { backgroundColor: "rgba(2, 91, 151, 0.49)", opacity: 1 }]}
-            onPressIn={() => setpress(6)}
-            onPressOut={() => setpress(0)}
-            onPress={() => senddata()}
+            style={({ pressed }) => [styles.btn, pressed && { opacity: 0.7 }]}
+            onPress={sendData}
           >
-            <Text style={{ color: "white", textTransform: "capitalize" }}>Signup Here</Text>
+            <Text style={{ color: "white", textTransform: "capitalize" }}>Sign Up</Text>
           </Pressable>
         </View>
       </ScrollView>
 
       <Pressable onPress={() => router.push("./login")}>
         <View style={styles.footer}>
-          <Text style={styles.ftext}>Already have an account? Login</Text>
+          <Text style={styles.footerText}>Already have an account? Login</Text>
         </View>
       </Pressable>
     </View>
@@ -223,23 +184,21 @@ const styles = StyleSheet.create({
     width: 250, height: 250, alignSelf: 'center', mixBlendMode: 'multiply',
   },
   inp: {
-    width: 250,
+    flex: 1,
     height: 50,
-    marginTop: 0,
-    position: "relative",
-    opacity: 1,
   },
-  input: {
+  inputContainer: {
     marginTop: 25,
     alignItems: "center",
-    position: "relative",
-    textTransform: "capitalize",
   },
-  label: {
-    position: "absolute",
-    left: 45,
-    top: 20,
-    backgroundColor: "white",
+  inputRow: {
+    flexDirection: 'row',
+    width: '80%',
+    alignItems: 'center',
+    borderRadius: 14,
+    elevation: 3,
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
   },
   btn: {
     backgroundColor: "#0a63bccb",
@@ -248,24 +207,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 5,
-    opacity: 1,
-  },
-  hr: {
-    borderBottomWidth: 1,
-    marginTop: 20,
-    borderBottomColor: "skyblue",
-    width: 300,
-    alignSelf: "center",
+    marginTop: 15,
   },
   footer: {
     backgroundColor: "#0a63bcd5",
     height: 68,
     alignItems: "center",
     justifyContent: "center",
-    color: "white",
   },
-  ftext: {
+  footerText: {
     color: "white",
     textTransform: "capitalize",
     width: 210,

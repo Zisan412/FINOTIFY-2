@@ -27,12 +27,8 @@ const fetchEntries = useCallback(() => {
         params: { user: userId },
         headers: { Authorization: `Bearer ${token}` },
       });
-      // console.log('res.data:', res.data); // structure dekh
-const data = res.data.data || res.data;
-setEntries(res.data.dashboard || []);
-    } catch (err) {
-      console.log('Stats fetch error:', err.message);
-    }
+      setEntries(res.data.dashboard || []);
+    } catch (err) {}
   };
   load();
 }, []);

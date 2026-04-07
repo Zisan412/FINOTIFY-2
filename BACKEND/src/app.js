@@ -12,7 +12,4 @@ connectDB(); // ✅ DB connect
 
 app.use("/user", register); // ✅ Routes mount
 
-console.log("JWT:", process.env.JWT_TOKEN);
-console.log("MONGO:", process.env.MONGODB_URI);
-
 module.exports = app;
