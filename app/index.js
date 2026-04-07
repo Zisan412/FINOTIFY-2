@@ -41,7 +41,7 @@ const Mainpage = () => {
   return (
     <ImageBackground style={styles.container}>
       <Image 
-        source={require("../assets/finotifylogo-transparent.png")} 
+        source={require("../assets/finotifylogotransparent.png")} 
         style={styles.logo}
         resizeMode="contain" 
       />
