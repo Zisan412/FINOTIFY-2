@@ -23,7 +23,6 @@ const Mainpage = () => {
     async function getdata() {
       try {
         const token = await AsyncStorage.getItem('token');
-        console.log('Token:', token);
         if (token) {
           router.replace('./dashboard/dashboard'); // ✅ replace use karo push nahi
         }
@@ -41,7 +40,7 @@ const Mainpage = () => {
   return (
     <ImageBackground style={styles.container}>
       <Image 
-        source={require("../assets/finotifylogotransparent.png")} 
+        source={require("../assets/finotifylogo.png")} 
         style={styles.logo}
         resizeMode="contain" 
       />
