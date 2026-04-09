@@ -48,7 +48,7 @@ router.put("/usertable/update-profile", async (req, res) => {
 
     } catch (error) {
         console.error("Error updating user profile:", error);
-        res.status(500).json({ success: false, message: "Server error occurred" });
+        res.status(500).json({ success: false, message: error.message || "Server error occurred" });
     }
 });
 

@@ -59,7 +59,8 @@ const EditProfile = () => {
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Failed to connect to the server.");
+      const errorMsg = error.response?.data?.message || "Failed to connect to the server.";
+      Alert.alert("Error", errorMsg);
     } finally {
       setIsSubmitting(false);
     }
