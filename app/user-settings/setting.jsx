@@ -106,10 +106,13 @@ useEffect(() => {
                 <Text style={styles.avatarText}>{userName.charAt(0).toUpperCase()}</Text>
                 <View style={styles.onlineStatus} />
               </View>
-              <View>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.userName}>{userName}</Text>
                 <Text style={styles.userEmail}>{userEmail}</Text>
               </View>
+              <Pressable style={styles.editProfileBtn} onPress={() => router.push("../user-settings/edit-profile")}>
+                <Text style={styles.editProfileText}>Edit</Text>
+              </Pressable>
             </View>
             
           </View>

@@ -9,42 +9,57 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   ScrollView,
+  Alert
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import { BASE_URL } from "../../constants/Config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Feedback = () => {
-  const [feedback, setFeedback] = useState("");
+const EditProfile = () => {
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!feedback.trim()) {
-      alert("Please enter your feedback");
+  useEffect(() => {
+    AsyncStorage.getItem('userName').then(name => { if (name) setUserName(name); });
+    AsyncStorage.getItem('userEmail').then(email => { if (email) setUserEmail(email); });
+    AsyncStorage.getItem('userId').then(id => { if (id) setUserId(id); });
+  }, []);
+
+  const handleUpdate = async () => {
+    if (!userName.trim() || !userEmail.trim()) {
+      Alert.alert("Error", "Name and email cannot be empty.");
+      return;
+    }
+
+    if (!userId) {
+      Alert.alert("Error", "User details missing.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const userName = await AsyncStorage.getItem("userName") || "Unknown User";
-      
-      const response = await axios.post(`${BASE_URL}/feedback/add`, {
-        username: userName,
-        desc: feedback,
+      const response = await axios.put(`${BASE_URL}/usertable/update-profile`, {
+        userId: userId,
+        newName: userName,
+        newEmail: userEmail,
       });
 
       if (response.data.success) {
-        alert("Thank you for your feedback! ❤️");
-        router.back();
+        await AsyncStorage.setItem('userName', userName);
+        await AsyncStorage.setItem('userEmail', userEmail);
+        Alert.alert("Success", "Profile updated successfully! 🚀");
+        router.replace("../user-settings"); // Go back and force setting to reload
       } else {
-        alert("Something went wrong!");
+        Alert.alert("Error", response.data.message || "Could not update profile.");
       }
     } catch (error) {
-      console.error("Error sending feedback:", error);
-      alert("Error submitting feedback. Please try again.");
+      console.error(error);
+      Alert.alert("Error", "Failed to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -61,8 +76,8 @@ const Feedback = () => {
             <Ionicons name="arrow-back" size={24} color="#1e293b" />
           </Pressable>
           <View style={styles.headerText}>
-            <Text style={styles.title}>Feedback</Text>
-            <Text style={styles.subtitle}>Help us improve Finotify</Text>
+            <Text style={styles.title}>Edit Profile</Text>
+            <Text style={styles.subtitle}>Update your Finotify account</Text>
           </View>
         </View>
 
@@ -73,21 +88,29 @@ const Feedback = () => {
         >
           <View style={styles.card}>
             <View style={styles.iconCircle}>
-              <Ionicons name="chatbubble-ellipses" size={32} color="#0a63bc" />
+              <Ionicons name="person-outline" size={32} color="#0a63bc" />
             </View>
-            <Text style={styles.cardTitle}>Share your thoughts</Text>
-            <Text style={styles.cardInfo}>
-              Your feedback is important to us. Tell us what you like or what we can improve.
-            </Text>
 
             <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Full Name</Text>
               <TextInput
-                placeholder="Type your message here..."
+                placeholder="Enter your name"
                 style={styles.input}
-                multiline
-                numberOfLines={6}
-                value={feedback}
-                onChangeText={setFeedback}
+                value={userName}
+                onChangeText={setUserName}
+                placeholderTextColor="#94a3b8"
+              />
+            </View>
+
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                placeholder="Enter your email"
+                style={styles.input}
+                value={userEmail}
+                onChangeText={setUserEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
                 placeholderTextColor="#94a3b8"
               />
             </View>
@@ -96,15 +119,15 @@ const Feedback = () => {
               style={({ pressed }) => [
                 styles.submitBtn,
                 pressed && styles.btnPressed,
-                !feedback.trim() && styles.disabledBtn
+                (!userName.trim() || !userEmail.trim()) && styles.disabledBtn
               ]}
-              onPress={handleSubmit}
-              disabled={isSubmitting || !feedback.trim()}
+              onPress={handleUpdate}
+              disabled={isSubmitting || !userName.trim() || !userEmail.trim()}
             >
               <Text style={styles.submitText}>
-                {isSubmitting ? "Sending..." : "Send Feedback"}
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Text>
-              {!isSubmitting && <Ionicons name="send" size={18} color="#fff" />}
+              {!isSubmitting && <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />}
             </Pressable>
           </View>
         </ScrollView>
@@ -113,7 +136,7 @@ const Feedback = () => {
   );
 };
 
-export default Feedback;
+export default EditProfile;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -176,34 +199,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1e293b',
-    marginBottom: 10,
-  },
-  cardInfo: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 25,
-    paddingHorizontal: 10,
-  },
   inputWrapper: {
     width: '100%',
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#64748b',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  input: {
     backgroundColor: '#f8fafc',
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 16,
     borderWidth: 1.5,
     borderColor: '#f1f5f9',
-    marginBottom: 25,
-  },
-  input: {
     fontSize: 16,
     color: '#1e293b',
-    minHeight: 120,
-    textAlignVertical: 'top',
     fontWeight: '500',
   },
   submitBtn: {
@@ -220,6 +234,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
+    marginTop: 10,
   },
   submitText: {
     color: '#fff',
