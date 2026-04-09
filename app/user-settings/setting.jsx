@@ -110,7 +110,7 @@ useEffect(() => {
                 <Text style={styles.userName}>{userName}</Text>
                 <Text style={styles.userEmail}>{userEmail}</Text>
               </View>
-              <Pressable style={styles.editProfileBtn} onPress={() => router.push("../user-settings/edit-profile")}>
+              <Pressable style={styles.editProfileBtn} onPress={() => router.push("./edit-profile")}>
                 <Text style={styles.editProfileText}>Edit</Text>
               </Pressable>
             </View>
@@ -144,7 +144,7 @@ useEffect(() => {
                 icon="chatbubble-ellipses-outline"
                 title="Send Feedback"
                 color="#00897b"
-                onPress={() => router.push("../user-settings/feedback")}
+                onPress={() => router.push("./feedback")}
               />
               <SettingItem
                 icon="help-circle-outline"
