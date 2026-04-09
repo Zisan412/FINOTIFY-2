@@ -7,7 +7,7 @@ import axios from "axios";
 import { BASE_URL } from "../../constants/Config";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 
-const Expenses = ({ go, onDelete }) => {
+const Expenses = ({ go = [], onDelete }) => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
 

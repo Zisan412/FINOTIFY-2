@@ -2,6 +2,7 @@
   "expo": {
     "name": "Finotify",
     "slug": "finotify",
+    "scheme": "finotify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/flogo.png",

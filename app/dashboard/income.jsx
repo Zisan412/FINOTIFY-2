@@ -7,7 +7,7 @@ import axios from "axios";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { BASE_URL } from "../../constants/Config";
 
-const Income = ({ go, onDelete }) => {
+const Income = ({ go = [], onDelete }) => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
 

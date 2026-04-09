@@ -13,7 +13,7 @@ const STANDARD_CATEGORIES = [
   '💵 Other',
 ];
 
-const Total = ({ go }) => {
+const Total = ({ go = [] }) => {
   const summary = {};
 
   go.forEach(item => {
