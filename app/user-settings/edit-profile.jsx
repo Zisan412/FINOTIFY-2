@@ -53,7 +53,7 @@ const EditProfile = () => {
         await AsyncStorage.setItem('userName', userName);
         await AsyncStorage.setItem('userEmail', userEmail);
         Alert.alert("Success", "Profile updated successfully! 🚀");
-        router.replace("../user-settings"); // Go back and force setting to reload
+        router.replace("/user-settings/setting"); // Go back to settings page
       } else {
         Alert.alert("Error", response.data.message || "Could not update profile.");
       }
