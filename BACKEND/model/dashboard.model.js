@@ -12,7 +12,7 @@ const DashboardSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
-    deletedByUser: {        // ✅ NEW — soft delete flag
+    deletedByUser: {        
         type: Boolean,
         default: false
     },

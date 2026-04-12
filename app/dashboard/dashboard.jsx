@@ -278,9 +278,13 @@ const Dashboard = () => {
   }, [monthlyData, searchQuery, filters, activeTab]);
 
   const totals = useMemo(() => {
-    const income = monthlyData.filter((i) => i.type === "income").reduce((s, j) => s + j.amount, 0);
-    const expense = monthlyData.filter((i) => i.type === "expense").reduce((s, k) => s + k.amount, 0);
-    return { balance: income - expense, income, expense };
+    const income = monthlyData.filter((i) => i.type === "income").reduce((s, j) => s + parseFloat(j.amount), 0);
+    const expense = monthlyData.filter((i) => i.type === "expense").reduce((s, k) => s + parseFloat(k.amount), 0);
+    return { 
+      balance: parseFloat((income - expense).toFixed(2)), 
+      income: parseFloat(income.toFixed(2)), 
+      expense: parseFloat(expense.toFixed(2)) 
+    };
   }, [monthlyData]);
 
   const handleRefresh = () => {

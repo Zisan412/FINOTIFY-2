@@ -73,7 +73,7 @@ const AddData = () => {
     if (amm) setAmount(String(amm));
     if (cat) setCategory(cat);
     if (des) setDesc(des);
-    if (bankN && bankN !== 'undefined') setBankName(bankN === 'Cash' ? '' : bankN);
+    if (bankN && bankN !== 'undefined') setBankName(bankN);
     if (upi && upi !== 'undefined') setUpiId(upi);
   }
 }, [editId]);
@@ -341,7 +341,7 @@ const AddData = () => {
             </View>
 
             {/* UPI ID — shown only when a real bank is selected */}
-            {bankName ? (
+            {bankName && bankName !== 'Cash' ? (
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>UPI ID <Text style={styles.optionalTag}>(Optional)</Text></Text>
                 <View style={[
@@ -718,13 +718,13 @@ const AddData = () => {
               {/* Cash option */}
               <Pressable
                 style={styles.catItem}
-                onPress={() => { setBankName(''); setUpiId(''); setShowBank(false); }}
+                onPress={() => { setBankName('Cash'); setUpiId(''); setShowBank(false); }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                   <Ionicons name="cash-outline" size={20} color="#10b981" />
                   <Text style={styles.catText}>Cash</Text>
                 </View>
-                {!bankName && <Ionicons name="checkmark-circle" size={18} color="#10b981" />}
+                {(!bankName || bankName === 'Cash') && <Ionicons name="checkmark-circle" size={18} color="#10b981" />}
               </Pressable>
 
               {/* User-added banks with delete */}

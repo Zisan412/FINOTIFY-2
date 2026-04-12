@@ -92,13 +92,13 @@ useEffect(() => {
     return true;
   });
 
-  const income = filtered
+  const income = parseFloat(filtered
     .filter((e) => e.type === 'income')
-    .reduce((sum, e) => sum + Number(e.amount), 0);
+    .reduce((sum, e) => sum + Number(e.amount), 0).toFixed(2));
 
-  const expense = filtered
+  const expense = parseFloat(filtered
     .filter((e) => e.type === 'expense')
-    .reduce((sum, e) => sum + Number(e.amount), 0);
+    .reduce((sum, e) => sum + Number(e.amount), 0).toFixed(2));
 
   return [
     {
@@ -132,7 +132,7 @@ useEffect(() => {
   ];
 },
 [entries, selectedFilter, startDate, endDate]);
-  const total = pieData.reduce((acc, curr) => acc + curr.value, 0);
+  const total = parseFloat(pieData.reduce((acc, curr) => acc + curr.value, 0).toFixed(2));
 
   // Clean, minimal data for PieChart with external labels
   const minimalPieData = useMemo(() => {

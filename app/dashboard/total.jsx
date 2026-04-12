@@ -13,7 +13,7 @@ const STANDARD_CATEGORIES = [
   '💵 Other',
 ];
 
-const Total = ({ go = [] }) => {
+const Total = ({ go }) => {
   const summary = {};
 
   go.forEach(item => {
@@ -21,8 +21,14 @@ const Total = ({ go = [] }) => {
     if (!summary[cat]) {
       summary[cat] = { income: 0, expense: 0 };
     }
-    if (item.type === "income") summary[cat].income += item.amount;
-    else summary[cat].expense += item.amount;
+    if (item.type === "income") summary[cat].income += parseFloat(item.amount);
+    else summary[cat].expense += parseFloat(item.amount);
+  });
+
+  // rounding step for all fields
+  Object.keys(summary).forEach(cat => {
+    summary[cat].income = parseFloat(summary[cat].income.toFixed(2));
+    summary[cat].expense = parseFloat(summary[cat].expense.toFixed(2));
   });
 
   const extraCategories = Object.keys(summary).filter(
@@ -30,9 +36,9 @@ const Total = ({ go = [] }) => {
   );
   const allCategories = [...STANDARD_CATEGORIES, ...extraCategories];
 
-  const totalIncome = Object.values(summary).reduce((s, c) => s + c.income, 0);
-  const totalExpense = Object.values(summary).reduce((s, c) => s + c.expense, 0);
-  const totalBalance = totalIncome - totalExpense;
+  const totalIncome = parseFloat(Object.values(summary).reduce((s, c) => s + c.income, 0).toFixed(2));
+  const totalExpense = parseFloat(Object.values(summary).reduce((s, c) => s + c.expense, 0).toFixed(2));
+  const totalBalance = parseFloat((totalIncome - totalExpense).toFixed(2));
 
   return (
     <ScrollView
