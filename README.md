@@ -1,95 +1,155 @@
-Manual expense tracking fails in practice people forget entries, miscategorize transactions, or abandon the app within days.
+<div align="center">
 
-Finotify eliminates that friction entirely. It reads UPI and bank transaction SMS messages directly on the device, parses them automatically, and builds a complete financial record without any manual input. Users can also add income or expenses manually when needed, making it a comprehensive solution for daily personal finance management.
+<img src="assets/1app.png" alt="Finotify Logo" width="100"/>
 
+# 💰 Finotify
 
-Features
+### Automated personal finance tracking for Android — powered by SMS intelligence
 
-Automated Transaction Detection
+[![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactnative.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Railway](https://img.shields.io/badge/Deployed-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)](https://railway.app)
+[![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 
-Parses UPI and bank SMS messages using pattern-matched regex. Identifies transaction type (credit/debit), amount, and merchant — and logs the entry instantly without user intervention.
+</div>
 
-Incremental Scan Engine
+---
 
-On refresh, the app scans only from the last recorded entry timestamp — preventing duplicates and ensuring no transaction is missed across sessions.
+## 🚩 The Problem
 
-Dashboard & Filtering
+Most people give up on expense tracking apps within days — not because they lack discipline, but because the apps demand constant manual input. Entering every transaction by hand is tedious, prone to errors, and easy to forget.
 
-Tabbed transaction view (All / Income / Expense) with keyword search and custom date range filters for quick financial review.
+**Finotify removes that barrier entirely.**
 
-Manual Entry Support
+It reads UPI and bank SMS messages directly on the device, parses them automatically, and builds a complete financial record without any manual effort. For everything else — cash transactions, salary credits, custom entries — users can add records manually too, making it a single source of truth for personal finance.
 
-Users can manually add income or expense entries, ensuring all financial activity is captured in one place — even transactions that don't come through SMS.
+---
 
-Due Payments Tracker
+## ✨ Features
 
-Dedicated screen for tracking upcoming or pending payments, helping users stay on top of recurring obligations.
+**📲 Automated SMS Transaction Detection**
+Scans the device inbox for UPI and bank messages using pattern-matched regex. Identifies transaction type (credit/debit), amount, merchant, and bank — and logs the entry instantly without user intervention.
 
-Monthly Statistics & Reports
+**🔄 Incremental Scan Engine**
+On refresh, the app scans only from the last recorded entry's timestamp — no duplicates, no missed transactions across sessions.
 
-Visual breakdown of income vs. expense trends across months. Helps users understand spending patterns and plan finances effectively.
+**📊 Dashboard with Filters**
+Tabbed transaction view across All / Income / Expense. Supports keyword search, category filters, sort options, and custom date ranges for fast financial review.
 
-Secure Authentication
+**✏️ Manual Entry Support**
+Users can add income or expense entries by hand — covering cash payments, salary, and any transaction not captured via SMS.
 
-JWT-based login and registration. Password recovery via OTP delivered through transactional email API.
+**🗓️ Due Payments Tracker**
+A dedicated screen to track money you owe or are owed. Supports Pay / Receive types with notes and due dates.
 
-Soft Delete
+**📈 Financial Stats**
+Visual donut chart showing income vs expense breakdown. Supports This Week, This Month, and Custom date range views.
 
-Deleted entries are flagged in the database rather than permanently removed — preventing re-insertion on the next SMS scan.
+**🔐 Secure Authentication**
+JWT-based login and registration with forgot password flow. OTP delivered to registered email via transactional email API.
 
+**🗑️ Soft Delete**
+Deleted entries are flagged in the database — not permanently removed — preventing them from being re-inserted on the next SMS scan.
 
-Tech Stack
+---
 
-LayerTechnologyMobile FrontendReact Native (Expo Router)Backend APINode.js, Express.jsDatabaseMongoDB AtlasAuthenticationJWTDeploymentRailwayBuildEAS (Expo Application Services)
+## 🛠️ Tech Stack
 
+| Layer | Technology |
+|---|---|
+| 📱 Mobile Frontend | React Native (Expo Router) |
+| ⚙️ Backend API | Node.js, Express.js |
+| 🗄️ Database | MongoDB Atlas |
+| 🔑 Authentication | JWT |
+| 📧 Email (OTP) | Brevo Transactional API |
+| 🚀 Deployment | Railway |
+| 📦 APK Build | EAS (Expo Application Services) |
 
-Architecture
+---
 
+## 🏗️ Architecture
+
+```
 FINOTIFY-2/
-├── FRONTEND/               # React Native (Expo Router)
-│   ├── app/                # Screens — Dashboard, Stats, Auth, Due
-│   └── components/         # Shared UI components
+├── app/                        # React Native screens (Expo Router)
+│   ├── authentication/         # Login, Signup, Forgot Password, OTP
+│   ├── dashboard/              # Main dashboard, filters, manual entry
+│   ├── charts/                 # Financial stats screen
+│   ├── due-payment/            # Due management screen
+│   └── user-settings/          # Profile and settings
 │
-└── BACKEND/                # REST API
+├── assets/                     # App icon and images
+├── constants/                  # Config (BASE_URL)
+│
+└── BACKEND/
     └── src/
-        ├── app.js          # Express application
-        ├── server.js       # Entry point
-        ├── db/             # MongoDB connection
-        └── routes/         # API route definitions
+        ├── app.js              # Express app entry point
+        ├── server.js           # Server startup
+        ├── db/                 # MongoDB connection
+        └── routes/             # Auth, Dashboard, Due, SMS, Feedback, Password
+```
 
+---
 
-How It Works
+## ⚙️ How It Works
 
+1. 🔐 User registers and logs in → JWT token stored locally via AsyncStorage
+2. 📩 App requests SMS read permission on Android
+3. 🔍 On load or refresh, device inbox is scanned for bank/UPI messages
+4. 🧠 Regex engine identifies transaction type, amount, merchant, and bank
+5. 💾 New entries (after last saved timestamp) are sent to the backend and stored in MongoDB
+6. 📋 Dashboard renders live data with filtering and search
+7. 📊 Stats screen aggregates data into income/expense visualizations
+8. 🗓️ Due screen tracks pending payments and receivables separately
+9. 🔑 Forgot password → OTP sent to email → user resets password
 
-User authenticates → JWT token issued and stored locally
-App reads device SMS inbox and applies regex patterns to detect bank/UPI transactions
-Parsed data (amount, type, merchant, date) is sent to the backend and stored in MongoDB Atlas
-Dashboard displays live transaction data with filters and search
-On each refresh, only messages since the last entry are processed — no duplicates
-Stats screen aggregates data for monthly income/expense visualization
-Due screen tracks upcoming payments separately from regular transactions
+---
 
+## 📸 Screenshots
 
+| Welcome | Login | Register |
+|---|---|---|
+| ![](screenshots/welcome.png) | ![](screenshots/login.png) | ![](screenshots/register.png) |
 
-Screenshots
+| Dashboard | Filters | Stats |
+|---|---|---|
+| ![](screenshots/dashboard.png) | ![](screenshots/filters.png) | ![](screenshots/stats.png) |
 
-WelcomeDashboardManual EntryShow ImageShow ImageShow Image
+| Due Management | Add Due Entry | Settings |
+|---|---|---|
+| ![](screenshots/due.png) | ![](screenshots/add_due.png) | ![](screenshots/settings.png) |
 
-StatsDue PaymentsSettingsShow ImageShow ImageShow Image
+---
 
+## 🗄️ Data Models
 
-To add screenshots: create a screenshots/ folder in the repo root and upload your images with the filenames above.
+**📋 Dashboard (Transactions)**
+`amount`, `bankName`, `category`, `type` (income/expense), `date`, `desc`, `upiId`, `user` (ref), `deletedByUser`, `createdAt`
 
+**🗓️ Due Records**
+`type` (pay/receive), `name`, `amount`, `note`, `date`, `user` (ref)
 
+**👤 Users**
+`name`, `phonenumber`, `email`, `password`, `since`
 
+---
 
-Team
+## 🔮 Future Enhancements
 
-NameRoleZisanFull Stack DevelopmentMusabFull Stack DevelopmentSahilFull Stack Development
+- 💱 Multi-currency support
+- 🤖 AI-powered auto-categorization of expenses
+- 📶 Offline storage for data access without internet
+- 📄 Bank statement import via Excel or PDF
+- 🏦 Expanded transaction support for NEFT, RTGS
+- 📊 Smart spending reports with insights
 
+---
 
-Status
+## 👥 Team
 
-Developed and demonstrated as part of BCA Semester 6 project evaluation at Asia Pacific BCA College, Ahmedabad.
+Built as a final semester grand project at Asia Pacific BCA College, Ahmedabad — submitted to Gujarat University under the Faculty of Computer Applications.
 
-APK available on request.
+- Shaikh Mohammed Zisan Naib Husen
+- Mansuri Sahil Sakilbhai
+- Momin Mohammad Musab Sijauddin
