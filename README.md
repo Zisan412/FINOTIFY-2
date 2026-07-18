@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/1app.png" alt="Finotify Logo" width="100"/>
+<img src="screenshots/logo.jpeg" alt="Finotify Logo" width="100"/>
 
 # 💰 Finotify
 
