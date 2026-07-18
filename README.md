@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="screenshots/logo.jpeg" alt="Finotify Logo" width="100"/>
 
 # 💰 Finotify
 
@@ -103,22 +102,6 @@ FINOTIFY-2/
 7. 📊 Stats screen aggregates data into income/expense visualizations
 8. 🗓️ Due screen tracks pending payments and receivables separately
 9. 🔑 Forgot password → OTP sent to email → user resets password
-
----
-
-## 📸 Screenshots
-
-| Welcome | Login | Register |
-|---|---|---|
-| ![](screenshots/welcome.png) | ![](screenshots/login.png) | ![](screenshots/register.png) |
-
-| Dashboard | Filters | Stats |
-|---|---|---|
-| ![](screenshots/dashboard.png) | ![](screenshots/filters.png) | ![](screenshots/stats.png) |
-
-| Due Management | Add Due Entry | Settings |
-|---|---|---|
-| ![](screenshots/due.png) | ![](screenshots/add_due.png) | ![](screenshots/settings.png) |
 
 ---
 
